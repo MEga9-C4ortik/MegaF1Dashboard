@@ -3,21 +3,31 @@
     align-items: center;
     justify-content: space-between;
     padding: 0 40px;
-    height: 70px;
-    background: #111;
+    height: 120px;
+    background: #0a0a0a;
     border-bottom: 2.5px solid #1a1a1a;
     position: sticky;
     top: 0;
     z-index: 100;
+    flex-wrap: wrap;
+}
+
+.left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .logo {
-    height: 50px;
+    height: 70px;
 }
 
 .header {
-    font-size: 50px;
+    font-size: 40px;
     color: #e10600;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
 .links {
@@ -31,12 +41,9 @@
     padding: 6px 16px;
     letter-spacing: 1.2px;
     text-transform: uppercase;
-    border-radius: 8px;
+    border-radius: 16px;
     transition: all 0.15s;
     text-decoration: none;
-}
-
-.link {
     color: #fff;
 }
 
@@ -46,16 +53,22 @@
 }
 
 .linkActive {
-    color: #fff;
-    background: #322;
-    border-bottom: 1.8px solid #e10600;
+    color: #e10600;
+    background: #151515;
+    border-bottom: 2px solid #e10600;
+}
+
+.right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .yearSelect {
     background: #111;
     color: #888;
     border: 1px solid #1e1e1e;
-    border-radius: 8px;
+    border-radius: 2px;
     padding: 5px 10px;
     font-size: 20px;
     font-family: 'JetBrains Mono', monospace;
@@ -65,7 +78,104 @@
     transition: border-color 0.15s, color 0.15s;
 }
 
-.yearSelect:hover, .yearSelect:focus {
+.yearSelect:hover {
     border-color: #e10600;
     color: #fff;
+}
+
+.burger {
+    display: none;
+    background: transparent;
+    color: #e10600;
+    font-size: 22px;
+    padding: 4px;
+    border: 1px solid #222;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+}
+
+.burgerText {
+
+}
+
+.mobileMenu {
+    visibility: hidden;
+    pointer-events: none;
+    position: absolute;
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 0 20px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        flex-wrap: wrap;
+        min-height: 60px;
+        height: auto;
+        overflow: visible;
+    }
+
+    .logo {
+        display: none;
+    }
+
+    .header {
+        font-size: 18px;
+    }
+
+    .links {
+        display: none;
+    }
+
+    .burger {
+        display: block;
+    }
+
+    .yearSelect{
+        font-size: 16px;
+    }
+
+    .mobileMenu {
+        visibility: visible;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        background: #0a0a0a;
+        gap: 2px;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        z-index: 99;
+        padding: 12px 20px;
+        border-bottom: 1px solid #1a1a1a;
+
+        transform: translateY(-110%);
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 0.3s ease, opacity 0.25s ease;
+    }
+
+    .mobileMenuOpen {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: all;
+    }
+
+    .mobileLink, .mobileLinkActive {
+        font-size: 16px;
+        font-weight: 600;
+        padding: 8px 8px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        transition: all 0.15s;
+        border-bottom: 1px solid #1a1a1a;
+    }
+
+    .mobileLink:hover {
+        color: #fff;
+        background: #151515;
+    }
 }

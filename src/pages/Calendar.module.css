@@ -35,9 +35,9 @@
 
 .card {
     background: #111;
-    border: 1.5px solid #ffffff;
+    border: 1.5px solid #666;
     border-radius: 4px;
-    padding: 18px 20px;
+    padding: 8px 14px;
     cursor: pointer;
     position: relative;
     overflow: hidden;
@@ -56,8 +56,8 @@
 }
 
 .card:hover {
-    border-color: #fff;
-    background: #141414;
+    border-color: #eee;
+    transform: translateY(-4%);
 }
 
 .card:hover::before {
@@ -89,19 +89,19 @@
 
 .round {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
+    font-size: 14px;
     color: #eee;
     letter-spacing: 1px;
     text-transform: uppercase;
 }
 
 .badge {
-    font-size: 12px;
+    font-size: 16px;
     padding: 5px 7px;
-    border-radius: 2px;
+    border-radius: 4px;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 600;
+    letter-spacing: 1.3px;
+    font-weight: 400;
     font-family: 'JetBrains Mono', monospace;
 }
 
@@ -112,7 +112,6 @@
 }
 
 .badgeDone {
-    background: transparent;
     color: #333;
     border: 1px solid #1e1e1e;
 }
@@ -120,12 +119,12 @@
 .badgeUpcoming {
     background: transparent;
     color: #eee;
-    border: 2px solid #eee;
+    border: 1px solid #eee;
     border-radius: 4px;
 }
 
 .country {
-    font-size: 16px;
+    font-size: 17px;
     color: #eee;
     text-transform: uppercase;
     letter-spacing: 1.5px;
@@ -142,7 +141,7 @@
 }
 
 .circuit {
-    font-size: 18px;
+    font-size: 20px;
     color: #fff;
     margin-bottom: 16px;
     letter-spacing: 0.8px;
@@ -163,13 +162,13 @@
 }
 
 .detailsBtn {
-    font-size: 10px;
+    font-size: 16px;
     letter-spacing: 1.5px;
     text-transform: uppercase;
     color: #e10600;
     background: transparent;
     padding: 4px 10px;
-    border: 2px solid #fff;
+    border: 1px solid #fff;
     border-radius: 4px;
     font-family: 'Rajdhani', sans-serif;
     transition: all 0.15s;
@@ -196,4 +195,35 @@
     padding: 80px;
     color: #e10600;
     font-family: 'JetBrains Mono', monospace;
+}
+
+@media (max-width: 768px) {
+    .page {
+        padding: 20px 16px;
+    }
+
+    .title {
+        font-size: 30px;
+    }
+
+    .subtitle {
+        font-size: 18px;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .raceName {
+        font-size: 22px;
+    }
+
+    .date {
+        font-size: 18px;
+    }
+
+    .circuit {
+        font-size: 18px;
+    }
 }
