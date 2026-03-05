@@ -157,3 +157,72 @@
     color: #e10600;
     font-family: 'JetBrains Mono', monospace;
 }
+
+@media (max-width: 768px) {
+    .page {
+        padding: 16px;
+    }
+
+    .header {
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 16px;
+    }
+
+    .raceName {
+        font-size: 22px;
+    }
+
+    .circuit {
+        font-size: 16px;
+    }
+
+    .content {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .btnHub {
+        flex-direction: row;
+        overflow-x: auto;
+        min-width: unset;
+        border-bottom: 1px solid #1a1a1a;
+        padding-bottom: 0;
+        gap: 0;
+    }
+
+    .btn {
+        border-left: none;
+        border-bottom: 3px solid transparent;
+        white-space: nowrap;
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+
+    .tabActive {
+        border-left: none;
+        border-bottom-color: #e10600;
+        background: transparent;
+    }
+
+    .team {
+        display: none;
+    }
+
+    .driverName {
+        display: none;
+    }
+
+    .results {
+        padding: 0;
+    }
+
+    .pos, .time, .pts {
+        font-size: 14px;
+        padding: 10px 8px;
+    }
+
+    .driverCode {
+        font-size: 14px;
+    }
+}
