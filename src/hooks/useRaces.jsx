@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fetchRaces } from '../services/jolpiApi';
+import { fetchRaces } from '../services/JolpiApi';
 
 function useRaces(year) {
     const [races, setRaces] = useState([]);
