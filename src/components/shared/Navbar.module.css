@@ -1,0 +1,71 @@
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    height: 70px;
+    background: #0a0a0a;
+    border-bottom: 2.5px solid #1a1a1a;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo {
+    height: 50px;
+}
+
+.header {
+    font-size: 50px;
+    color: #e10600;
+}
+
+.links {
+    display: flex;
+    gap: 2px;
+}
+
+.link, .linkActive {
+    font-size: 20px;
+    font-weight: 600;
+    padding: 6px 16px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    border-radius: 16px;
+    transition: all 0.15s;
+    text-decoration: none;
+}
+
+.link {
+    color: #fff;
+}
+
+.link:hover {
+    color: #e10600;
+    background: #151515;
+}
+
+.linkActive {
+    color: #fff;
+    background: #151515;
+    border-bottom: 2px solid #e10600;
+}
+
+.yearSelect {
+    background: #111;
+    color: #888;
+    border: 1px solid #1e1e1e;
+    border-radius: 2px;
+    padding: 5px 10px;
+    font-size: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    cursor: pointer;
+    outline: none;
+    letter-spacing: 1px;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+.yearSelect:hover, .yearSelect:focus {
+    border-color: #e10600;
+    color: #fff;
+}

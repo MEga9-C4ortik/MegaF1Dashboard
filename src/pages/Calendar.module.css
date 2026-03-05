@@ -1,85 +1,198 @@
 .page {
-    padding: 40px;
-    max-width: 100%;
-    margin: 0 auto;
+    padding: 32px 40px;
+    width: 100%;
+}
+
+.header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 32px;
+    border-bottom: 2px solid #1a1a1a;
+    padding-bottom: 20px;
 }
 
 .title {
-    font-size: 50px;
-    font-weight: bold;
-    text-align: center;
+    font-size: 45px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
 }
 
-.main {
+.subtitle {
+    font-size: 24px;
+    color: #555;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 1px;
+}
+
+.grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 12px;
 }
 
 .card {
-    background: #1a1a1a;
-    border: 5px solid #2a2a2a;
-    border-radius: 16px;
-    padding: 0 10px 2px 10px;
-    transition: transform 0.2s, border-color 0.2s;
+    background: #111;
+    border: 1.5px solid #1e1e1e;
+    border-radius: 4px;
+    padding: 18px 20px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.15s, background 0.15s;
 }
+
+.card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background: #222;
+    transition: background 0.15s;
+}
+
 .card:hover {
-    transform: scale(1.05);
-    border-color: #e10600;
+    border-color: #2a2a2a;
+    background: #141414;
+}
+
+.card:hover::before {
+    background: #e10600;
+}
+
+/* прошедшая гонка */
+.cardPast {
+    opacity: 0.6;
+}
+
+.cardPast:hover {
+    opacity: 1;
+}
+
+.cardNext {
+    border-color: rgba(225, 6, 0, 0.7);
+    background: #130a0a;
+}
+
+.cardNext::before {
+    background: #e10600;
+}
+
+.cardTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .round {
-    font-size: 18px;
-    color: #888888;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #333;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.badge {
+    font-size: 12px;
+    padding: 5px 7px;
+    border-radius: 2px;
     text-transform: uppercase;
     letter-spacing: 1px;
-    margin-bottom: 8px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.badgeNext {
+    background: rgba(225, 6, 0, 0.11);
+    color: #e10600;
+    border: 1px solid rgba(225, 6, 0, 0.25);
+}
+
+.badgeDone {
+    background: transparent;
+    color: #333;
+    border: 1px solid #1e1e1e;
+}
+
+.badgeUpcoming {
+    background: transparent;
+    color: #444;
+    border: 1px solid #1e1e1e;
+}
+
+.country {
+    font-size: 16px;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
 }
 
 .raceName {
-    color: #ffffff;
-    font-size: 28px;
-    font-weight: 600;
-    margin-bottom: 4px;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    line-height: 1.2;
+    margin-bottom: 3px;
+    color: #eee;
 }
 
 .circuit {
-    font-size: 20px;
-    color: #888888;
-    margin-bottom: 12px;
+    font-size: 18px;
+    color: #3a3a3a;
+    margin-bottom: 16px;
+    letter-spacing: 0.8px;
+}
+
+.dateRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 14px;
+    border-top: 1px solid #1a1a1a;
 }
 
 .date {
-    font-size: 14px;
-    color: #e10600;
-    font-weight: 500;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    color: #666;
 }
 
-.btn {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
+.detailsBtn {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #444;
     background: transparent;
-    border: 3px solid #2a2a2a;
-    border-radius: 8px;
-    color: #ffffff;
-    font-size: 20px;
-    transition: background 0.2s, border-color 0.2s;
+    padding: 4px 10px;
+    border: 1px solid #222;
+    border-radius: 2px;
+    font-family: 'Rajdhani', sans-serif;
+    transition: all 0.15s;
 }
 
-.btn:hover {
-    background: #e10600;
+.detailsBtn:hover {
+    color: #fff;
     border-color: #e10600;
+    background: rgba(225, 6, 0, 0.08);
 }
 
 .loading {
     text-align: center;
     padding: 80px;
-    color: #888888;
+    color: #333;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 50px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
 }
 
 .error {
     text-align: center;
     padding: 80px;
     color: #e10600;
+    font-family: 'JetBrains Mono', monospace;
 }
