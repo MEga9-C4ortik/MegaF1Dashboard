@@ -1,7 +1,7 @@
 .page {
     padding: 32px 40px;
     width: 100%;
-    background: #0f0f0f;
+    background: #222;
 }
 
 .content {
@@ -73,16 +73,30 @@
     transition: background 0.1s;
 }
 
-.table tbody tr:hover {
-    background: #111;
-}
-
 .pos {
     font-family: 'JetBrains Mono', monospace;
     font-size: 18px;
     color: #555;
     padding: 12px 12px 12px 20px;
     width: 40px;
+}
+
+.gold {
+    background: rgba(255, 200, 0, 0.06);
+    border-left: 3px solid #ffc800;
+    color: #ffd700;
+}
+
+.silver {
+    background: rgba(192, 192, 192, 0.06);
+    border-left: 3px solid #c0c0c0;
+    color: #c0c0c0;
+}
+
+.bronze {
+    background: rgba(205, 127, 50, 0.06);
+    border-left: 3px solid #cd7f32;
+    color: #cd7f32;
 }
 
 .driver {
