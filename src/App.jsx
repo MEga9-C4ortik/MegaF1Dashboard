@@ -1,5 +1,5 @@
-import './App.css'
-import {BrowserRouter,Route, Routes} from "react-router-dom";
+import { useState } from 'react'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 import Navbar from './components/shared/Navbar'
 import Calendar from './pages/Calendar'
@@ -8,17 +8,20 @@ import Standings from './pages/Standings'
 import Live from './pages/Live'
 
 function App() {
-  return (
-    <BrowserRouter>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Calendar />} />
-        <Route path="/race/:raceId" element={<Race />} />
-        <Route path="/standings" element={<Standings />} />
-        <Route path="/live" element={<Live />} />
-      </Routes>
-    </BrowserRouter>
-  )
+    const currentYear = new Date().getFullYear();
+    const [year, setYear] = useState(currentYear);
+
+    return (
+        <BrowserRouter>
+            <Navbar year={year} setYear={setYear} />
+            <Routes>
+                <Route path="/" element={<Calendar year={year} />} />
+                <Route path="/race/:raceId" element={<Race year={year} />} />
+                <Route path="/standings" element={<Standings year={year} />} />
+                <Route path="/live" element={<Live />} />
+            </Routes>
+        </BrowserRouter>
+    );
 }
 
 export default App;
