@@ -85,18 +85,47 @@
 
 .burger {
     display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 40px;
+    height: 40px;
     background: transparent;
-    color: #e10600;
-    font-size: 22px;
-    padding: 4px;
     border: 1px solid #222;
     border-radius: 4px;
     cursor: pointer;
     transition: border-color 0.15s;
+    padding: 0;
 }
 
-.burgerText {
+.burger:hover {
+    border-color: #e10600;
+}
 
+/* три полоски */
+.burger span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: #fff;
+    border-radius: 2px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    transform-origin: center;
+}
+
+/* анимация в крест */
+.burgerOpen span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+
+.burgerOpen span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+}
+
+.burgerOpen span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
 }
 
 .mobileMenu {
@@ -130,7 +159,7 @@
     }
 
     .burger {
-        display: block;
+        display: flex;
     }
 
     .yearSelect{

@@ -66,10 +66,12 @@ function Navbar({ year, setYear }) {
                 )}
 
                 <button
-                    className={styles.burger}
+                    className={`${styles.burger} ${menuOpen ? styles.burgerOpen : ''}`}
                     onClick={() => setMenuOpen(!menuOpen)}
                 >
-                    {menuOpen ? '✕' : '☰'}
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </button>
             </div>
         </nav>
