@@ -19,7 +19,9 @@ function Standings({year}) {
     return (
         <div className={styles.page}>
             <div className={styles.header}>
-                <h1 className={styles.title}>Standings {year}</h1>
+                <h1 className={styles.title}>
+                    {activeTab === 'drivers' ? 'Drivers Championship' : 'Constructors Championship'} {year}
+                </h1>
 
                 <div className={styles.tabs}>
                     <button

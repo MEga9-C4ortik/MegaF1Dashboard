@@ -16,7 +16,7 @@
     font-size: 36px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 1.5px;
 }
 
 .tabs {
@@ -27,13 +27,11 @@
 .tab {
     background: transparent;
     color: #555;
-    font-size: 13px;
+    font-size: 20px;
     font-weight: 600;
     letter-spacing: 1.5px;
     text-transform: uppercase;
     padding: 8px 20px;
-    border: 1px solid #1e1e1e;
-    border-radius: 2px;
     font-family: 'Rajdhani', sans-serif;
     transition: all 0.15s;
 }
@@ -45,7 +43,7 @@
 
 .tabActive {
     color: #fff;
-    border-color: #e10600;
+    border-bottom: 3px solid #e10600;
     background: rgba(225, 6, 0, 0.08);
 }
 
@@ -60,8 +58,8 @@
 
 .table th {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    color: #333;
+    font-size: 20px;
+    color: #eee;
     letter-spacing: 2px;
     text-align: left;
     padding: 8px 12px;
@@ -73,29 +71,28 @@
     transition: background 0.1s;
 }
 
-.table tbody tr:hover {
-    background: #111;
-}
-
 .gold {
     border-left: 3px solid #ffc800;
     color: #ffc800;
+    background: rgba(255, 200, 0, 0.9);
 }
 
 .silver {
     border-left: 3px solid #c0c0c0;
     color: #c0c0c0;
+    background: rgba(192, 192, 192, 0.9);
 }
 
 .bronze {
     border-left: 3px solid #cd7f32;
-    color: #cd7f32ж
+    color: #cd7f32;
+    background: rgba(205, 127, 50, 0.9);
 }
 
 .pos {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    color: #555;
+    font-size: 18px;
+    color: #fff;
     padding: 14px 12px;
     width: 40px;
 }
@@ -109,7 +106,7 @@
 
 .driverCode {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
+    font-size: 18px;
     font-weight: 600;
     color: #fff;
     letter-spacing: 1px;
@@ -117,21 +114,15 @@
 }
 
 .driverName {
-    font-size: 14px;
-    color: #888;
-}
-
-.nat {
-    padding: 14px 12px;
-    font-size: 12px;
-    color: #444;
-    letter-spacing: 0.5px;
+    font-size: 18px;
+    color: #fff;
 }
 
 .team {
     padding: 14px 12px;
-    font-size: 13px;
-    color: #666;
+    font-size: 18px;
+    color: #eee;
+    font-weight: 400;
 }
 
 .pts {
@@ -145,8 +136,8 @@
 .wins {
     padding: 14px 12px;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    color: #555;
+    font-size: 18px;
+    color: #fff;
 }
 
 .loading {
@@ -154,7 +145,7 @@
     padding: 80px;
     color: #333;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
+    font-size: 20px;
     letter-spacing: 2px;
     text-transform: uppercase;
 }
@@ -179,5 +170,10 @@
 
     .title {
         font-size: 24px;
+    }
+
+    .table {
+        display: block;
+        overflow-x: auto;
     }
 }
