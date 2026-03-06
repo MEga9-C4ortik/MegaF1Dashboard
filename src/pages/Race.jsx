@@ -44,8 +44,12 @@ function Race() {
         <div className={styles.page}>
             <div className={styles.header}>
                 <div className={styles.headerTop}>
+                    <span className={styles.round}>
+                        round {String(round).padStart(2, '0')}
+                    </span>
+
                     <span className={styles.sessionBadge}>
-                        round {String(round).padStart(2, '0')} | {formatDate(currentData?.date)} | {tabs.find(t => t.key === activeSession)?.label}
+                         {formatDate(currentData?.date)} | {tabs.find(t => t.key === activeSession)?.label}
                     </span>
                 </div>
 

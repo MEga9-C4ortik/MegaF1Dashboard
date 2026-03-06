@@ -14,7 +14,15 @@
 .headerTop {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: left;
+}
+
+.round {
+    font-size: 24px;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 400;
 }
 
 .sessionBadge {
@@ -31,7 +39,7 @@
     text-transform: uppercase;
     letter-spacing: 1px;
     line-height: 1.1;
-    color: #fff;
+    color: #e10600;
 }
 
 .circuit {
@@ -206,12 +214,22 @@
         margin-bottom: 16px;
     }
 
+    .headerTop {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .sessionBadge {
+        font-size: 20px;
+    }
+
     .raceName {
-        font-size: 22px;
+        font-size: 36px;
     }
 
     .circuit {
-        font-size: 16px;
+        font-size: 18px;
+        color: #eee;
     }
 
     .content {
@@ -240,14 +258,6 @@
         border-left: none;
         border-bottom-color: #e10600;
         background: transparent;
-    }
-
-    .team {
-        display: none;
-    }
-
-    .driverName {
-        display: none;
     }
 
     .results {
