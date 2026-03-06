@@ -1,4 +1,4 @@
-import styles from 'LiveTower.module.css'
+import styles from './LiveTower.module.css'
 
 function getLatestPositions(positions) {
     const map = {};
