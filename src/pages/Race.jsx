@@ -24,7 +24,7 @@ function Race() {
     const [activeSession, setActiveSession] = useState('race')
 
     if (loading) return <p className={styles.loading}>Loading...</p>
-    if (error) return <p className={styles.error}>{error}</p>
+    if (error) return <p className={styles.error}>Error: {error}</p>
 
     const raceInfo = sessions.race
     if (!raceInfo) return <p className={styles.error}>Race not found</p>

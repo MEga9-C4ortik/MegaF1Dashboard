@@ -1,9 +1,96 @@
+import {useState} from 'react'
+import useStandings from '../hooks/useStandings.jsx'
+import styles from './Standings.module.css'
 
+const getMedalStyle = (position) => {
+    if (position === '1') return styles.gold;
+    if (position === '2') return styles.silver;
+    if (position === '3') return styles.bronze;
+    return '';
+}
 
-function standings(){
+function Standings({year}) {
+    const {drivers, constructors, loading, error} = useStandings(year);
+    const [activeTab, setActiveTab] = useState('drivers');
+
+    if (loading) return <p className={styles.loading}> Loading ...</p>
+    if(error) return <p className={styles.error}> Error: {error}</p>
+
     return (
-        <h1>Standings</h1>
+        <div className={styles.page}>
+            <div className={styles.header}>
+                <h1 className={styles.title}>Standings {year}</h1>
+
+                <div className={styles.tabs}>
+                    <button
+                        className={`${styles.tab} ${activeTab === 'drivers' ? styles.tabActive : ''}`}
+                        onClick={() => setActiveTab('drivers')}
+                    >
+                        Drivers
+                    </button>
+                    <button
+                        className={`${styles.tab} ${activeTab === 'constructors' ? styles.tabActive : ''}`}
+                        onClick={() => setActiveTab('constructors')}
+                    >
+                        Constructors
+                    </button>
+                </div>
+            </div>
+
+            {activeTab === 'drivers' && (
+                <table className={styles.table}>
+                    <thead>
+                    <tr>
+                        <th>POS</th>
+                        <th>DRIVER</th>
+                        <th>TEAM</th>
+                        <th>PTS</th>
+                        <th>WINS</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {drivers.map(d => (
+                        <tr key={d.position} className={getMedalStyle(d.position)}>
+                            <td className={styles.pos}>{d.position}</td>
+                            <td className={styles.driver}>
+                                <span className={styles.driverCode}>{d.Driver.code}</span>
+                                <span className={styles.driverName}>
+                                    {d.Driver.givenName} {d.Driver.familyName}
+                                </span>
+                            </td>
+                            <td className={styles.team}>{d.Constructors[0]?.name}</td>
+                            <td className={styles.pts}>{d.points}</td>
+                            <td className={styles.wins}>{d.wins}</td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            )}
+
+            {activeTab === 'constructors' && (
+                <table className={styles.table}>
+                    <thead>
+                    <tr>
+                        <th>POS</th>
+                        <th>TEAM</th>
+                        <th>PTS</th>
+                        <th>WINS</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {constructors.map(c => (
+                        <tr key={c.position} className={getMedalStyle(c.position)}>
+                            <td className={styles.pos}>{c.position}</td>
+                            <td className={styles.team}>{c.Constructor.name}</td>
+                            <td className={styles.pts}>{c.points}</td>
+                            <td className={styles.wins}>{c.wins}</td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            )}
+        </div>
     );
 }
 
-export default standings;
+export default Standings;
