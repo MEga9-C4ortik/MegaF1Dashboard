@@ -18,8 +18,7 @@ export const fetchSessionsByMeeting = async (meetingKey) => {
   return Array.isArray(data) ? data : [];
 }
 
-// sinceDate передаём как query string напрямую без encodeURIComponent
-// OpenF1 требует date>= буквально, fetch() сам не кодирует если передать через конкатенацию
+// /position поддерживает date>= — грузим инкрементально
 export const fetchPositions = async (sessionKey, sinceDate = null) => {
   const url = sinceDate
       ? `${BASE_URL}/position?session_key=${sessionKey}&date>=${sinceDate}`
@@ -28,11 +27,15 @@ export const fetchPositions = async (sessionKey, sinceDate = null) => {
   return Array.isArray(data) ? data : [];
 }
 
-export const fetchIntervals = async (sessionKey, sinceDate = null) => {
-  const url = sinceDate
-      ? `${BASE_URL}/intervals?session_key=${sessionKey}&date>=${sinceDate}`
-      : `${BASE_URL}/intervals?session_key=${sessionKey}`;
-  const data = await safeFetch(url);
+// /intervals НЕ поддерживает date>= — всегда грузим всё, берём последние сами в хуке
+export const fetchIntervals = async (sessionKey) => {
+  const data = await safeFetch(`${BASE_URL}/intervals?session_key=${sessionKey}`);
+  return Array.isArray(data) ? data : [];
+}
+
+// /laps — времена кругов для каждого водителя
+export const fetchLaps = async (sessionKey) => {
+  const data = await safeFetch(`${BASE_URL}/laps?session_key=${sessionKey}`);
   return Array.isArray(data) ? data : [];
 }
 

@@ -11,7 +11,6 @@ import Map from '../components/live/Map'
 import ReplayControls from '../components/live/ReplayControls'
 import styles from './Live.module.css'
 
-// Табы вынесены отдельно — рендерятся всегда одинаково
 function SessionTabs({ sessions, activeSessionKey, isLive, currentSessionKey, onSelect }) {
     if (!sessions.length) return null;
     return (
@@ -21,7 +20,6 @@ function SessionTabs({ sessions, activeSessionKey, isLive, currentSessionKey, on
                     key={s.session_key}
                     className={`${styles.sessionTab} ${activeSessionKey === s.session_key ? styles.sessionTabActive : ''}`}
                     onClick={() => {
-                        // Нажали на текущую живую — сброс в live режим
                         if (isLive && s.session_key === currentSessionKey) {
                             onSelect(null);
                         } else {
@@ -44,7 +42,7 @@ function Live() {
     const isReplayMode = !!selectedSessionKey || !isLive;
 
     const {
-        positions, intervals, drivers,
+        positions, intervals, laps, drivers,
         stints, pits, fiaMessages, radio,
         weather, loading: dataLoading, hasData
     } = useLiveData(activeSessionKey);
@@ -60,12 +58,13 @@ function Live() {
         onSelect: setSelectedSessionKey,
     };
 
-    // Всё ещё коннектимся к API сессий
+    // Шаг 1: сессии ещё грузятся
     if (sessionLoading) {
         return <p className={styles.loading}>Connecting...</p>;
     }
 
-    // Нет живой сессии и ничего не выбрано — NoSessionScreen с табами
+    // Шаг 2: нет живой сессии И пользователь ничего не выбрал
+    // selectedSessionKey = null означает "юзер не нажимал на табы"
     if (!isLive && !selectedSessionKey) {
         return (
             <div className={styles.page}>
@@ -77,7 +76,8 @@ function Live() {
         );
     }
 
-    // Есть sessionKey, данные грузятся (и нет кеша чтобы показать сразу)
+    // Шаг 3: есть sessionKey — данные грузятся
+    // Показываем loading, но табы всегда видны
     if (dataLoading) {
         return (
             <div className={styles.page}>
@@ -93,7 +93,8 @@ function Live() {
         );
     }
 
-    // Данные загрузились но пустые — сессия ещё не началась или API пустой
+    // Шаг 4: загрузка завершена, данных нет (сессия не началась)
+    // ВАЖНО: проверяем !hasData только ПОСЛЕ того как loading = false
     if (!hasData) {
         return (
             <div className={styles.page}>
@@ -109,7 +110,7 @@ function Live() {
         );
     }
 
-    // Нормальный рендер с данными
+    // Шаг 5: всё норм, рендерим данные
     return (
         <div className={styles.page}>
             <div className={styles.header}>
@@ -147,6 +148,7 @@ function Live() {
                             drivers={drivers}
                             stints={stints}
                             intervals={intervals}
+                            laps={laps}
                             pits={pits}
                         />
                         : <p style={{color:'#333', padding:'40px', fontFamily:'JetBrains Mono', fontSize:12, letterSpacing:2}}>
