@@ -53,7 +53,7 @@ function Navbar({ year, setYear }) {
             </div>
 
             <div className={styles.right}>
-                {location.pathname !== '/live' && (
+                {location.pathname !== '/live' && !location.pathname.startsWith('/race/') && (
                     <select
                         className={styles.yearSelect}
                         value={year}

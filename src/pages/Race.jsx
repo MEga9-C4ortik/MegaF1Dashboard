@@ -43,15 +43,17 @@ function Race() {
     return (
         <div className={styles.page}>
             <div className={styles.header}>
-                <span className={styles.round}>Round {String(round).padStart(2, '0')}</span>
-                <span className={styles.raceName}>{raceInfo.raceName}</span>
+                <div className={styles.headerTop}>
+                    <span className={styles.sessionBadge}>
+                        RND {String(round).padStart(2, '0')} · {formatDate(currentData?.date)} · {tabs.find(t => t.key === activeSession)?.label}
+                    </span>
+                </div>
+
+                <h1 className={styles.raceName}>{raceInfo.raceName}</h1>
+
                 <span className={styles.circuit}>
-                    {raceInfo.Circuit?.circuitName} · {raceInfo.Circuit?.Location?.country} · {raceInfo.Circuit?.Location?.locality}
+                    {raceInfo.Circuit?.circuitName} — {raceInfo.Circuit?.Location?.locality}, {raceInfo.Circuit?.Location?.country}
                 </span>
-                <span className={styles.session}>
-                    {tabs.find(t => t.key === activeSession)?.label}
-                </span>
-                <span className={styles.date}>{formatDate(currentData?.date)}</span>
             </div>
 
             <div className={styles.content}>
