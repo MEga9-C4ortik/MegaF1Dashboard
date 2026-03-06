@@ -1,13 +1,13 @@
 const BASE_URL = 'https://api.openf1.org/v1'
 
 export const fetchCurrentSession = async () => {
-  const response = await fetch(`${BASE_URL}/sessions/session_key=latest`);
+  const response = await fetch(`${BASE_URL}/sessions?session_key=latest`);
   const data = await response.json();
   return data[0] ?? null;
 }
 
 export const fetchPositions = async (sessionKey) => {
-  const response = await fetch(`${BASE_URL}/positions/session_key=${sessionKey}`);
+  const response = await fetch(`${BASE_URL}/positions?session_key=${sessionKey}`);
   const data = await response.json();
   return data;
 }
