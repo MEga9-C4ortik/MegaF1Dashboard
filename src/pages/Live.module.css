@@ -23,13 +23,36 @@
     letter-spacing: 2px;
     white-space: nowrap;
 }
+.sessionTabs {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
 
-.liveDot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #e10600;
-    animation: blink 1s infinite;
+.sessionTab {
+    background: transparent;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-bottom: 2px solid #1e1e1e;
+    border-radius: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.sessionTab:hover {
+    color: #fff;
+    border-color: #333;
+}
+
+.sessionTabActive {
+    color: #fff;
+    border-color: #e10600;
+    background: rgba(225, 6, 0, 0.08);
 }
 
 @keyframes blink {

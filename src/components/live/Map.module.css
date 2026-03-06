@@ -1,0 +1,45 @@
+.container {
+    width: 100%;
+}
+
+.title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: #333;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.mapWrapper {
+    width: 100%;
+    background: #080808;
+    border: 1px solid #1a1a1a;
+    border-radius: 4px;
+    overflow: hidden;
+    min-height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.svg {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.loading {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: #333;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 40px;
+}
+
+@media (max-width: 768px) {
+    .mapWrapper {
+        min-height: 120px;
+    }
+}

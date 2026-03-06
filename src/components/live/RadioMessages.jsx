@@ -8,8 +8,6 @@ const formatTime = (dateStr) => {
 }
 
 function RadioMessages({ messages, drivers }) {
-    const [playing, setPlaying] = useState(null);
-
     if (!messages || messages.length === 0)
         return <p className={styles.empty}>Radio Silence</p>;
 
@@ -40,8 +38,6 @@ function RadioMessages({ messages, drivers }) {
                             <div className={styles.player}>
                                 <audio
                                     src={msg.recording_url}
-                                    onPlay={() => setPlaying(i)}
-                                    onEnded={() => setPlaying(null)}
                                     controls
                                     className={styles.audio}
                                 />

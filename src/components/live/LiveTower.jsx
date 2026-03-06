@@ -35,6 +35,7 @@ function TyreIcon({ compound }) {
 }
 
 function LiveTower({ positions, drivers, stints, intervals, pits }) {
+    if (!positions || !drivers) return null;
     const latest = getLatestPositions(positions);
 
     const driversMap = {};
