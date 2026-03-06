@@ -63,7 +63,7 @@
 .sessionName {
     font-family: 'JetBrains Mono', monospace;
     font-size: 13px;
-    color: #555;
+    color: #fff;
     letter-spacing: 1px;
     white-space: nowrap;
 }
@@ -114,5 +114,14 @@
         min-width: unset;
         padding: 16px;
         border-top: 1px solid #1a1a1a;
+        gap: 24px;
+        overflow-x: hidden;
+    }
+
+    .left {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-right: none;
     }
 }

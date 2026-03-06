@@ -110,19 +110,13 @@
 }
 
 @media (max-width: 768px) {
-    .towerHeader {
-        grid-template-columns: 32px 1fr 60px 70px;
-        padding: 6px 12px;
+    .tower {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
-    /* скрываем interval на мобильном */
-    .towerHeader span:last-child,
-    .row > .interval {
-        display: none;
-    }
-
+    .towerHeader,
     .row {
-        grid-template-columns: 32px 1fr 60px 70px;
-        padding: 10px 12px;
+        min-width: 420px;
     }
 }

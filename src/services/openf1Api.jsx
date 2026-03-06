@@ -18,13 +18,17 @@ export const fetchSessionsByMeeting = async (meetingKey) => {
   return Array.isArray(data) ? data : [];
 }
 
-export const fetchPositions = async (sessionKey) => {
-  const data = await safeFetch(`${BASE_URL}/position?session_key=${sessionKey}`);
+export const fetchPositions = async (sessionKey, sinceDate = null) => {
+  let url = `${BASE_URL}/position?session_key=${sessionKey}`;
+  if (sinceDate) url += `&date>=${sinceDate}`;
+  const data = await safeFetch(url);
   return Array.isArray(data) ? data : [];
 }
 
-export const fetchIntervals = async (sessionKey) => {
-  const data = await safeFetch(`${BASE_URL}/intervals?session_key=${sessionKey}`);
+export const fetchIntervals = async (sessionKey, sinceDate = null) => {
+  let url = `${BASE_URL}/intervals?session_key=${sessionKey}`;
+  if (sinceDate) url += `&date>=${sinceDate}`;
+  const data = await safeFetch(url);
   return Array.isArray(data) ? data : [];
 }
 

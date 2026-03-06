@@ -25,7 +25,7 @@ function useCountdown(targetDate) {
 
         tick();
         const interval = setInterval(tick, 1000);
-        return () => clearInterval(tick);
+        return () => clearInterval(interval);
     }, [targetDate]);
 
     return timeLeft;
