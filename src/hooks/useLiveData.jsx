@@ -7,6 +7,7 @@ import {
     fetchPits,
     fetchFiaMessages,
     fetchWeather,
+    fetchTeamRadio,
 } from '../services/openf1Api'
 
 function useLiveData(session) {
@@ -16,6 +17,7 @@ function useLiveData(session) {
     const [stints, setStints] = useState([]);
     const [pits, setPits] = useState([]);
     const [fiaMessages, setFiaMessages] = useState([]);
+    const [radio, setRadio] = useState([]);
     const [weather, setWeather] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -23,13 +25,14 @@ function useLiveData(session) {
         if(!session) return;
 
         try {
-            const [pos, int, drv, stn, pit, fms, wth] = await Promise.allSettled([
+            const [pos, int, drv, stn, pit, fms, trd, wth] = await Promise.allSettled([
                 fetchPositions(session),
                 fetchIntervals(session),
                 fetchDrivers(session),
                 fetchStints(session),
                 fetchPits(session),
                 fetchFiaMessages(session),
+                fetchTeamRadio(session),
                 fetchWeather(session),
             ]);
 
@@ -39,6 +42,7 @@ function useLiveData(session) {
             if (stn.status === 'fulfilled') setStints(stn.value);
             if (pit.status === 'fulfilled') setPits(pit.value);
             if (fms.status === 'fulfilled') setFiaMessages(fms.value);
+            if (trd.status === 'fulfilled') setRadio(trd.value);
             if (wth.status === 'fulfilled') setWeather(wth.value?.at(-1) ?? null);
         } catch(error) {
             console.error('Live data fetch failed:', error);
@@ -54,7 +58,7 @@ function useLiveData(session) {
         return () => clearInterval(interval);
     }, [loadData]);
 
-    return { positions, intervals, drivers, stints, pits, fiaMessages, weather, loading };
+    return { positions, intervals, drivers, stints, pits, fiaMessages, radio, weather, loading };
 }
 
 export default useLiveData;
