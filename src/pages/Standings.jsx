@@ -2,10 +2,9 @@ import {useState} from 'react'
 import useStandings from '../hooks/useStandings.jsx'
 import styles from './Standings.module.css'
 
-const getMedalStyle = (position) => {
-    if (position === '1') return styles.gold;
-    if (position === '2') return styles.silver;
-    if (position === '3') return styles.bronze;
+const getPodiumStyle = (position) => {
+    if (position === '1' || position === '2' || position === '3')
+        return styles.podium;
     return '';
 }
 
@@ -52,7 +51,7 @@ function Standings({year}) {
                     </thead>
                     <tbody>
                     {drivers.map(d => (
-                        <tr key={d.position} className={getMedalStyle(d.position)}>
+                        <tr key={d.position} className={getPodiumStyle(d.position)}>
                             <td className={styles.pos}>{d.position}</td>
                             <td className={styles.driver}>
                                 <span className={styles.driverCode}>{d.Driver.code}</span>
@@ -81,7 +80,7 @@ function Standings({year}) {
                     </thead>
                     <tbody>
                     {constructors.map(c => (
-                        <tr key={c.position} className={getMedalStyle(c.position)}>
+                        <tr key={c.position} className={getPodiumStyle(c.position)}>
                             <td className={styles.pos}>{c.position}</td>
                             <td className={styles.team}>{c.Constructor.name}</td>
                             <td className={styles.pts}>{c.points}</td>

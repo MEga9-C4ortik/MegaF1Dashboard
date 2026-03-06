@@ -10,10 +10,9 @@ const formatDate = (dateStr) => {
     }).toUpperCase()
 }
 
-const getMedalStyle = (position) => {
-    if (position === '1') return styles.gold
-    if (position === '2') return styles.silver
-    if (position === '3') return styles.bronze
+const getPodiumStyle = (position) => {
+    if (position === '1' || position === '2' || position === '3')
+        return styles.podium;
     return ''
 }
 
@@ -95,7 +94,7 @@ function ResultsTable({ session, data }) {
                 </thead>
                 <tbody>
                 {results.map(r => (
-                    <tr key={r.position}>
+                    <tr key={r.position} className={getPodiumStyle(r.position)}>
                         <td className={styles.pos}>{r.position}</td>
                         <td className={styles.driver}>
                             <span className={styles.driverCode}>{r.Driver.code}</span>
@@ -122,7 +121,7 @@ function ResultsTable({ session, data }) {
             </thead>
             <tbody>
             {results.map(r => (
-                <tr key={r.position} className={getMedalStyle(r.position)}>
+                <tr key={r.position} className={getPodiumStyle(r.position)}>
                     <td className={styles.pos}>{r.position}</td>
                     <td className={styles.driver}>
                         <span className={styles.driverCode}>{r.Driver.code}</span>
