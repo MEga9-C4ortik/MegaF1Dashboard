@@ -22,7 +22,7 @@ const TICK_MS = 500;
  */
 function useReplay(allPositions) {
     const [isPlaying, setIsPlaying]   = useState(false);
-    const [speedIndex, setSpeedIndex] = useState(1); // индекс в PLAYBACK_SPEEDS, дефолт x2
+    const [speedIndex, setSpeedIndex] = useState(0); // индекс в PLAYBACK_SPEEDS, дефолт x1
     const [currentTime, setCurrentTime] = useState(null); // Date объект
 
     // useMemo пересчитывается только когда изменится allPositions.
@@ -110,11 +110,9 @@ function useReplay(allPositions) {
         if (!minTime || !maxTime) return;
         const range = maxTime.getTime() - minTime.getTime();
         setCurrentTime(new Date(minTime.getTime() + range * fraction));
-        // При ручной перемотке ставим на паузу — не мешаем пользователю
         setIsPlaying(false);
     };
 
-    // Текущая позиция слайдера 0..1
     const progress = useMemo(() => {
         if (!minTime || !maxTime || !currentTime) return 0;
         const range = maxTime.getTime() - minTime.getTime();
@@ -127,12 +125,12 @@ function useReplay(allPositions) {
     };
 
     return {
-        replayPositions,  // позиции отфильтрованные по currentTime — передаём в LiveTower
+        replayPositions,
         isPlaying,
         currentTime,
         minTime,
         maxTime,
-        progress,         // 0..1 для слайдера
+        progress,
         speed: PLAYBACK_SPEEDS[speedIndex],
         play,
         pause,

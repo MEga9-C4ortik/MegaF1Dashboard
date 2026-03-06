@@ -11,27 +11,28 @@ import {
 } from '../services/openf1Api'
 import { getCached, setCached, hasStaticCache } from '../services/SessionCache'
 
-// Live: refreshing dynamic info every 15 сек
-const DYNAMIC_INTERVAL = 15000;
-// static info interval
-const STATIC_INTERVAL = 60000;
-const INCREMENTAL_WINDOW_SEC = 35;
+const DYNAMIC_INTERVAL = 15000;  // 15 сек — позиции и интервалы
+const STATIC_INTERVAL  = 60000;  // 60 сек — стинты, питы, радио
+const INCREMENTAL_WINDOW_SEC = 35; // окно для инкрементальных запросов
+
+// Задержка между запросами чтобы не словить 429
+const delay = (ms) => new Promise(r => setTimeout(r, ms));
 
 function useLiveData(sessionKey) {
-    const [positions, setPositions]       = useState([]);
-    const [intervals, setIntervals]       = useState([]);
-    const [weather, setWeather]           = useState(null);
-    const [drivers, setDrivers]           = useState([]);
-    const [stints, setStints]             = useState([]);
-    const [pits, setPits]                 = useState([]);
-    const [fiaMessages, setFiaMessages]   = useState([]);
-    const [radio, setRadio]               = useState([]);
-    const [loading, setLoading]           = useState(true);
+    const [positions, setPositions]     = useState([]);
+    const [intervals, setIntervals]     = useState([]);
+    const [weather, setWeather]         = useState(null);
+    const [drivers, setDrivers]         = useState([]);
+    const [stints, setStints]           = useState([]);
+    const [pits, setPits]               = useState([]);
+    const [fiaMessages, setFiaMessages] = useState([]);
+    const [radio, setRadio]             = useState([]);
+    const [loading, setLoading]         = useState(true);
 
-    // //Flag: is there loaded dynamic data
     const initialDynamicDone = useRef(false);
     const isMounted = useRef(true);
 
+    // Сброс при смене сессии — сразу читаем кеш
     useEffect(() => {
         isMounted.current = true;
         initialDynamicDone.current = false;
@@ -48,6 +49,8 @@ function useLiveData(sessionKey) {
             if (cached.intervals)   setIntervals(cached.intervals);
             if (cached.weather)     setWeather(cached.weather);
             setLoading(false);
+            // Если есть кеш статики — помечаем что первая загрузка уже была
+            if (cached.drivers?.length) initialDynamicDone.current = true;
         } else {
             setPositions([]);
             setIntervals([]);
@@ -62,35 +65,49 @@ function useLiveData(sessionKey) {
         return () => { isMounted.current = false; };
     }, [sessionKey]);
 
-    // --- Динамика ---
-    // Первый вызов: грузим всё (нет sinceDate)
-    // Последующие: только за последние INCREMENTAL_WINDOW_SEC секунд
+    // Динамика: позиции + интервалы + погода
+    // Первый раз — полная загрузка, потом — только последние INCREMENTAL_WINDOW_SEC сек
     const loadDynamic = useCallback(async () => {
         if (!sessionKey) return;
 
-        // Для инкрементальных обновлений берём окно в прошлое
         const sinceDate = initialDynamicDone.current
             ? new Date(Date.now() - INCREMENTAL_WINDOW_SEC * 1000).toISOString()
-            : null; // null = полная загрузка
+            : null;
 
         try {
-            const [pos, int, wth] = await Promise.allSettled([
-                fetchPositions(sessionKey, sinceDate),
-                fetchIntervals(sessionKey, sinceDate),
-                fetchWeather(sessionKey), // погода маленькая — всегда грузим всё
-            ]);
+            // Грузим последовательно с задержкой — избегаем 429
+            let posData = null, intData = null, wthData = null;
+
+            try {
+                posData = await fetchPositions(sessionKey, sinceDate);
+            } catch (e) {
+                if (!e.message?.includes('429')) console.error('Positions failed:', e);
+            }
+
+            await delay(200);
+            if (!isMounted.current) return;
+
+            try {
+                intData = await fetchIntervals(sessionKey, sinceDate);
+            } catch (e) {
+                if (!e.message?.includes('429')) console.error('Intervals failed:', e);
+            }
+
+            await delay(200);
+            if (!isMounted.current) return;
+
+            try {
+                wthData = await fetchWeather(sessionKey);
+            } catch (e) {
+                if (!e.message?.includes('429')) console.error('Weather failed:', e);
+            }
 
             if (!isMounted.current) return;
 
-            if (pos.status === 'fulfilled' && pos.value.length > 0) {
+            if (posData && posData.length > 0) {
                 if (initialDynamicDone.current) {
-                    // Инкрементальное обновление: мёрджим новые данные со старыми
-                    // positions — массив всех position-записей для каждого driver_number
-                    // LiveTower сам берёт последнюю для каждого водителя — просто appending
                     setPositions(prev => {
-                        const merged = [...prev, ...pos.value];
-                        // Дедуплицируем по дате+номеру чтобы не раздувать массив
-                        // (на случай если окна перекрываются)
+                        const merged = [...prev, ...posData];
                         const seen = new Set();
                         return merged.filter(p => {
                             const key = `${p.driver_number}_${p.date}`;
@@ -100,15 +117,15 @@ function useLiveData(sessionKey) {
                         });
                     });
                 } else {
-                    setPositions(pos.value);
+                    setPositions(posData);
                 }
-                setCached(sessionKey, { positions: pos.value });
+                setCached(sessionKey, { positions: posData });
             }
 
-            if (int.status === 'fulfilled' && int.value.length > 0) {
+            if (intData && intData.length > 0) {
                 if (initialDynamicDone.current) {
                     setIntervals(prev => {
-                        const merged = [...prev, ...int.value];
+                        const merged = [...prev, ...intData];
                         const seen = new Set();
                         return merged.filter(i => {
                             const key = `${i.driver_number}_${i.date}`;
@@ -118,18 +135,17 @@ function useLiveData(sessionKey) {
                         });
                     });
                 } else {
-                    setIntervals(int.value);
+                    setIntervals(intData);
                 }
-                setCached(sessionKey, { intervals: int.value });
+                setCached(sessionKey, { intervals: intData });
             }
 
-            if (wth.status === 'fulfilled') {
-                const latest = wth.value?.at(-1) ?? null;
+            if (wthData) {
+                const latest = wthData.at(-1) ?? null;
                 setWeather(latest);
                 setCached(sessionKey, { weather: latest });
             }
 
-            // После первой успешной загрузки переключаемся на инкрементальный режим
             if (!initialDynamicDone.current) {
                 initialDynamicDone.current = true;
             }
@@ -139,7 +155,8 @@ function useLiveData(sessionKey) {
         }
     }, [sessionKey]);
 
-    // --- Статика ---
+    // Статика: drivers, stints, pits, fia, radio
+    // Грузим только если нет кеша
     const loadStatic = useCallback(async () => {
         if (!sessionKey) return;
 
@@ -149,25 +166,30 @@ function useLiveData(sessionKey) {
         }
 
         try {
-            const [drv, stn, pit, fms, trd] = await Promise.allSettled([
-                fetchDrivers(sessionKey),
-                fetchStints(sessionKey),
-                fetchPits(sessionKey),
-                fetchFiaMessages(sessionKey),
-                fetchTeamRadio(sessionKey),
-            ]);
-
-            if (!isMounted.current) return;
-
+            // Последовательная загрузка с задержками — не бомбим API одновременно
             const toCache = {};
 
-            if (drv.status === 'fulfilled') { setDrivers(drv.value);      toCache.drivers     = drv.value; }
-            if (stn.status === 'fulfilled') { setStints(stn.value);        toCache.stints      = stn.value; }
-            if (pit.status === 'fulfilled') { setPits(pit.value);          toCache.pits        = pit.value; }
-            if (fms.status === 'fulfilled') { setFiaMessages(fms.value);   toCache.fiaMessages = fms.value; }
-            if (trd.status === 'fulfilled') { setRadio(trd.value);         toCache.radio       = trd.value; }
+            const tryFetch = async (fn, setter, key, delayMs = 300) => {
+                await delay(delayMs);
+                if (!isMounted.current) return;
+                try {
+                    const data = await fn(sessionKey);
+                    if (isMounted.current) setter(data);
+                    toCache[key] = data;
+                } catch (e) {
+                    if (!e.message?.includes('429')) console.error(`${key} failed:`, e);
+                }
+            };
 
-            setCached(sessionKey, toCache);
+            await tryFetch(fetchDrivers,    setDrivers,     'drivers',     0);
+            await tryFetch(fetchStints,     setStints,      'stints',      300);
+            await tryFetch(fetchPits,       setPits,        'pits',        300);
+            await tryFetch(fetchFiaMessages,setFiaMessages, 'fiaMessages', 300);
+            await tryFetch(fetchTeamRadio,  setRadio,       'radio',       300);
+
+            if (Object.keys(toCache).length > 0) {
+                setCached(sessionKey, toCache);
+            }
         } catch (err) {
             console.error('Static fetch error:', err);
         } finally {
@@ -175,16 +197,14 @@ function useLiveData(sessionKey) {
         }
     }, [sessionKey]);
 
-    // --- Запуск и интервалы ---
     useEffect(() => {
         if (!sessionKey) return;
 
-        // Параллельно стартуем оба
         loadDynamic();
         loadStatic();
 
         const dynamicTimer = setInterval(loadDynamic, DYNAMIC_INTERVAL);
-        const staticTimer  = setInterval(loadStatic, STATIC_INTERVAL);
+        const staticTimer  = setInterval(loadStatic,  STATIC_INTERVAL);
 
         return () => {
             clearInterval(dynamicTimer);
@@ -192,7 +212,7 @@ function useLiveData(sessionKey) {
         };
     }, [loadDynamic, loadStatic, sessionKey]);
 
-    // hasData: есть ли вообще данные для этой сессии
+    // hasData: есть реальные данные (не просто загрузились, а непустые)
     const hasData = drivers.length > 0 || positions.length > 0;
 
     return { positions, intervals, drivers, stints, pits, fiaMessages, radio, weather, loading, hasData };

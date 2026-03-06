@@ -18,16 +18,20 @@ export const fetchSessionsByMeeting = async (meetingKey) => {
   return Array.isArray(data) ? data : [];
 }
 
+// sinceDate передаём как query string напрямую без encodeURIComponent
+// OpenF1 требует date>= буквально, fetch() сам не кодирует если передать через конкатенацию
 export const fetchPositions = async (sessionKey, sinceDate = null) => {
-  let url = `${BASE_URL}/position?session_key=${sessionKey}`;
-  if (sinceDate) url += `&date>=${sinceDate}`;
+  const url = sinceDate
+      ? `${BASE_URL}/position?session_key=${sessionKey}&date>=${sinceDate}`
+      : `${BASE_URL}/position?session_key=${sessionKey}`;
   const data = await safeFetch(url);
   return Array.isArray(data) ? data : [];
 }
 
 export const fetchIntervals = async (sessionKey, sinceDate = null) => {
-  let url = `${BASE_URL}/intervals?session_key=${sessionKey}`;
-  if (sinceDate) url += `&date>=${sinceDate}`;
+  const url = sinceDate
+      ? `${BASE_URL}/intervals?session_key=${sessionKey}&date>=${sinceDate}`
+      : `${BASE_URL}/intervals?session_key=${sessionKey}`;
   const data = await safeFetch(url);
   return Array.isArray(data) ? data : [];
 }
@@ -69,7 +73,7 @@ export const fetchTrackLayout = async (sessionKey) => {
 }
 
 export const fetchDriverLocations = async (sessionKey) => {
-  const since = new Date(Date.now() - 5000).toISOString()
+  const since = new Date(Date.now() - 5000).toISOString();
   const data = await safeFetch(`${BASE_URL}/location?session_key=${sessionKey}&date>=${since}`);
   return Array.isArray(data) ? data : [];
 }

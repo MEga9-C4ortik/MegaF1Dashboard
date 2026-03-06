@@ -11,15 +11,36 @@ import Map from '../components/live/Map'
 import ReplayControls from '../components/live/ReplayControls'
 import styles from './Live.module.css'
 
+// Табы вынесены отдельно — рендерятся всегда одинаково
+function SessionTabs({ sessions, activeSessionKey, isLive, currentSessionKey, onSelect }) {
+    if (!sessions.length) return null;
+    return (
+        <div className={styles.sessionTabs}>
+            {sessions.map(s => (
+                <button
+                    key={s.session_key}
+                    className={`${styles.sessionTab} ${activeSessionKey === s.session_key ? styles.sessionTabActive : ''}`}
+                    onClick={() => {
+                        // Нажали на текущую живую — сброс в live режим
+                        if (isLive && s.session_key === currentSessionKey) {
+                            onSelect(null);
+                        } else {
+                            onSelect(s.session_key);
+                        }
+                    }}
+                >
+                    {s.session_name}
+                </button>
+            ))}
+        </div>
+    );
+}
+
 function Live() {
     const { session, sessions, isLive, loading: sessionLoading } = useLiveSession();
     const [selectedSessionKey, setSelectedSessionKey] = useState(null);
 
-    // activeSessionKey: если пользователь выбрал таб — используем его,
-    // иначе берём текущую сессию
     const activeSessionKey = selectedSessionKey ?? session?.session_key ?? null;
-
-    // isReplayMode: true когда смотрим не живую сессию
     const isReplayMode = !!selectedSessionKey || !isLive;
 
     const {
@@ -29,38 +50,34 @@ function Live() {
     } = useLiveData(activeSessionKey);
 
     const replay = useReplay(positions);
-
     const displayPositions = isReplayMode ? replay.replayPositions : positions;
 
-    // --- Состояния загрузки ---
-    if (sessionLoading) return <p className={styles.loading}>Connecting...</p>;
+    const tabsProps = {
+        sessions,
+        activeSessionKey,
+        isLive,
+        currentSessionKey: session?.session_key,
+        onSelect: setSelectedSessionKey,
+    };
 
-    // --- Нет активной сессии и пользователь ничего не выбрал ---
-    // Показываем NoSessionScreen с табами поверх для выбора прошлых сессий
+    // Всё ещё коннектимся к API сессий
+    if (sessionLoading) {
+        return <p className={styles.loading}>Connecting...</p>;
+    }
+
+    // Нет живой сессии и ничего не выбрано — NoSessionScreen с табами
     if (!isLive && !selectedSessionKey) {
         return (
             <div className={styles.page}>
                 <div className={styles.header}>
-                    {sessions.length > 0 && (
-                        <div className={styles.sessionTabs}>
-                            {sessions.map(s => (
-                                <button
-                                    key={s.session_key}
-                                    className={`${styles.sessionTab} ${activeSessionKey === s.session_key ? styles.sessionTabActive : ''}`}
-                                    onClick={() => setSelectedSessionKey(s.session_key)}
-                                >
-                                    {s.session_name}
-                                </button>
-                            ))}
-                        </div>
-                    )}
+                    <SessionTabs {...tabsProps} />
                 </div>
                 <NoSessionScreen session={session} />
             </div>
         );
     }
 
-    // --- Выбрана сессия (таб), но данные ещё грузятся ---
+    // Есть sessionKey, данные грузятся (и нет кеша чтобы показать сразу)
     if (dataLoading) {
         return (
             <div className={styles.page}>
@@ -69,33 +86,14 @@ function Live() {
                         <span className={styles.liveDot} />
                         {isLive && !selectedSessionKey ? 'LIVE' : 'REPLAY'}
                     </div>
-                    {sessions.length > 0 && (
-                        <div className={styles.sessionTabs}>
-                            {sessions.map(s => (
-                                <button
-                                    key={s.session_key}
-                                    className={`${styles.sessionTab} ${activeSessionKey === s.session_key ? styles.sessionTabActive : ''}`}
-                                    onClick={() => {
-                                        if (isLive && s.session_key === session?.session_key) {
-                                            setSelectedSessionKey(null);
-                                        } else {
-                                            setSelectedSessionKey(s.session_key);
-                                        }
-                                    }}
-                                >
-                                    {s.session_name}
-                                </button>
-                            ))}
-                        </div>
-                    )}
+                    <SessionTabs {...tabsProps} />
                 </div>
                 <span className={styles.loading}>Loading data...</span>
             </div>
         );
     }
 
-    // --- Данные загрузились, но их нет (сессия ещё не начиналась или API пустой) ---
-    // Показываем NoSessionScreen вместо "NO DATA FOR THIS SESSION"
+    // Данные загрузились но пустые — сессия ещё не началась или API пустой
     if (!hasData) {
         return (
             <div className={styles.page}>
@@ -104,33 +102,14 @@ function Live() {
                         <span className={styles.liveDot} />
                         {isLive && !selectedSessionKey ? 'LIVE' : 'REPLAY'}
                     </div>
-                    {sessions.length > 0 && (
-                        <div className={styles.sessionTabs}>
-                            {sessions.map(s => (
-                                <button
-                                    key={s.session_key}
-                                    className={`${styles.sessionTab} ${activeSessionKey === s.session_key ? styles.sessionTabActive : ''}`}
-                                    onClick={() => {
-                                        if (isLive && s.session_key === session?.session_key) {
-                                            setSelectedSessionKey(null);
-                                        } else {
-                                            setSelectedSessionKey(s.session_key);
-                                        }
-                                    }}
-                                >
-                                    {s.session_name}
-                                </button>
-                            ))}
-                        </div>
-                    )}
+                    <SessionTabs {...tabsProps} />
                 </div>
-                {/* Нет данных для выбранной сессии — показываем нормальный экран */}
                 <NoSessionScreen session={session} />
             </div>
         );
     }
 
-    // --- Нормальный рендер с данными ---
+    // Нормальный рендер с данными
     return (
         <div className={styles.page}>
             <div className={styles.header}>
@@ -141,27 +120,7 @@ function Live() {
                 <span className={styles.sessionName}>
                     {session?.session_name} — {session?.circuit_short_name}
                 </span>
-
-                {sessions.length > 0 && (
-                    <div className={styles.sessionTabs}>
-                        {sessions.map(s => (
-                            <button
-                                key={s.session_key}
-                                className={`${styles.sessionTab} ${activeSessionKey === s.session_key ? styles.sessionTabActive : ''}`}
-                                onClick={() => {
-                                    if (isLive && s.session_key === session?.session_key) {
-                                        setSelectedSessionKey(null);
-                                    } else {
-                                        setSelectedSessionKey(s.session_key);
-                                    }
-                                }}
-                            >
-                                {s.session_name}
-                            </button>
-                        ))}
-                    </div>
-                )}
-
+                <SessionTabs {...tabsProps} />
                 <Weather weather={weather} />
             </div>
 
@@ -195,7 +154,6 @@ function Live() {
                         </p>
                     }
                 </div>
-
                 <div className={styles.right}>
                     <Map sessionKey={activeSessionKey} drivers={drivers} />
                     <FiaMessages messages={fiaMessages} />

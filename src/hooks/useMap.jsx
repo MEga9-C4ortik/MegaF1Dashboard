@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { fetchTrackLayout, fetchDriverLocations } from '../services/openf1Api'
+import { getTrackLayoutCache, setTrackLayoutCache } from '../services/SessionCache'
 
 const W = 600, H = 400, PAD = 24;
 
@@ -35,6 +36,12 @@ function useMap(sessionKey, drivers) {
     const [driverDots, setDriverDots] = useState([]);
     const [normParams, setNormParams] = useState(null);
     const [loading, setLoading] = useState(true);
+    const isMounted = useRef(true);
+
+    useEffect(() => {
+        isMounted.current = true;
+        return () => { isMounted.current = false; };
+    }, []);
 
     useEffect(() => {
         if (!sessionKey) return;
@@ -45,18 +52,30 @@ function useMap(sessionKey, drivers) {
 
         const load = async () => {
             try {
-                const points = await fetchTrackLayout(sessionKey);
-                if (!points.length) return;
+                // Проверяем кеш — track layout для сессии не меняется
+                const cached = getTrackLayoutCache(sessionKey);
+                let points;
+
+                if (cached) {
+                    points = cached;
+                } else {
+                    // Задержка перед запросом чтобы не слать всё одновременно с useLiveData
+                    await new Promise(r => setTimeout(r, 800));
+                    if (!isMounted.current) return;
+                    points = await fetchTrackLayout(sessionKey);
+                    if (points.length) setTrackLayoutCache(sessionKey, points);
+                }
+
+                if (!points.length || !isMounted.current) return;
 
                 const params = buildNormParams(points);
                 setNormParams(params);
-
                 const normed = points.map(p => normPoint(p.x, p.y, params));
                 setTrackPath(pointsToPath(normed));
             } catch (err) {
                 console.error('Track layout failed:', err);
             } finally {
-                setLoading(false);
+                if (isMounted.current) setLoading(false);
             }
         }
 
@@ -72,19 +91,19 @@ function useMap(sessionKey, drivers) {
         const loadLocations = async () => {
             try {
                 const raw = await fetchDriverLocations(sessionKey);
-                if (!raw.length) return;
+                if (!raw.length || !isMounted.current) return;
 
                 const latest = {};
                 raw.forEach(loc => {
                     if (!latest[loc.driver_number] ||
                         loc.date > latest[loc.driver_number].date) {
-                        latest[loc.driver_number] = loc
+                        latest[loc.driver_number] = loc;
                     }
                 });
 
                 const dots = Object.values(latest).map(loc => {
-                    const { px, py } = normPoint(loc.x, loc.y, normParams)
-                    const driver = driversMap[loc.driver_number]
+                    const { px, py } = normPoint(loc.x, loc.y, normParams);
+                    const driver = driversMap[loc.driver_number];
                     return {
                         driver_number: loc.driver_number,
                         px, py,
@@ -93,14 +112,17 @@ function useMap(sessionKey, drivers) {
                     };
                 });
 
-                setDriverDots(dots);
+                if (isMounted.current) setDriverDots(dots);
             } catch (err) {
-                console.error('Driver locations failed:', err);
+                // 429 или другие — тихо глотаем, попробуем в следующий тик
+                if (!err.message?.includes('429')) {
+                    console.error('Driver locations failed:', err);
+                }
             }
         }
 
         loadLocations();
-        const interval = setInterval(loadLocations, 3000);
+        const interval = setInterval(loadLocations, 5000); // было 3сек — увеличил до 5
         return () => clearInterval(interval);
     }, [sessionKey, normParams, drivers]);
 
