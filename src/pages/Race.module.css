@@ -14,7 +14,6 @@
 .headerTop {
     display: flex;
     justify-content: space-between;
-    align-items: left;
 }
 
 .round {
@@ -22,7 +21,7 @@
     color: #fff;
     text-transform: uppercase;
     letter-spacing: 2px;
-    font-weight: 400;
+    font-weight: 500;
 }
 
 .sessionBadge {

@@ -49,7 +49,7 @@ function Race() {
                     </span>
 
                     <span className={styles.sessionBadge}>
-                         {formatDate(currentData?.date)} | {tabs.find(t => t.key === activeSession)?.label}
+                         {formatDate(currentData?.date)}   {tabs.find(t => t.key === activeSession)?.label}
                     </span>
                 </div>
 
