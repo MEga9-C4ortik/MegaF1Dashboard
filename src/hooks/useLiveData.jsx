@@ -33,13 +33,13 @@ function useLiveData(session) {
                 fetchWeather(session),
             ]);
 
-            if (pos.status === 'fulfilled') setPositions(pos.value)
-            if (int.status === 'fulfilled') setIntervals(int.value)
-            if (drv.status === 'fulfilled') setDrivers(drv.value)
-            if (stn.status === 'fulfilled') setStints(stn.value)
-            if (pit.status === 'fulfilled') setPits(pit.value)
-            if (fms.status === 'fulfilled') setFiaMessages(fms.value)
-            if (wth.status === 'fulfilled') setWeather(wth.value?.at(-1) ?? null)
+            if (pos.status === 'fulfilled') setPositions(pos.value);
+            if (int.status === 'fulfilled') setIntervals(int.value);
+            if (drv.status === 'fulfilled') setDrivers(drv.value);
+            if (stn.status === 'fulfilled') setStints(stn.value);
+            if (pit.status === 'fulfilled') setPits(pit.value);
+            if (fms.status === 'fulfilled') setFiaMessages(fms.value);
+            if (wth.status === 'fulfilled') setWeather(wth.value?.at(-1) ?? null);
         } catch(error) {
             console.error('Live data fetch failed:', error);
         } finally {
@@ -50,11 +50,11 @@ function useLiveData(session) {
     useEffect(() => {
         loadData();
 
-        const interval = setInterval(loadData, 5000)
-        return () => clearInterval(interval)
+        const interval = setInterval(loadData, 5000);
+        return () => clearInterval(interval);
     }, [loadData]);
 
-    return { positions, intervals, drivers, stints, pits, fiaMessages, weather, loading }
+    return { positions, intervals, drivers, stints, pits, fiaMessages, weather, loading };
 }
 
 export default useLiveData;

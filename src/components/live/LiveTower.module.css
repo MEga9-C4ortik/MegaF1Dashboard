@@ -1,0 +1,128 @@
+.tower {
+    width: 100%;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.towerHeader {
+    display: grid;
+    grid-template-columns: 40px 1fr 80px 100px 100px;
+    padding: 6px 16px;
+    font-size: 10px;
+    color: #fff;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #1a1a1a;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 40px 1fr 80px 100px 100px;
+    padding: 10px 16px;
+    border-bottom: 1px solid #111;
+    border-left: 3px solid transparent;
+    transition: background 0.1s, border-left-color 0.3s;
+    align-items: center;
+}
+
+.row:hover {
+    background: #111;
+}
+
+.rowPit {
+    opacity: 0.6;
+    background: #0a0a0a;
+}
+
+.pos {
+    font-size: 14px;
+    color: #555;
+}
+
+.driver {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.acronym {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 1px;
+}
+
+.team {
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    opacity: 0.8;
+}
+
+.tyreCell {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.tyre {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.tyreAge {
+    font-size: 10px;
+    color: #444;
+}
+
+.pitBadge {
+    font-size: 10px;
+    font-weight: 700;
+    color: #ffc800;
+    letter-spacing: 1px;
+    border: 1px solid rgba(255, 200, 0, 0.3);
+    padding: 2px 6px;
+    border-radius: 2px;
+}
+
+.gap {
+    font-size: 12px;
+    color: #888;
+}
+
+.interval {
+    font-size: 12px;
+    color: #555;
+}
+
+.empty {
+    text-align: center;
+    padding: 40px;
+    color: #333;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+@media (max-width: 768px) {
+    .towerHeader {
+        grid-template-columns: 32px 1fr 60px 70px;
+        padding: 6px 12px;
+    }
+
+    /* скрываем interval на мобильном */
+    .towerHeader span:last-child,
+    .row > .interval {
+        display: none;
+    }
+
+    .row {
+        grid-template-columns: 32px 1fr 60px 70px;
+        padding: 10px 12px;
+    }
+}

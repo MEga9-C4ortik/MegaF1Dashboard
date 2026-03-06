@@ -12,26 +12,25 @@ function useLiveSession() {
                 const data = await fetchCurrentSession()
                 setSession(data)
 
-                // проверяем идёт ли сессия прямо сейчас
                 if (data?.date_end) {
                     const end = new Date(data.date_end)
                     const now = new Date()
-                    setIsLive(now < end)
+                    setIsLive(now < end);
                 } else {
-                    setIsLive(false)
+                    setIsLive(false);
                 }
             } catch (err) {
-                console.error('Session check failed:', err)
-                setIsLive(false)
+                console.error('Session check failed:', err);
+                setIsLive(false);
             } finally {
-                setLoading(false)
+                setLoading(false);
             }
         }
 
         checkSession();
 
-        const interval = setInterval(checkSession, 30000)
-        return () => clearInterval(interval)
+        const interval = setInterval(checkSession, 30000);
+        return () => clearInterval(interval);
     }, []);
 
     return { session, isLive, loading }
