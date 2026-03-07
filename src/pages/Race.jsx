@@ -1,43 +1,50 @@
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import useRaceResult from '../hooks/useRaceResult'
+import useOpenF1Sessions from '../hooks/useOpenF1Sessions'
 import styles from './Race.module.css'
 
 const formatDate = (dateStr) => {
-    if (!dateStr) return ''
+    if (!dateStr) return '';
     return new Date(dateStr).toLocaleDateString('en-GB', {
         day: '2-digit', month: 'short', year: 'numeric'
-    }).toUpperCase()
+    }).toUpperCase();
 }
 
 const getPodiumStyle = (position) => {
     if (position === '1' || position === '2' || position === '3')
         return styles.podium;
-    return ''
+    return '';
 }
 
 function Race() {
-    const { raceId } = useParams()
-    const [year, round] = raceId.split('-')
-    const { sessions, loading, error } = useRaceResult(year, round)
-    const [activeSession, setActiveSession] = useState('race')
+    const { raceId } = useParams();
+    const navigate = useNavigate();
+    const [year, round] = raceId.split('-');
+    const { sessions, loading, error } = useRaceResult(year, round);
+    const [activeSession, setActiveSession] = useState('race');
 
-    if (loading) return <p className={styles.loading}>Loading...</p>
-    if (error) return <p className={styles.error}>Error: {error}</p>
+    const countryName = sessions.race?.Circuit?.Location?.country;
+    const { sessionKeyMap } = useOpenF1Sessions(year, countryName);
+
+    if (loading) return <p className={styles.loading}>Loading...</p>;
+    if (error) return <p className={styles.error}>Error: {error}</p>;
 
     const raceInfo = sessions.race
-    if (!raceInfo) return <p className={styles.error}>Race not found</p>
+    if (!raceInfo) return <p className={styles.error}>Race not found</p>;
 
     const tabs = [
-        { key: 'race',   label: 'Race',    data: sessions.race },
-        { key: 'quali',  label: 'Qualification',   data: sessions.quali },
-        { key: 'sprint', label: 'Sprint',  data: sessions.sprint },
-        { key: 'fp1',    label: 'FP1',     data: sessions.fp1 },
-        { key: 'fp2',    label: 'FP2',     data: sessions.fp2 },
-        { key: 'fp3',    label: 'FP3',     data: sessions.fp3 },
-    ].filter(tab => tab.data) // removing unexisting tabs(sprint)
+        { key: 'race',   label: 'Race',          data: sessions.race },
+        { key: 'quali',  label: 'Qualification',  data: sessions.quali },
+        { key: 'sprint', label: 'Sprint',         data: sessions.sprint },
+        { key: 'fp1',    label: 'FP1',            data: sessions.fp1 },
+        { key: 'fp2',    label: 'FP2',            data: sessions.fp2 },
+        { key: 'fp3',    label: 'FP3',            data: sessions.fp3 },
+    ].filter(tab => tab.data);
 
-    const currentData = sessions[activeSession]
+    const currentData = sessions[activeSession];
+
+    const watchSessionKey = sessionKeyMap[activeSession];
 
     return (
         <div className={styles.page}>
@@ -48,7 +55,17 @@ function Race() {
                     </span>
 
                     <span className={styles.sessionBadge}>
-                         {formatDate(currentData?.date)}   {tabs.find(t => t.key === activeSession)?.label}
+                         {formatDate(currentData?.date)}&nbsp;&nbsp;&nbsp;{tabs.find(t => t.key === activeSession)?.label}
+                        {watchSessionKey && (
+                            <div className={styles.watchBar}>
+                                <button
+                                    className={styles.watchBtn}
+                                    onClick={() => navigate(`/pitwall?sessionKey=${watchSessionKey}`)}
+                                >
+                                    ▶ Watch on Pit Wall
+                                </button>
+                            </div>
+                        )}
                     </span>
                 </div>
 
@@ -79,6 +96,9 @@ function Race() {
         </div>
     )
 }
+
+// isFP — практика, показываем таблицу без PTS
+const FP_SESSIONS = new Set(['fp1', 'fp2', 'fp3']);
 
 function ResultsTable({ session, data }) {
     if (!data) return <p className={styles.error}>No data</p>
@@ -111,7 +131,35 @@ function ResultsTable({ session, data }) {
         );
     }
 
-    const results = data.Results || data.SprintResults || data.PracticeResults || []
+    // FP — нет очков, отдельная таблица без PTS колонки
+    if (FP_SESSIONS.has(session)) {
+        const results = data.PracticeResults || []
+        return (
+            <table className={styles.table}>
+                <thead>
+                <tr>
+                    <th>POS</th><th>DRIVER</th><th>TEAM</th><th>TIME</th>
+                </tr>
+                </thead>
+                <tbody>
+                {results.map(r => (
+                    <tr key={r.position}>
+                        <td className={styles.pos}>{r.position}</td>
+                        <td className={styles.driver}>
+                            <span className={styles.driverCode}>{r.Driver.code}</span>
+                            <span className={styles.driverName}>{r.Driver.familyName}</span>
+                        </td>
+                        <td className={styles.team}>{r.Constructor.name}</td>
+                        <td className={styles.time}>{r.Time?.time || r.status || '—'}</td>
+                    </tr>
+                ))}
+                </tbody>
+            </table>
+        );
+    }
+
+    // Race / Sprint
+    const results = data.Results || data.SprintResults || []
     return (
         <table className={styles.table}>
             <thead>

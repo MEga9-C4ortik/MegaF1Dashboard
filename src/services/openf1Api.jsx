@@ -5,7 +5,7 @@ const safeFetch = async (url) => {
   if (!res.ok) {
     throw new Error(`HTTP ${res.status} for ${url}`);
   }
-  return res.json();
+  return res.json()
 }
 
 export const fetchCurrentSession = async () => {
@@ -16,6 +16,13 @@ export const fetchCurrentSession = async () => {
 export const fetchSessionsByMeeting = async (meetingKey) => {
   const data = await safeFetch(`${BASE_URL}/sessions?meeting_key=${meetingKey}`);
   return Array.isArray(data) ? data : [];
+}
+
+export const fetchMeetings = async (year) => {
+  const data = await safeFetch(`${BASE_URL}/meetings?year=${year}`);
+  return Array.isArray(data)
+      ? data.sort((a, b) => a.meeting_number - b.meeting_number)
+      : [];
 }
 
 export const fetchPositions = async (sessionKey, sinceDate = null) => {
@@ -66,15 +73,12 @@ export const fetchWeather = async (sessionKey) => {
   return Array.isArray(data) ? data : [];
 }
 
-// driverNumber — передаём реального пилота из сессии, не хардкодим 1
 export const fetchTrackLayout = async (sessionKey, driverNumber) => {
   const data = await safeFetch(`${BASE_URL}/location?session_key=${sessionKey}&driver_number=${driverNumber}`);
   const arr = Array.isArray(data) ? data : [];
   return arr.filter((_, i) => i % 5 === 0);
 }
 
-// replayTime — для replay используем окно вокруг позиции реплея,
-// иначе Date.now()-5s это будущее для прошлых сессий → всегда пустой массив
 export const fetchDriverLocations = async (sessionKey, replayTime = null) => {
   let url;
   if (replayTime) {

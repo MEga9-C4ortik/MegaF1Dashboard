@@ -80,7 +80,11 @@
 
 .yearSelect:hover {
     border-color: #e10600;
+}
+
+.yearSelect:focus {
     color: #fff;
+    border-color: #e10600;
 }
 
 .burger {
@@ -113,7 +117,6 @@
     transform-origin: center;
 }
 
-/* анимация в крест */
 .burgerOpen span:nth-child(1) {
     transform: translateY(7px) rotate(45deg);
 }

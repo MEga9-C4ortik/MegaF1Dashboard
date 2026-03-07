@@ -20,7 +20,7 @@ function getCurrentStint(stints, laps, driverNumber, currentTime) {
 
     if (!driverStints.length) return null;
 
-    // Если нет currentTime (live режим) — берём последний stint
+    // Если нет currentTime (pitWall режим) — берём последний stint
     if (!currentTime) {
         return driverStints[driverStints.length - 1];
     }
@@ -53,7 +53,7 @@ function getLatestInterval(intervals, driverNumber) {
     );
 }
 
-// Последний круг до currentTime (или вообще последний в live)
+// Последний круг до currentTime (или вообще последний в pitWall)
 function getLastLap(laps, driverNumber, currentTime) {
     let driverLaps = laps.filter(
         l => l.driver_number === driverNumber && l.lap_duration != null

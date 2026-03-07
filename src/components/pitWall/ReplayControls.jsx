@@ -1,6 +1,5 @@
 import styles from './ReplayControls.module.css'
 
-// Показываем время как +MM:SS от начала сессии — понятнее чем абсолютный UTC
 function formatElapsed(current, min) {
     if (!current || !min) return '+00:00';
     const diffSec = Math.floor((current.getTime() - min.getTime()) / 1000);
@@ -57,9 +56,9 @@ function ReplayControls({ isPlaying, currentTime, minTime, maxTime, progress, sp
 
             <span className={styles.time}>{formatDuration(minTime, maxTime)}</span>
 
-            <button className={styles.speedBtn} onClick={cycleSpeed} title="Change playback speed">
+            <select className={styles.speedBtn} onClick={cycleSpeed} title="Change playback speed">
                 x{speed}
-            </button>
+            </select>
         </div>
     );
 }

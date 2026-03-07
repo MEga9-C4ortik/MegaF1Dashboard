@@ -15,13 +15,13 @@ function useRaceResult(year, round) {
         fp2: null,
         fp3: null,
     })
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState(null)
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const loadAll = async () => {
             try {
-                setLoading(true)
+                setLoading(true);
 
                 const [race, quali, sprint, fp1, fp2, fp3] = await Promise.allSettled([
                     fetchRaceResult(year, round),
@@ -32,19 +32,21 @@ function useRaceResult(year, round) {
                     fetchFP(year, round, 3),
                 ]);
 
-                // allSettled не падает если одна сессия не найдена
+                const getValue = (result) =>
+                    result.status === 'fulfilled' && result.value ? result.value : null;
+
                 setSessions({
-                    race:   race.status   === 'fulfilled' ? race.value   : null,
-                    quali:  quali.status  === 'fulfilled' ? quali.value  : null,
-                    sprint: sprint.status === 'fulfilled' ? sprint.value : null,
-                    fp1:    fp1.status    === 'fulfilled' ? fp1.value    : null,
-                    fp2:    fp2.status    === 'fulfilled' ? fp2.value    : null,
-                    fp3:    fp3.status    === 'fulfilled' ? fp3.value    : null,
+                    race:   getValue(race),
+                    quali:  getValue(quali),
+                    sprint: getValue(sprint),
+                    fp1:    getValue(fp1),
+                    fp2:    getValue(fp2),
+                    fp3:    getValue(fp3),
                 })
             } catch (err) {
-                setError(err.message)
+                setError(err.message);
             } finally {
-                setLoading(false)
+                setLoading(false);
             }
         }
 

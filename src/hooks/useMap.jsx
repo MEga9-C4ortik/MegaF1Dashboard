@@ -93,7 +93,7 @@ function useMap(sessionKey, drivers, replayTime = null) {
         const loadLocations = async () => {
             try {
                 // В replay режиме передаём replayTime — запрашиваем локации на момент реплея.
-                // В live режиме replayTime = null — берём последние 5 секунд реального времени.
+                // В pitWall режиме replayTime = null — берём последние 5 секунд реального времени.
                 const raw = await fetchDriverLocations(sessionKey, replayTime);
                 if (!raw.length || !isMounted.current) return;
 
@@ -127,7 +127,7 @@ function useMap(sessionKey, drivers, replayTime = null) {
         loadLocations();
 
         // В replay режиме интервальный polling не нужен — replayTime обновляется снаружи.
-        // В live режиме — опрашиваем каждые 5 секунд.
+        // В pitWall режиме — опрашиваем каждые 5 секунд.
         if (replayTime) return;
         const interval = setInterval(loadLocations, 5000);
         return () => clearInterval(interval);

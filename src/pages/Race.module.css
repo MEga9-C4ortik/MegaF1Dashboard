@@ -259,3 +259,28 @@
         font-size: 14px;
     }
 }
+/* ── Watch on Pit Wall button ── */
+.watchBar {
+    padding: 12px 0 4px 0;
+    margin-bottom: 8px;
+}
+
+.watchBtn {
+    background: transparent;
+    border: 1px solid #e10600;
+    color: #e10600;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.watchBtn:hover {
+    background: #e10600;
+    color: #fff;
+}

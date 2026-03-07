@@ -29,8 +29,8 @@ function Navbar({ year, setYear }) {
                 <Link to="/standings" className={location.pathname === '/standings' ? styles.linkActive : styles.link}>
                     Standings
                 </Link>
-                <Link to="/live" className={location.pathname === '/live' ? styles.linkActive : styles.link}>
-                    Live
+                <Link to="/pitWall" className={location.pathname === '/pitWall' ? styles.linkActive : styles.link}>
+                    Pit Wall
                 </Link>
             </div>
 
@@ -45,15 +45,15 @@ function Navbar({ year, setYear }) {
                       onClick={handleLinkClick}>
                     Standings
                 </Link>
-                <Link to="/live"
-                      className={location.pathname === '/live' ? styles.mobileLinkActive : styles.mobileLink}
+                <Link to="/pitWall"
+                      className={location.pathname === '/pitWall' ? styles.mobileLinkActive : styles.mobileLink}
                       onClick={handleLinkClick}>
                     Live
                 </Link>
             </div>
 
             <div className={styles.right}>
-                {location.pathname !== '/live' && !location.pathname.startsWith('/race/') && (
+                {!location.pathname.startsWith('/race/') && (
                     <select
                         className={styles.yearSelect}
                         value={year}
