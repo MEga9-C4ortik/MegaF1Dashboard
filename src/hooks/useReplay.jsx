@@ -4,14 +4,12 @@ const PLAYBACK_SPEEDS = [1, 2, 5, 10, 30];
 const TICK_MS = 500;
 
 function useReplay(allPositions, allIntervals = [], sessionKey = null) {
-    const [isPlaying, setIsPlaying]     = useState(false);
-    const [speedIndex, setSpeedIndex]   = useState(0);
+    const [isPlaying, setIsPlaying]   = useState(false);
+    const [speedIndex, setSpeedIndex] = useState(0);
     const [currentTime, setCurrentTime] = useState(null);
 
     const { minTime, maxTime } = useMemo(() => {
-        if (!allPositions || allPositions.length === 0) {
-            return { minTime: null, maxTime: null };
-        }
+        if (!allPositions || allPositions.length === 0) return { minTime: null, maxTime: null };
         const times = allPositions.map(p => new Date(p.date).getTime()).filter(Boolean);
         return {
             minTime: new Date(Math.min(...times)),
@@ -19,16 +17,10 @@ function useReplay(allPositions, allIntervals = [], sessionKey = null) {
         };
     }, [allPositions]);
 
-    // Когда появляются данные — ставим на начало
     useEffect(() => {
-        if (minTime && !currentTime) {
-            setCurrentTime(minTime);
-        }
+        if (minTime && !currentTime) setCurrentTime(minTime);
     }, [minTime]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // Сброс при смене сессии — зависим от sessionKey, НЕ от allPositions!
-    // Если зависеть от allPositions, то каждый инкрементальный fetch (каждые 15 сек)
-    // создаёт новую ссылку на массив и сбрасывает replay на начало — это был главный баг.
     useEffect(() => {
         setCurrentTime(null);
         setIsPlaying(false);
@@ -36,9 +28,7 @@ function useReplay(allPositions, allIntervals = [], sessionKey = null) {
     }, [sessionKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const speedRef = useRef(PLAYBACK_SPEEDS[speedIndex]);
-    useEffect(() => {
-        speedRef.current = PLAYBACK_SPEEDS[speedIndex];
-    }, [speedIndex]);
+    useEffect(() => { speedRef.current = PLAYBACK_SPEEDS[speedIndex]; }, [speedIndex]);
 
     useEffect(() => {
         if (!isPlaying || !maxTime) return;
@@ -46,10 +36,7 @@ function useReplay(allPositions, allIntervals = [], sessionKey = null) {
             setCurrentTime(prev => {
                 if (!prev) return prev;
                 const next = new Date(prev.getTime() + TICK_MS * speedRef.current);
-                if (next >= maxTime) {
-                    setIsPlaying(false);
-                    return maxTime;
-                }
+                if (next >= maxTime) { setIsPlaying(false); return maxTime; }
                 return next;
             });
         }, TICK_MS);
@@ -57,27 +44,27 @@ function useReplay(allPositions, allIntervals = [], sessionKey = null) {
     }, [isPlaying, maxTime]);
 
     const replayPositions = useMemo(() => {
-        if (!currentTime || !allPositions || allPositions.length === 0) return [];
+        if (!currentTime || !allPositions?.length) return [];
         const cutoff = currentTime.getTime();
         const filtered = allPositions.filter(p => new Date(p.date).getTime() <= cutoff);
-        const latestByDriver = {};
+        const latest = {};
         filtered.forEach(p => {
-            const ex = latestByDriver[p.driver_number];
-            if (!ex || p.date > ex.date) latestByDriver[p.driver_number] = p;
+            if (!latest[p.driver_number] || p.date > latest[p.driver_number].date)
+                latest[p.driver_number] = p;
         });
-        return Object.values(latestByDriver);
+        return Object.values(latest);
     }, [allPositions, currentTime]);
 
     const replayIntervals = useMemo(() => {
-        if (!currentTime || !allIntervals || allIntervals.length === 0) return [];
+        if (!currentTime || !allIntervals?.length) return [];
         const cutoff = currentTime.getTime();
         const filtered = allIntervals.filter(i => new Date(i.date).getTime() <= cutoff);
-        const latestByDriver = {};
+        const latest = {};
         filtered.forEach(i => {
-            const ex = latestByDriver[i.driver_number];
-            if (!ex || i.date > ex.date) latestByDriver[i.driver_number] = i;
+            if (!latest[i.driver_number] || i.date > latest[i.driver_number].date)
+                latest[i.driver_number] = i;
         });
-        return Object.values(latestByDriver);
+        return Object.values(latest);
     }, [allIntervals, currentTime]);
 
     const play  = () => setIsPlaying(true);
@@ -90,6 +77,12 @@ function useReplay(allPositions, allIntervals = [], sessionKey = null) {
         setIsPlaying(false);
     };
 
+    // Устанавливаем конкретную скорость по значению (для <select>)
+    const setSpeed = (value) => {
+        const idx = PLAYBACK_SPEEDS.indexOf(Number(value));
+        if (idx !== -1) setSpeedIndex(idx);
+    };
+
     const progress = useMemo(() => {
         if (!minTime || !maxTime || !currentTime) return 0;
         const range = maxTime.getTime() - minTime.getTime();
@@ -97,23 +90,11 @@ function useReplay(allPositions, allIntervals = [], sessionKey = null) {
         return (currentTime.getTime() - minTime.getTime()) / range;
     }, [minTime, maxTime, currentTime]);
 
-    const cycleSpeed = () => {
-        setSpeedIndex(i => (i + 1) % PLAYBACK_SPEEDS.length);
-    };
-
     return {
-        replayPositions,
-        replayIntervals,
-        isPlaying,
-        currentTime,
-        minTime,
-        maxTime,
-        progress,
+        replayPositions, replayIntervals,
+        isPlaying, currentTime, minTime, maxTime, progress,
         speed: PLAYBACK_SPEEDS[speedIndex],
-        play,
-        pause,
-        seek,
-        cycleSpeed,
+        play, pause, seek, setSpeed,
     };
 }
 

@@ -1,4 +1,3 @@
-import { PLAYBACK_SPEEDS } from '../../hooks/useReplay'
 import styles from './ReplayControls.module.css'
 
 function formatElapsed(current, min) {
@@ -59,9 +58,11 @@ function ReplayControls({ isPlaying, currentTime, minTime, maxTime, progress, sp
                 onChange={e => setSpeed(e.target.value)}
                 title="Playback speed"
             >
-                {PLAYBACK_SPEEDS.map(s => (
-                    <option key={s} value={s}>x{s}</option>
-                ))}
+                <option value={1}>x1</option>
+                <option value={2}>x2</option>
+                <option value={5}>x5</option>
+                <option value={10}>x10</option>
+                <option value={30}>x30</option>
             </select>
         </div>
     );
