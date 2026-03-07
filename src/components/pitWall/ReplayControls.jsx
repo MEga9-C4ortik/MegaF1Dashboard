@@ -1,3 +1,4 @@
+import { PLAYBACK_SPEEDS } from '../../hooks/useReplay'
 import styles from './ReplayControls.module.css'
 
 function formatElapsed(current, min) {
@@ -16,11 +17,8 @@ function formatDuration(min, max) {
     return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
-function ReplayControls({ isPlaying, currentTime, minTime, maxTime, progress, speed, play, pause, seek, cycleSpeed }) {
-    const handleSlider = (e) => {
-        seek(Number(e.target.value) / 100);
-    };
-
+function ReplayControls({ isPlaying, currentTime, minTime, maxTime, progress, speed, play, pause, seek, setSpeed }) {
+    const handleSlider = (e) => seek(Number(e.target.value) / 100);
     const isFinished = progress >= 1;
 
     return (
@@ -48,16 +46,22 @@ function ReplayControls({ isPlaying, currentTime, minTime, maxTime, progress, sp
             <input
                 type="range"
                 className={styles.slider}
-                min={0}
-                max={100}
+                min={0} max={100}
                 value={Math.round(progress * 100)}
                 onChange={handleSlider}
             />
 
             <span className={styles.time}>{formatDuration(minTime, maxTime)}</span>
 
-            <select className={styles.speedBtn} onClick={cycleSpeed} title="Change playback speed">
-                x{speed}
+            <select
+                className={styles.speedSelect}
+                value={speed}
+                onChange={e => setSpeed(e.target.value)}
+                title="Playback speed"
+            >
+                {PLAYBACK_SPEEDS.map(s => (
+                    <option key={s} value={s}>x{s}</option>
+                ))}
             </select>
         </div>
     );

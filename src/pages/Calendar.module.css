@@ -227,3 +227,237 @@
         font-size: 18px;
     }
 }
+/* ══════════════════════════════════════════
+   NEXT RACE — Featured block
+══════════════════════════════════════════ */
+.nextCard {
+    background: #130a0a;
+    border: 1.5px solid rgba(225, 6, 0, 0.4);
+    border-radius: 4px;
+    margin-bottom: 28px;
+    overflow: hidden;
+}
+
+.nextCardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px 28px 16px;
+    border-bottom: 1px solid #1e0a0a;
+    gap: 16px;
+}
+
+.nextCardLeft {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.nextCardRight {
+    flex-shrink: 0;
+    padding-top: 4px;
+}
+
+.nextBadge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: #e10600;
+    margin-bottom: 6px;
+}
+
+.nextRound {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #555;
+    letter-spacing: 1px;
+}
+
+.nextCountry {
+    font-size: 14px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-top: 4px;
+}
+
+.nextRaceName {
+    font-size: 28px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    line-height: 1.1;
+    color: #e10600;
+    margin-top: 4px;
+}
+
+.nextCircuit {
+    font-size: 14px;
+    color: #555;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+}
+
+.nextCardBody {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+}
+
+/* ── Schedule block ── */
+.scheduleBlock, .resultsBlock {
+    padding: 18px 24px;
+    border-right: 1px solid #1e0a0a;
+}
+
+.resultsBlock:last-child {
+    border-right: none;
+}
+
+.blockTitle {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2.5px;
+    color: #444;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+}
+
+.scheduleList {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.scheduleRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.scheduleRowDone {
+    opacity: 0.45;
+}
+
+.scheduleLabel {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    color: #fff;
+    letter-spacing: 0.5px;
+    width: 100px;
+    flex-shrink: 0;
+}
+
+.scheduleDate {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    color: #666;
+    letter-spacing: 0.5px;
+    flex: 1;
+}
+
+.scheduleBadge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+.scheduleDone {
+    color: #333;
+    border: 1px solid #1e1e1e;
+}
+
+.scheduleUpcoming {
+    color: #e10600;
+    border: 1px solid rgba(225, 6, 0, 0.25);
+    background: rgba(225, 6, 0, 0.07);
+}
+
+.miniTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.miniTable tr {
+    border-bottom: 1px solid #150808;
+}
+
+.miniPos {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    color: #444;
+    padding: 5px 8px 5px 0;
+    width: 20px;
+}
+
+.miniDriver {
+    display: flex;
+    gap: 7px;
+    align-items: center;
+    padding: 5px 0;
+}
+
+.miniCode {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: 0.5px;
+}
+
+.miniName {
+    font-size: 16px;
+    color: #555;
+}
+
+.miniTeam {
+    font-size: 16px;
+    color: #444;
+    padding: 5px 8px;
+}
+
+.miniTime {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    color: #888;
+    padding: 5px 0;
+    text-align: right;
+    white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+    .nextCardBody {
+        grid-template-columns: 1fr;
+    }
+
+    .scheduleBlock, .resultsBlock {
+        border-right: none;
+        border-bottom: 1px solid #1e0a0a;
+        padding: 16px;
+    }
+
+    .nextCardHeader {
+        flex-direction: column;
+        padding: 16px;
+    }
+
+    .nextRaceName {
+        font-size: 24px;
+    }
+
+    .scheduleRow {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .scheduleDate {
+        font-size: 12px;
+    }
+}
