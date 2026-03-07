@@ -28,7 +28,7 @@ function useLiveData(sessionKey) {
     const [pits, setPits]               = useState([]);
     const [fiaMessages, setFiaMessages] = useState([]);
     const [radio, setRadio]             = useState([]);
-    const [loading, setLoading]         = useState(false); // false по умолчанию — не грузим пока нет sessionKey
+    const [loading, setLoading]         = useState(false);
 
     const initialDynamicDone = useRef(false);
     const isMounted = useRef(true);
@@ -37,7 +37,6 @@ function useLiveData(sessionKey) {
         isMounted.current = true;
         initialDynamicDone.current = false;
 
-        // Нет сессии — сбрасываем всё и выходим, loading = false
         if (!sessionKey) {
             setPositions([]);
             setIntervals([]);
@@ -54,7 +53,6 @@ function useLiveData(sessionKey) {
 
         setLoading(true);
 
-        // Есть кеш — показываем сразу, loading снимаем
         const cached = getCached(sessionKey);
         if (cached) {
             if (cached.drivers)     setDrivers(cached.drivers);
@@ -69,7 +67,6 @@ function useLiveData(sessionKey) {
             setLoading(false);
             if (cached.drivers?.length) initialDynamicDone.current = true;
         } else {
-            // Нет кеша — сбрасываем стейт, loading останется true пока loadStatic не завершится
             setPositions([]);
             setIntervals([]);
             setLaps([]);
@@ -121,6 +118,9 @@ function useLiveData(sessionKey) {
 
             if (posData && posData.length > 0) {
                 if (initialDynamicDone.current) {
+                    // Инкрементальный update: мержим новые данные в существующий массив.
+                    // НЕ кешируем posData — это только последние 35 секунд!
+                    // Кеш positions обновляется только при первой (полной) загрузке.
                     setPositions(prev => {
                         const merged = [...prev, ...posData];
                         const seen = new Set();
@@ -132,9 +132,10 @@ function useLiveData(sessionKey) {
                         });
                     });
                 } else {
+                    // Первая загрузка — полный массив, кешируем его
                     setPositions(posData);
+                    setCached(sessionKey, { positions: posData });
                 }
-                setCached(sessionKey, { positions: posData });
             }
 
             if (intData && intData.length > 0) {
@@ -163,7 +164,7 @@ function useLiveData(sessionKey) {
     }, [sessionKey]);
 
     const loadStatic = useCallback(async () => {
-        if (!sessionKey) return; // выход без setLoading — sessionKey=null уже обработан выше
+        if (!sessionKey) return;
 
         if (hasStaticCache(sessionKey)) {
             setLoading(false);

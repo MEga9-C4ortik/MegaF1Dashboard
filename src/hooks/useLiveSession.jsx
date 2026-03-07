@@ -20,10 +20,17 @@ function useLiveSession() {
                     ));
                 }
 
-                if (data?.date_end) {
-                    const end = new Date(data.date_end);
+                if (data) {
                     const now = new Date();
-                    setIsLive(now < end);
+                    const start = data.date_start ? new Date(data.date_start) : null;
+                    const end   = data.date_end   ? new Date(data.date_end)   : null;
+
+                    // Сессия live если уже началась И ещё не закончилась.
+                    // Раньше: date_end == null → isLive = false — было неверно,
+                    // т.к. живая сессия может не иметь date_end пока идёт.
+                    const hasStarted = start && now >= start;
+                    const hasEnded   = end && now >= end;
+                    setIsLive(!!(hasStarted && !hasEnded));
                 } else {
                     setIsLive(false);
                 }

@@ -1,37 +1,17 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 
-// Скорость реплея: во сколько раз быстрее реального времени
 const PLAYBACK_SPEEDS = [1, 2, 5, 10, 30];
-
-// Как часто тикает таймер реплея (мс)
-// При скорости x30 и тике 500мс → прыгаем на 15 секунд за тик
 const TICK_MS = 500;
 
-/**
- * useReplay — управляет воспроизведением исторических данных сессии.
- *
- * Принимает все positions (полная история за сессию).
- * Возвращает positions отфильтрованные по текущему времени реплея.
- *
- * Идея:
- * - positions содержат поле `date` — это ISO строка когда была записана позиция
- * - Мы берём min/max date из всех позиций → это диапазон сессии
- * - currentTime — текущий момент реплея (двигается при play)
- * - Фильтруем: берём записи где date <= currentTime,
- *   для каждого водителя берём самую последнюю → это их позиция "сейчас"
- */
-function useReplay(allPositions) {
-    const [isPlaying, setIsPlaying]   = useState(false);
-    const [speedIndex, setSpeedIndex] = useState(0); // индекс в PLAYBACK_SPEEDS, дефолт x1
-    const [currentTime, setCurrentTime] = useState(null); // Date объект
+function useReplay(allPositions, allIntervals = [], sessionKey = null) {
+    const [isPlaying, setIsPlaying]     = useState(false);
+    const [speedIndex, setSpeedIndex]   = useState(0);
+    const [currentTime, setCurrentTime] = useState(null);
 
-    // useMemo пересчитывается только когда изменится allPositions.
-    // Не пересчитываем диапазон каждый рендер — это дорого если позиций много.
     const { minTime, maxTime } = useMemo(() => {
         if (!allPositions || allPositions.length === 0) {
             return { minTime: null, maxTime: null };
         }
-        // Преобразуем строки в числа (ms) для сравнения
         const times = allPositions.map(p => new Date(p.date).getTime()).filter(Boolean);
         return {
             minTime: new Date(Math.min(...times)),
@@ -39,16 +19,22 @@ function useReplay(allPositions) {
         };
     }, [allPositions]);
 
-    // Когда появляются данные — ставим currentTime на начало сессии
+    // Когда появляются данные — ставим на начало
     useEffect(() => {
         if (minTime && !currentTime) {
             setCurrentTime(minTime);
         }
     }, [minTime]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // ─── Тик реплея ──────────────────────────────────────────────────────────
-    // useRef для скорости — не хотим пересоздавать интервал при каждой смене скорости.
-    // Вместо этого интервал всегда читает актуальное значение через ref.
+    // Сброс при смене сессии — зависим от sessionKey, НЕ от allPositions!
+    // Если зависеть от allPositions, то каждый инкрементальный fetch (каждые 15 сек)
+    // создаёт новую ссылку на массив и сбрасывает replay на начало — это был главный баг.
+    useEffect(() => {
+        setCurrentTime(null);
+        setIsPlaying(false);
+        setSpeedIndex(0);
+    }, [sessionKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
     const speedRef = useRef(PLAYBACK_SPEEDS[speedIndex]);
     useEffect(() => {
         speedRef.current = PLAYBACK_SPEEDS[speedIndex];
@@ -56,15 +42,10 @@ function useReplay(allPositions) {
 
     useEffect(() => {
         if (!isPlaying || !maxTime) return;
-
         const timer = setInterval(() => {
             setCurrentTime(prev => {
                 if (!prev) return prev;
-
-                // Сдвигаем время вперёд: tick * скорость = сколько реального времени прошло
                 const next = new Date(prev.getTime() + TICK_MS * speedRef.current);
-
-                // Дошли до конца — останавливаем
                 if (next >= maxTime) {
                     setIsPlaying(false);
                     return maxTime;
@@ -72,40 +53,36 @@ function useReplay(allPositions) {
                 return next;
             });
         }, TICK_MS);
-
         return () => clearInterval(timer);
-        // isPlaying и maxTime в deps: перезапускаем интервал только при play/pause
-        // или когда узнали maxTime (данные загрузились)
     }, [isPlaying, maxTime]);
 
-    // ─── Фильтрация позиций по currentTime ───────────────────────────────────
-    // useMemo: не пересчитываем при каждом рендере — только когда изменились данные или время
     const replayPositions = useMemo(() => {
         if (!currentTime || !allPositions || allPositions.length === 0) return [];
-
         const cutoff = currentTime.getTime();
-
-        // Шаг 1: оставляем только записи до текущего момента
         const filtered = allPositions.filter(p => new Date(p.date).getTime() <= cutoff);
-
-        // Шаг 2: для каждого водителя берём самую свежую запись
-        // (т.е. его позицию именно на момент currentTime)
         const latestByDriver = {};
         filtered.forEach(p => {
-            const existing = latestByDriver[p.driver_number];
-            if (!existing || p.date > existing.date) {
-                latestByDriver[p.driver_number] = p;
-            }
+            const ex = latestByDriver[p.driver_number];
+            if (!ex || p.date > ex.date) latestByDriver[p.driver_number] = p;
         });
-
         return Object.values(latestByDriver);
     }, [allPositions, currentTime]);
 
-    // ─── Хелперы ─────────────────────────────────────────────────────────────
+    const replayIntervals = useMemo(() => {
+        if (!currentTime || !allIntervals || allIntervals.length === 0) return [];
+        const cutoff = currentTime.getTime();
+        const filtered = allIntervals.filter(i => new Date(i.date).getTime() <= cutoff);
+        const latestByDriver = {};
+        filtered.forEach(i => {
+            const ex = latestByDriver[i.driver_number];
+            if (!ex || i.date > ex.date) latestByDriver[i.driver_number] = i;
+        });
+        return Object.values(latestByDriver);
+    }, [allIntervals, currentTime]);
+
     const play  = () => setIsPlaying(true);
     const pause = () => setIsPlaying(false);
 
-    // Перемотка по слайдеру: значение 0..1 → конвертируем в Date
     const seek = (fraction) => {
         if (!minTime || !maxTime) return;
         const range = maxTime.getTime() - minTime.getTime();
@@ -126,6 +103,7 @@ function useReplay(allPositions) {
 
     return {
         replayPositions,
+        replayIntervals,
         isPlaying,
         currentTime,
         minTime,
@@ -136,7 +114,6 @@ function useReplay(allPositions) {
         pause,
         seek,
         cycleSpeed,
-        PLAYBACK_SPEEDS,
     };
 }
 

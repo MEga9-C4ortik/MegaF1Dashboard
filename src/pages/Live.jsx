@@ -20,7 +20,9 @@ function SessionTabs({ sessions, activeSessionKey, isLive, currentSessionKey, on
                     key={s.session_key}
                     className={`${styles.sessionTab} ${activeSessionKey === s.session_key ? styles.sessionTabActive : ''}`}
                     onClick={() => {
-                        if (isLive && s.session_key === currentSessionKey) {
+                        if (s.session_key === currentSessionKey && isLive) {
+                            onSelect(null);
+                        } else if (s.session_key === activeSessionKey && !isLive) {
                             onSelect(null);
                         } else {
                             onSelect(s.session_key);
@@ -47,8 +49,31 @@ function Live() {
         weather, loading: dataLoading, hasData
     } = useLiveData(activeSessionKey);
 
-    const replay = useReplay(positions);
+    // Передаём activeSessionKey — сброс replay только при смене сессии, не при каждом fetch
+    const replay = useReplay(positions, intervals, activeSessionKey);
+    const ct = isReplayMode ? replay.currentTime : null;
+
     const displayPositions = isReplayMode ? replay.replayPositions : positions;
+    const displayIntervals = isReplayMode ? replay.replayIntervals  : intervals;
+
+    const displayStints = stints; // stints не имеют date — не фильтруем
+
+    const displayPits = (isReplayMode && ct)
+        ? pits.filter(p => p.pit_in_time && new Date(p.pit_in_time) <= ct)
+        : pits;
+
+    const displayFiaMessages = isReplayMode
+        ? (ct ? fiaMessages.filter(m => new Date(m.date) <= ct) : [])
+        : fiaMessages;
+
+    const displayRadio = isReplayMode
+        ? (ct ? radio.filter(m => new Date(m.date) <= ct) : [])
+        : radio;
+
+    // В replay — показываем имя выбранной сессии, не текущей live
+    const activeSession = selectedSessionKey
+        ? (sessions.find(s => s.session_key === selectedSessionKey) ?? session)
+        : session;
 
     const tabsProps = {
         sessions,
@@ -58,13 +83,14 @@ function Live() {
         onSelect: setSelectedSessionKey,
     };
 
-    // Шаг 1: сессии ещё грузятся
+    const showBadge = isLive || !!selectedSessionKey;
+    const badgeLabel = (isLive && !selectedSessionKey) ? 'LIVE' : 'REPLAY';
+    const badgeDotClass = badgeLabel === 'LIVE' ? styles.dot : styles.dotReplay;
+
     if (sessionLoading) {
         return <p className={styles.loading}>Connecting...</p>;
     }
 
-    // Шаг 2: нет живой сессии И пользователь ничего не выбрал
-    // selectedSessionKey = null означает "юзер не нажимал на табы"
     if (!isLive && !selectedSessionKey) {
         return (
             <div className={styles.page}>
@@ -76,16 +102,11 @@ function Live() {
         );
     }
 
-    // Шаг 3: есть sessionKey — данные грузятся
-    // Показываем loading, но табы всегда видны
     if (dataLoading) {
         return (
             <div className={styles.page}>
                 <div className={styles.header}>
-                    <div className={styles.live}>
-                        <span className={styles.liveDot} />
-                        {isLive && !selectedSessionKey ? 'LIVE' : 'REPLAY'}
-                    </div>
+                    {showBadge && <div className={styles.live}><span className={badgeDotClass} />{badgeLabel}</div>}
                     <SessionTabs {...tabsProps} />
                 </div>
                 <span className={styles.loading}>Loading data...</span>
@@ -93,16 +114,11 @@ function Live() {
         );
     }
 
-    // Шаг 4: загрузка завершена, данных нет (сессия не началась)
-    // ВАЖНО: проверяем !hasData только ПОСЛЕ того как loading = false
     if (!hasData) {
         return (
             <div className={styles.page}>
                 <div className={styles.header}>
-                    <div className={styles.live}>
-                        <span className={styles.liveDot} />
-                        {isLive && !selectedSessionKey ? 'LIVE' : 'REPLAY'}
-                    </div>
+                    {showBadge && <div className={styles.live}><span className={badgeDotClass} />{badgeLabel}</div>}
                     <SessionTabs {...tabsProps} />
                 </div>
                 <NoSessionScreen session={session} />
@@ -110,16 +126,12 @@ function Live() {
         );
     }
 
-    // Шаг 5: всё норм, рендерим данные
     return (
         <div className={styles.page}>
             <div className={styles.header}>
-                <div className={styles.live}>
-                    <span className={styles.liveDot} />
-                    {isLive && !selectedSessionKey ? 'LIVE' : 'REPLAY'}
-                </div>
+                {showBadge && <div className={styles.live}><span className={badgeDotClass} />{badgeLabel}</div>}
                 <span className={styles.sessionName}>
-                    {session?.session_name} — {session?.circuit_short_name}
+                    {activeSession?.session_name} — {activeSession?.circuit_short_name}
                 </span>
                 <SessionTabs {...tabsProps} />
                 <Weather weather={weather} />
@@ -146,10 +158,11 @@ function Live() {
                         ? <LiveTower
                             positions={displayPositions}
                             drivers={drivers}
-                            stints={stints}
-                            intervals={intervals}
+                            stints={displayStints}
+                            intervals={displayIntervals}
                             laps={laps}
-                            pits={pits}
+                            pits={displayPits}
+                            currentTime={ct}
                         />
                         : <p style={{color:'#333', padding:'40px', fontFamily:'JetBrains Mono', fontSize:12, letterSpacing:2}}>
                             NO DATA FOR THIS SESSION
@@ -157,9 +170,9 @@ function Live() {
                     }
                 </div>
                 <div className={styles.right}>
-                    <Map sessionKey={activeSessionKey} drivers={drivers} />
-                    <FiaMessages messages={fiaMessages} />
-                    <RadioMessages messages={radio} drivers={drivers} />
+                    <Map sessionKey={activeSessionKey} drivers={drivers} replayTime={ct} />
+                    <FiaMessages messages={displayFiaMessages} />
+                    <RadioMessages messages={displayRadio} drivers={drivers} />
                 </div>
             </div>
         </div>

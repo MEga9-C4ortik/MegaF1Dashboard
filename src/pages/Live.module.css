@@ -125,3 +125,24 @@
         border-right: none;
     }
 }
+/* Точка LIVE — красная, мигает */
+.dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #e10600;
+    animation: blink 2s infinite;
+}
+
+/* Точка REPLAY — серая, не мигает */
+.dotReplay {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #555;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.2; }
+}

@@ -1,8 +1,8 @@
 import useTrackMap from '../../hooks/useMap'
 import styles from './Map.module.css'
 
-function Map({ sessionKey, drivers }) {
-    const { trackPath, driverDots, loading, W, H } = useTrackMap(sessionKey, drivers)
+function Map({ sessionKey, drivers, replayTime }) {
+    const { trackPath, driverDots, loading, W, H } = useTrackMap(sessionKey, drivers, replayTime)
 
     return (
         <div className={styles.container}>

@@ -31,7 +31,7 @@ function pointsToPath(points) {
         .join(' ') + ' Z';
 }
 
-function useMap(sessionKey, drivers) {
+function useMap(sessionKey, drivers, replayTime = null) {
     const [trackPath, setTrackPath] = useState('');
     const [driverDots, setDriverDots] = useState([]);
     const [normParams, setNormParams] = useState(null);
@@ -52,17 +52,19 @@ function useMap(sessionKey, drivers) {
 
         const load = async () => {
             try {
-                // Проверяем кеш — track layout для сессии не меняется
                 const cached = getTrackLayoutCache(sessionKey);
                 let points;
 
                 if (cached) {
                     points = cached;
                 } else {
-                    // Задержка перед запросом чтобы не слать всё одновременно с useLiveData
                     await new Promise(r => setTimeout(r, 800));
                     if (!isMounted.current) return;
-                    points = await fetchTrackLayout(sessionKey);
+
+                    // Используем первого доступного пилота из сессии, а не хардкодим 1.
+                    // Если driver_number=1 не едет в этом сезоне — API вернёт пустой массив.
+                    const driverNum = drivers?.length > 0 ? drivers[0].driver_number : 1;
+                    points = await fetchTrackLayout(sessionKey, driverNum);
                     if (points.length) setTrackLayoutCache(sessionKey, points);
                 }
 
@@ -90,7 +92,9 @@ function useMap(sessionKey, drivers) {
 
         const loadLocations = async () => {
             try {
-                const raw = await fetchDriverLocations(sessionKey);
+                // В replay режиме передаём replayTime — запрашиваем локации на момент реплея.
+                // В live режиме replayTime = null — берём последние 5 секунд реального времени.
+                const raw = await fetchDriverLocations(sessionKey, replayTime);
                 if (!raw.length || !isMounted.current) return;
 
                 const latest = {};
@@ -114,7 +118,6 @@ function useMap(sessionKey, drivers) {
 
                 if (isMounted.current) setDriverDots(dots);
             } catch (err) {
-                // 429 или другие — тихо глотаем, попробуем в следующий тик
                 if (!err.message?.includes('429')) {
                     console.error('Driver locations failed:', err);
                 }
@@ -122,9 +125,13 @@ function useMap(sessionKey, drivers) {
         }
 
         loadLocations();
-        const interval = setInterval(loadLocations, 5000); // было 3сек — увеличил до 5
+
+        // В replay режиме интервальный polling не нужен — replayTime обновляется снаружи.
+        // В live режиме — опрашиваем каждые 5 секунд.
+        if (replayTime) return;
+        const interval = setInterval(loadLocations, 5000);
         return () => clearInterval(interval);
-    }, [sessionKey, normParams, drivers]);
+    }, [sessionKey, normParams, drivers, replayTime]);
 
     return { trackPath, driverDots, loading, W, H };
 }

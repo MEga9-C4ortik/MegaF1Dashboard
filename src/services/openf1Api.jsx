@@ -18,7 +18,6 @@ export const fetchSessionsByMeeting = async (meetingKey) => {
   return Array.isArray(data) ? data : [];
 }
 
-// /position поддерживает date>= — грузим инкрементально
 export const fetchPositions = async (sessionKey, sinceDate = null) => {
   const url = sinceDate
       ? `${BASE_URL}/position?session_key=${sessionKey}&date>=${sinceDate}`
@@ -27,13 +26,11 @@ export const fetchPositions = async (sessionKey, sinceDate = null) => {
   return Array.isArray(data) ? data : [];
 }
 
-// /intervals НЕ поддерживает date>= — всегда грузим всё, берём последние сами в хуке
 export const fetchIntervals = async (sessionKey) => {
   const data = await safeFetch(`${BASE_URL}/intervals?session_key=${sessionKey}`);
   return Array.isArray(data) ? data : [];
 }
 
-// /laps — времена кругов для каждого водителя
 export const fetchLaps = async (sessionKey) => {
   const data = await safeFetch(`${BASE_URL}/laps?session_key=${sessionKey}`);
   return Array.isArray(data) ? data : [];
@@ -69,14 +66,26 @@ export const fetchWeather = async (sessionKey) => {
   return Array.isArray(data) ? data : [];
 }
 
-export const fetchTrackLayout = async (sessionKey) => {
-  const data = await safeFetch(`${BASE_URL}/location?session_key=${sessionKey}&driver_number=1`);
+// driverNumber — передаём реального пилота из сессии, не хардкодим 1
+export const fetchTrackLayout = async (sessionKey, driverNumber) => {
+  const data = await safeFetch(`${BASE_URL}/location?session_key=${sessionKey}&driver_number=${driverNumber}`);
   const arr = Array.isArray(data) ? data : [];
   return arr.filter((_, i) => i % 5 === 0);
 }
 
-export const fetchDriverLocations = async (sessionKey) => {
-  const since = new Date(Date.now() - 5000).toISOString();
-  const data = await safeFetch(`${BASE_URL}/location?session_key=${sessionKey}&date>=${since}`);
+// replayTime — для replay используем окно вокруг позиции реплея,
+// иначе Date.now()-5s это будущее для прошлых сессий → всегда пустой массив
+export const fetchDriverLocations = async (sessionKey, replayTime = null) => {
+  let url;
+  if (replayTime) {
+    const t = typeof replayTime === 'string' ? new Date(replayTime) : replayTime;
+    const since = new Date(t.getTime() - 5000).toISOString();
+    const until = t.toISOString();
+    url = `${BASE_URL}/location?session_key=${sessionKey}&date>=${since}&date<=${until}`;
+  } else {
+    const since = new Date(Date.now() - 5000).toISOString();
+    url = `${BASE_URL}/location?session_key=${sessionKey}&date>=${since}`;
+  }
+  const data = await safeFetch(url);
   return Array.isArray(data) ? data : [];
 }
