@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 
-const PLAYBACK_SPEEDS = [1, 2, 5, 10, 30];
 const TICK_MS = 500;
 
 function useReplay(allPositions, allIntervals = [], sessionKey = null) {
-    const [isPlaying, setIsPlaying]   = useState(false);
-    const [speedIndex, setSpeedIndex] = useState(0);
+    const [isPlaying, setIsPlaying]     = useState(false);
+    const [speed, setSpeed]             = useState(1);
     const [currentTime, setCurrentTime] = useState(null);
+
+    const speedRef = useRef(1);
+    useEffect(() => { speedRef.current = speed; }, [speed]);
 
     const { minTime, maxTime } = useMemo(() => {
         if (!allPositions || allPositions.length === 0) return { minTime: null, maxTime: null };
@@ -24,11 +26,8 @@ function useReplay(allPositions, allIntervals = [], sessionKey = null) {
     useEffect(() => {
         setCurrentTime(null);
         setIsPlaying(false);
-        setSpeedIndex(0);
+        setSpeed(1);
     }, [sessionKey]); // eslint-disable-line react-hooks/exhaustive-deps
-
-    const speedRef = useRef(PLAYBACK_SPEEDS[speedIndex]);
-    useEffect(() => { speedRef.current = PLAYBACK_SPEEDS[speedIndex]; }, [speedIndex]);
 
     useEffect(() => {
         if (!isPlaying || !maxTime) return;
@@ -77,12 +76,6 @@ function useReplay(allPositions, allIntervals = [], sessionKey = null) {
         setIsPlaying(false);
     };
 
-    // Устанавливаем конкретную скорость по значению (для <select>)
-    const setSpeed = (value) => {
-        const idx = PLAYBACK_SPEEDS.indexOf(Number(value));
-        if (idx !== -1) setSpeedIndex(idx);
-    };
-
     const progress = useMemo(() => {
         if (!minTime || !maxTime || !currentTime) return 0;
         const range = maxTime.getTime() - minTime.getTime();
@@ -93,8 +86,7 @@ function useReplay(allPositions, allIntervals = [], sessionKey = null) {
     return {
         replayPositions, replayIntervals,
         isPlaying, currentTime, minTime, maxTime, progress,
-        speed: PLAYBACK_SPEEDS[speedIndex],
-        play, pause, seek, setSpeed,
+        speed, play, pause, seek, setSpeed,
     };
 }
 

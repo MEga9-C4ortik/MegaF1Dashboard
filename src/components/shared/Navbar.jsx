@@ -19,11 +19,11 @@ function Navbar({ year, setYear }) {
         <nav className={styles.navbar}>
             <div className={styles.left}>
                 <img className={styles.logo} src={myLogo} alt="Mega F1 Dashboard" />
-                <h1 className={styles.header}>Mega F1 Dashboard</h1>
+                <span className={styles.title}>Mega F1 Dashboard</span>
             </div>
 
             <div className={styles.links}>
-                <Link to="/" className={location.pathname === '/' ? styles.linkActive : styles.link}>
+                <Link to="/" className={(location.pathname === '/' || location.pathname === '/calendar') ? styles.linkActive : styles.link}>
                     Calendar
                 </Link>
                 <Link to="/standings" className={location.pathname === '/standings' ? styles.linkActive : styles.link}>
@@ -36,7 +36,8 @@ function Navbar({ year, setYear }) {
 
             <div className={`${styles.mobileMenu} ${menuOpen ? styles.mobileMenuOpen : ''}`}>
                 <Link to="/"
-                      className={location.pathname === '/' ? styles.mobileLinkActive : styles.mobileLink}
+                      className={(location.pathname === '/' || location.pathname === '/calendar')
+                          ? styles.mobileLinkActive : styles.mobileLink}
                       onClick={handleLinkClick}>
                     Calendar
                 </Link>
@@ -48,7 +49,7 @@ function Navbar({ year, setYear }) {
                 <Link to="/pitWall"
                       className={location.pathname === '/pitWall' ? styles.mobileLinkActive : styles.mobileLink}
                       onClick={handleLinkClick}>
-                    Live
+                    Pit Wall
                 </Link>
             </div>
 

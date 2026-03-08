@@ -8,11 +8,6 @@ const safeFetch = async (url) => {
   return res.json()
 }
 
-export const fetchCurrentSession = async () => {
-  const data = await safeFetch(`${BASE_URL}/sessions?session_key=latest`);
-  return Array.isArray(data) ? (data[0] ?? null) : null;
-}
-
 export const fetchSessionsByMeeting = async (meetingKey) => {
   const data = await safeFetch(`${BASE_URL}/sessions?meeting_key=${meetingKey}`);
   return Array.isArray(data) ? data : [];
@@ -33,7 +28,7 @@ export const fetchPositions = async (sessionKey, sinceDate = null) => {
   return Array.isArray(data) ? data : [];
 }
 
-export const fetchIntervals = async (sessionKey) => {
+export const fetchIntervalsGaps = async (sessionKey) => {
   const data = await safeFetch(`${BASE_URL}/intervals?session_key=${sessionKey}`);
   return Array.isArray(data) ? data : [];
 }

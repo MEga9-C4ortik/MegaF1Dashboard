@@ -17,7 +17,6 @@ export function hasStaticCache(sessionKey) {
     return c && Array.isArray(c.drivers) && c.drivers.length > 0;
 }
 
-// Track layout кешируется навсегда — трасса не меняется в рамках митинга
 export function getTrackLayoutCache(sessionKey) {
     return trackLayoutCache[sessionKey] ?? null;
 }

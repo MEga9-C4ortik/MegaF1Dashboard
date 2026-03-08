@@ -55,7 +55,7 @@ function ReplayControls({ isPlaying, currentTime, minTime, maxTime, progress, sp
             <select
                 className={styles.speedSelect}
                 value={speed}
-                onChange={e => setSpeed(e.target.value)}
+                onChange={e => setSpeed(Number(e.target.value))}
                 title="Playback speed"
             >
                 <option value={1}>x1</option>

@@ -2,12 +2,13 @@ import { useSearchParams } from 'react-router-dom'
 import useSessionBrowser from '../hooks/useSessionBrowser'
 import useLiveData from '../hooks/useLiveData'
 import useReplay from '../hooks/useReplay'
-import LiveTower from '../components/pitWall/LiveTower'
-import FiaMessages from '../components/pitWall/FiaMessages'
-import Weather from '../components/pitWall/Weather'
-import RadioMessages from '../components/pitWall/RadioMessages'
-import Map from '../components/pitWall/Map'
-import ReplayControls from '../components/pitWall/ReplayControls'
+// WebStorm мог переименовать папку live -> pitwall, обнови пути если надо
+import LiveTower from '../components/pitwall/LiveTower'
+import FiaMessages from '../components/pitwall/FiaMessages'
+import Weather from '../components/pitwall/Weather'
+import RadioMessages from '../components/pitwall/RadioMessages'
+import Map from '../components/pitwall/Map'
+import ReplayControls from '../components/pitwall/ReplayControls'
 import styles from './PitWall.module.css'
 
 // year приходит из App.jsx как prop — там же yearSelect в Navbar
@@ -54,6 +55,7 @@ function PitWall({ year }) {
     return (
         <div className={styles.page}>
 
+            {/* ── Панель выбора GP ── */}
             <div className={styles.selectorBar}>
                 <span className={styles.pitwallLabel}>PIT WALL</span>
 
@@ -74,6 +76,7 @@ function PitWall({ year }) {
                 </select>
             </div>
 
+            {/* ── Табы сессий + название + погода ── */}
             {(sessions.length > 0 || loadingSessions) && (
                 <div className={styles.header}>
                     <div className={styles.sessionTabs}>
@@ -101,6 +104,7 @@ function PitWall({ year }) {
                 </div>
             )}
 
+            {/* ── Контролы реплея ── */}
             {activeSessionKey && !dataLoading && positions.length > 0 && (
                 <ReplayControls
                     isPlaying={replay.isPlaying}
@@ -112,19 +116,14 @@ function PitWall({ year }) {
                     play={replay.play}
                     pause={replay.pause}
                     seek={replay.seek}
-                    cycleSpeed={replay.cycleSpeed}
+                    setSpeed={replay.setSpeed}
                 />
             )}
 
             {!activeSessionKey && !loadingMeetings && (
                 <div className={styles.empty}>
-                    <span>
+                    <span className={styles.emptyText}>
                         Select a GP and session to watch the replay
-                    </span>
-                    <span>
-                        Only GP starting from 2023 are available
-                    </span>
-                    <span>
                         (Sessions are available only 30 minutes after it ends)
                     </span>
                 </div>
@@ -134,6 +133,7 @@ function PitWall({ year }) {
                 <p className={styles.loading}>Loading session data...</p>
             )}
 
+            {/* ── Основной контент ── */}
             {activeSessionKey && !dataLoading && (
                 <div className={styles.content}>
                     <div className={styles.left}>

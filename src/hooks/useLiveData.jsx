@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import {
     fetchPositions,
-    fetchIntervals,
+    fetchIntervalsGaps,
     fetchLaps,
     fetchDrivers,
     fetchStints,
@@ -96,8 +96,9 @@ function useLiveData(sessionKey) {
             await delay(200);
             if (!isMounted.current) return;
 
+            // Один запрос — оба поля: interval + gap_to_leader
             let intData = null;
-            try { intData = await fetchIntervals(sessionKey); }
+            try { intData = await fetchIntervalsGaps(sessionKey); }
             catch (e) { if (!e.message?.includes('429')) console.error('Intervals failed:', e); }
 
             await delay(200);
@@ -118,9 +119,6 @@ function useLiveData(sessionKey) {
 
             if (posData && posData.length > 0) {
                 if (initialDynamicDone.current) {
-                    // Инкрементальный update: мержим новые данные в существующий массив.
-                    // НЕ кешируем posData — это только последние 35 секунд!
-                    // Кеш positions обновляется только при первой (полной) загрузке.
                     setPositions(prev => {
                         const merged = [...prev, ...posData];
                         const seen = new Set();
@@ -132,7 +130,6 @@ function useLiveData(sessionKey) {
                         });
                     });
                 } else {
-                    // Первая загрузка — полный массив, кешируем его
                     setPositions(posData);
                     setCached(sessionKey, { positions: posData });
                 }
