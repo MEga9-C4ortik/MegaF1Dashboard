@@ -4,7 +4,7 @@ const safeFetch = async (url) => {
     const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP ${response.status} for ${url}`);
     return response.json();
-}
+};
 
 export const fetchRaces = async (year) => {
     const data = await safeFetch(`${BASE_URL}/${year}/races.json`);
@@ -31,16 +31,16 @@ export const fetchQualiResult = async (year, round) => {
     return data.MRData.RaceTable.Races[0];
 }
 
-export const fetchFP = async (year, round, number) => {
-    const data = await safeFetch(`${BASE_URL}/${year}/${round}/practice/${number}.json`);
-    // Races[0] будет undefined если у этой гонки нет практики (например sprint weekend)
-    // В этом случае бросаем ошибку чтобы Promise.allSettled поймал как rejected
-    const race = data.MRData.RaceTable.Races[0];
-    if (!race) throw new Error(`No FP${number} data for ${year} round ${round}`);
-    return race;
-}
-
 export const fetchSprintResult = async (year, round) => {
     const data = await safeFetch(`${BASE_URL}/${year}/${round}/sprint.json`);
     return data.MRData.RaceTable.Races[0];
+}
+
+export const fetchRace = async (year, round) => {
+    try {
+        const data = await safeFetch(`${BASE_URL}/${year}/${round}/races.json`);
+        return data.MRData.RaceTable.Races[0] ?? null;
+    } catch {
+        return null;
+    }
 }

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
-import { fetchMeetings, fetchSessionsByMeeting } from '../services/openf1Api'
+import { fetchMeetings, fetchSessionsByMeeting, fetchLaps, fetchDrivers } from '../services/openf1Api'
 
-// Маппинг session_name из OpenF1 → ключи которые использует Race.jsx
 const SESSION_NAME_MAP = {
     'Race':              'race',
     'Qualifying':        'quali',
@@ -13,8 +12,6 @@ const SESSION_NAME_MAP = {
     'Sprint Shootout':   'sprintQuali',
 };
 
-// Матчим страну Jolpi ('United Kingdom', 'UAE') с country_name из OpenF1 ('Great Britain', 'Abu Dhabi')
-// Делаем мягкое сравнение — ищем вхождение слова
 const countriesMatch = (jolpiCountry, openf1Country) => {
     if (!jolpiCountry || !openf1Country) return false;
     const a = jolpiCountry.toLowerCase();
@@ -22,11 +19,44 @@ const countriesMatch = (jolpiCountry, openf1Country) => {
     return a.includes(b) || b.includes(a);
 };
 
-// year       — год гонки (строка или число)
-// countryName — из raceInfo.Circuit.Location.country (Jolpi)
-// Возвращает { sessionKeyMap: { race: 9149, quali: 9148, fp1: 9146, ... } }
+// Лучший круг каждого пилота для FP классификации
+async function buildFPClassification(sessionKey) {
+    const [laps, drivers] = await Promise.all([
+        fetchLaps(sessionKey),
+        fetchDrivers(sessionKey),
+    ]);
+
+    const driversMap = {};
+    drivers.forEach(d => { driversMap[d.driver_number] = d; });
+
+    const bestByDriver = {};
+    laps.forEach(lap => {
+        if (!lap.lap_duration) return;
+        const prev = bestByDriver[lap.driver_number];
+        if (!prev || lap.lap_duration < prev.lap_duration) {
+            bestByDriver[lap.driver_number] = lap;
+        }
+    });
+
+    return Object.values(bestByDriver)
+        .sort((a, b) => a.lap_duration - b.lap_duration)
+        .map((lap, idx) => {
+            const d = driversMap[lap.driver_number];
+            return {
+                position:     idx + 1,
+                driver_number: lap.driver_number,
+                nameAcronym:  d?.name_acronym ?? String(lap.driver_number),
+                familyName:   d?.last_name ?? '',
+                teamName:     d?.team_name ?? '',
+                teamColour:   d?.team_colour ?? null,
+                bestLap:      lap.lap_duration,
+            };
+        });
+}
+
 function useOpenF1Sessions(year, countryName) {
     const [sessionKeyMap, setSessionKeyMap] = useState({});
+    const [fpResults, setFpResults] = useState({});  // { fp1: [...], fp2: [...], fp3: [...] }
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -34,6 +64,7 @@ function useOpenF1Sessions(year, countryName) {
 
         setLoading(true);
         setSessionKeyMap({});
+        setFpResults({});
 
         const load = async () => {
             try {
@@ -52,6 +83,22 @@ function useOpenF1Sessions(year, countryName) {
                     if (key) map[key] = s.session_key;
                 });
                 setSessionKeyMap(map);
+
+                // Фетчим FP классификации параллельно
+                const fpKeys = ['fp1', 'fp2', 'fp3'].filter(k => map[k]);
+                const fpEntries = await Promise.allSettled(
+                    fpKeys.map(k => buildFPClassification(map[k]).then(r => [k, r]))
+                );
+
+                const fpMap = {};
+                fpEntries.forEach(result => {
+                    if (result.status === 'fulfilled') {
+                        const [k, data] = result.value;
+                        if (data.length > 0) fpMap[k] = data;
+                    }
+                });
+                setFpResults(fpMap);
+
             } catch (err) {
                 console.error('useOpenF1Sessions failed:', err);
             } finally {
@@ -60,10 +107,9 @@ function useOpenF1Sessions(year, countryName) {
         };
 
         load();
-
     }, [year, countryName]);
 
-    return { sessionKeyMap, loading };
+    return { sessionKeyMap, fpResults, loading };
 }
 
 export default useOpenF1Sessions;

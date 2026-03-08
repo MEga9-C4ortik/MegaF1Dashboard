@@ -107,6 +107,9 @@
     gap: 16px;
     justify-content: center;
     padding: 100px 40px;
+}
+
+.emptyText {
     font-family: 'JetBrains Mono', monospace;
     font-size: 20px;
     color: #fff;

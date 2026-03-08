@@ -98,7 +98,6 @@ function PitWall({ year }) {
                 </div>
             )}
 
-            {/* ── Контролы реплея ── */}
             {activeSessionKey && !dataLoading && positions.length > 0 && (
                 <ReplayControls
                     isPlaying={replay.isPlaying}
@@ -116,10 +115,12 @@ function PitWall({ year }) {
 
             {!activeSessionKey && !loadingMeetings && (
                 <div className={styles.empty}>
-                    <span className={styles.emptyText}>
-                        Select a GP and session to watch the replay
-                        (Sessions are available only 30 minutes after it ends)
-                    </span>
+                        <span className={styles.emptyText}>
+                            Select a session to watch.
+                        </span>
+                        <span className={styles.emptyText}>
+                            Replays are available 30 minutes after the session ends.
+                        </span>
                 </div>
             )}
 
