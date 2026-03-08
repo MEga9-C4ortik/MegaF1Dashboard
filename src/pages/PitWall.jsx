@@ -23,7 +23,6 @@ function PitWall({ year }) {
         loadingMeetings, loadingSessions,
     } = useSessionBrowser(year, urlSessionKey);
 
-    // URL sessionKey имеет приоритет над выбранным вручную
     const activeSessionKey = urlSessionKey ?? selectedSessionKey;
 
     const {
@@ -52,7 +51,6 @@ function PitWall({ year }) {
 
     return (
         <div className={styles.page}>
-
             <div className={styles.selectorBar}>
                 <span className={styles.pitwallLabel}>PIT WALL</span>
 
