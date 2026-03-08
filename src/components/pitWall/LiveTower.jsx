@@ -37,6 +37,18 @@ function getCurrentStint(stints, laps, driverNumber, currentTime) {
     return activeStint;
 }
 
+// Текущий возраст резины: tyre_age_at_start + круги проеханные в этом стинте
+function getCurrentTyreAge(laps, driverNumber, stint, currentTime) {
+    if (!stint) return null;
+    let driverLaps = laps.filter(l => l.driver_number === driverNumber && l.lap_duration != null);
+    if (currentTime) {
+        driverLaps = driverLaps.filter(l => l.date_start && new Date(l.date_start) <= currentTime);
+    }
+    const maxLap = driverLaps.length > 0 ? Math.max(...driverLaps.map(l => l.lap_number)) : stint.lap_start;
+    const lapsOnStint = Math.max(0, maxLap - stint.lap_start + 1);
+    return (stint.tyre_age_at_start ?? 0) + lapsOnStint;
+}
+
 function getLatestInterval(intervals, driverNumber) {
     const driverIntervals = intervals.filter(i => i.driver_number === driverNumber);
     if (!driverIntervals.length) return null;
@@ -149,6 +161,7 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
             {latest.map((pos, index) => {
                 const driver    = driversMap[pos.driver_number];
                 const stint     = getCurrentStint(stints, laps, pos.driver_number, currentTime);
+                const tyreAge   = getCurrentTyreAge(laps, pos.driver_number, stint, currentTime);
                 const interval  = getLatestInterval(intervals, pos.driver_number);
                 const lastLap   = getLastLap(laps, pos.driver_number, currentTime);
                 const bestLap   = getBestLap(laps, pos.driver_number, currentTime);
@@ -182,7 +195,7 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
                                 : <TyreIcon compound={stint?.compound} />
                             }
                             {!isInPit && stint && (
-                                <span className={styles.tyreAge}>{stint.tyre_age_at_start ?? 0}L</span>
+                                <span className={styles.tyreAge}>{tyreAge ?? 0}L</span>
                             )}
                         </span>
 

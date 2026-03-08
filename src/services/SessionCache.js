@@ -12,9 +12,13 @@ export function setCached(sessionKey, data) {
     };
 }
 
+// Статик кэш валиден только если у пилотов есть team_colour.
+// Для свежих сессий OpenF1 иногда не успевает заполнить цвета —
+// в этом случае возвращаем false чтобы перезагрузить.
 export function hasStaticCache(sessionKey) {
     const c = cache[sessionKey];
-    return c && Array.isArray(c.drivers) && c.drivers.length > 0;
+    if (!c || !Array.isArray(c.drivers) || c.drivers.length === 0) return false;
+    return c.drivers.some(d => d.team_colour != null);
 }
 
 export function getTrackLayoutCache(sessionKey) {

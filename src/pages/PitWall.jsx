@@ -4,7 +4,6 @@ import useLiveData from '../hooks/useLiveData'
 import useReplay from '../hooks/useReplay'
 import LiveTower from '../components/pitWall/LiveTower'
 import FiaMessages from '../components/pitWall/FiaMessages'
-import Weather from '../components/pitWall/Weather'
 import RadioMessages from '../components/pitWall/RadioMessages'
 import Map from '../components/pitWall/Map'
 import ReplayControls from '../components/pitWall/ReplayControls'
@@ -49,28 +48,32 @@ function PitWall({ year }) {
 
     const activeSession = sessions.find(s => s.session_key === activeSessionKey);
 
+
+    function windDir(deg) {
+        if (deg == null) return '';
+        const dirs = ['N','NE','E','SE','S','SW','W','NW'];
+        return ' ' + dirs[Math.round(deg / 45) % 8];
+    }
+
     return (
         <div className={styles.page}>
+            {/* ── GP selector ── */}
             <div className={styles.selectorBar}>
                 <span className={styles.pitwallLabel}>PIT WALL</span>
-
                 <select
                     className={styles.select}
                     value={selectedMeetingKey ?? ''}
                     onChange={e => setSelectedMeetingKey(Number(e.target.value))}
                     disabled={loadingMeetings}
                 >
-                    <option value=''>
-                        {loadingMeetings ? 'Loading...' : '— Select GP —'}
-                    </option>
+                    <option value=''>{loadingMeetings ? 'Loading...' : '— Select GP —'}</option>
                     {meetings.map(m => (
-                        <option key={m.meeting_key} value={m.meeting_key}>
-                            {m.meeting_name}
-                        </option>
+                        <option key={m.meeting_key} value={m.meeting_key}>{m.meeting_name}</option>
                     ))}
                 </select>
             </div>
 
+            {/* ── Session tabs ── */}
             {(sessions.length > 0 || loadingSessions) && (
                 <div className={styles.header}>
                     <div className={styles.sessionTabs}>
@@ -79,7 +82,7 @@ function PitWall({ year }) {
                             : sessions.map(s => (
                                 <button
                                     key={s.session_key}
-                                    className={`${styles.sessionTab} ${activeSessionKey === s.session_key ? styles.sessionTabActive : ''}`}
+                                    className={`${styles.sessionTab} ${s.session_key === activeSessionKey ? styles.sessionTabActive : ''}`}
                                     onClick={() => setSelectedSessionKey(s.session_key)}
                                 >
                                     {s.session_name}
@@ -87,14 +90,44 @@ function PitWall({ year }) {
                             ))
                         }
                     </div>
-
                     {activeSession && (
                         <span className={styles.sessionName}>
                             {activeSession.session_name} — {activeSession.circuit_short_name}
                         </span>
                     )}
+                </div>
+            )}
 
-                    <Weather weather={weather} />
+            {weather && (
+                <div className={styles.weatherBar}>
+                    <div className={styles.weatherItem}>
+                        <span className={styles.weatherLabel}>Air</span>
+                        <span className={styles.weatherValue}>{weather.air_temperature ?? '—'}°C</span>
+                    </div>
+                    <div className={styles.weatherItem}>
+                        <span className={styles.weatherLabel}>Track</span>
+                        <span className={styles.weatherValue}>{weather.track_temperature ?? '—'}°C</span>
+                    </div>
+                    <div className={styles.weatherItem}>
+                        <span className={styles.weatherLabel}>Humidity</span>
+                        <span className={styles.weatherValue}>{weather.humidity ?? '—'}%</span>
+                    </div>
+                    <div className={styles.weatherItem}>
+                        <span className={styles.weatherLabel}>Wind</span>
+                        <span className={styles.weatherValue}>
+                            {weather.wind_speed ?? '—'} m/s{windDir(weather.wind_direction)}
+                        </span>
+                    </div>
+                    <div className={styles.weatherItem}>
+                        <span className={styles.weatherLabel}>Pressure</span>
+                        <span className={styles.weatherValue}>{weather.pressure != null ? `${weather.pressure} hPa` : '—'}</span>
+                    </div>
+                    <div className={styles.weatherItem}>
+                        <span className={styles.weatherLabel}>Rain</span>
+                        <span className={`${styles.weatherValue} ${weather.rainfall ? styles.weatherValueRain : styles.weatherDim}`}>
+                            {weather.rainfall ? '⛆ YES' : 'NO'}
+                        </span>
+                    </div>
                 </div>
             )}
 
@@ -113,14 +146,16 @@ function PitWall({ year }) {
                 />
             )}
 
+            {activeSessionKey && !dataLoading && (
+                <div className={styles.mapSection}>
+                    <Map sessionKey={activeSessionKey} drivers={drivers} replayTime={ct} />
+                </div>
+            )}
+
             {!activeSessionKey && !loadingMeetings && (
                 <div className={styles.empty}>
-                        <span className={styles.emptyText}>
-                            Select a session to watch.
-                        </span>
-                        <span className={styles.emptyText}>
-                            Replays are available 30 minutes after the session ends.
-                        </span>
+                    <span className={styles.emptyText}>Select a session to watch.</span>
+                    <span className={styles.emptyText}>Replays are available 30 minutes after the session ends.</span>
                 </div>
             )}
 
@@ -145,7 +180,6 @@ function PitWall({ year }) {
                         }
                     </div>
                     <div className={styles.right}>
-                        <Map sessionKey={activeSessionKey} drivers={drivers} replayTime={ct} />
                         <FiaMessages messages={displayFiaMessages} />
                         <RadioMessages messages={displayRadio} drivers={drivers} />
                     </div>

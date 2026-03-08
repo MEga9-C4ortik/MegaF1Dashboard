@@ -145,7 +145,7 @@ function useLiveData(sessionKey) {
                 setCached(sessionKey, { laps: lapsData });
             }
 
-            if (wthData) {
+            if (wthData && wthData.length > 0) {
                 const latest = wthData.at(-1) ?? null;
                 setWeather(latest);
                 setCached(sessionKey, { weather: latest });

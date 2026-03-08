@@ -1,12 +1,36 @@
 import useTrackMap from '../../hooks/useMap'
 import styles from './Map.module.css'
 
+function DriverDot({ dot }) {
+    const hasColor = dot.color != null;
+    const color    = hasColor ? dot.color : '#666';
+    const label    = dot.acronym ?? String(dot.number);
+    const fontSize = dot.acronym ? 9 : 8;
+
+    return (
+        <g key={dot.driver_number}>
+            <circle cx={dot.px} cy={dot.py} r={16} fill={color} opacity={hasColor ? 0.12 : 0.06} />
+            <circle cx={dot.px} cy={dot.py} r={8} fill={color} stroke="#050505" strokeWidth={2} />
+            <text
+                x={dot.px}
+                y={dot.py - 13}
+                textAnchor="middle"
+                fontSize={fontSize}
+                fill={hasColor ? color : '#555'}
+                fontFamily="JetBrains Mono, monospace"
+                fontWeight="700"
+            >
+                {label}
+            </text>
+        </g>
+    );
+}
+
 function Map({ sessionKey, drivers, replayTime }) {
     const { trackPath, driverDots, loading, W, H } = useTrackMap(sessionKey, drivers, replayTime)
 
     return (
         <div className={styles.container}>
-            <h3 className={styles.title}>Track Map</h3>
             <div className={styles.mapWrapper}>
                 {loading ? (
                     <p className={styles.loading}>Loading track...</p>
@@ -17,19 +41,14 @@ function Map({ sessionKey, drivers, replayTime }) {
                         preserveAspectRatio="xMidYMid meet"
                     >
                         {trackPath && <>
-                            <path d={trackPath} fill="none" stroke="#1a1a1a" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d={trackPath} fill="none" stroke="#2a2a2a" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d={trackPath} fill="none" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 8" />
+                            <path d={trackPath} fill="none" stroke="#0a0a0a"  strokeWidth={22} strokeLinecap="round" strokeLinejoin="round" />
+                            <path d={trackPath} fill="none" stroke="#1c1c1c"  strokeWidth={16} strokeLinecap="round" strokeLinejoin="round" />
+                            <path d={trackPath} fill="none" stroke="#242424"  strokeWidth={10} strokeLinecap="round" strokeLinejoin="round" />
+                            <path d={trackPath} fill="none" stroke="#2e2e2e"  strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" strokeDasharray="6 12" />
                         </>}
 
                         {driverDots.map(dot => (
-                            <g key={dot.driver_number}>
-                                <circle cx={dot.px} cy={dot.py} r={10} fill={dot.color} opacity={0.15} />
-                                <circle cx={dot.px} cy={dot.py} r={6} fill={dot.color} stroke="#0a0a0a" strokeWidth={1.5} />
-                                <text x={dot.px} y={dot.py - 10} textAnchor="middle" fontSize="8" fill={dot.color} fontFamily="JetBrains Mono, monospace" fontWeight="700">
-                                    {dot.acronym}
-                                </text>
-                            </g>
+                            <DriverDot key={dot.driver_number} dot={dot} />
                         ))}
                     </svg>
                 )}

@@ -1,5 +1,11 @@
 import styles from './Weather.module.css'
 
+function windDirLabel(deg) {
+    if (deg == null) return '—';
+    const dirs = ['N','NE','E','SE','S','SW','W','NW'];
+    return dirs[Math.round(deg / 45) % 8];
+}
+
 function Weather({ weather }) {
     if (!weather) return null;
 
@@ -22,13 +28,22 @@ function Weather({ weather }) {
                 </div>
                 <div className={styles.item}>
                     <span className={styles.label}>Wind</span>
-                    <span className={styles.value}>{weather.wind_speed ?? '—'} m/s</span>
+                    <span className={styles.value}>
+                        {weather.wind_speed ?? '—'} m/s
+                        {weather.wind_direction != null && (
+                            <span className={styles.windDir}> {windDirLabel(weather.wind_direction)}</span>
+                        )}
+                    </span>
+                </div>
+                <div className={styles.item}>
+                    <span className={styles.label}>Pressure</span>
+                    <span className={styles.value}>{weather.pressure != null ? `${weather.pressure} hPa` : '—'}</span>
                 </div>
                 <div className={styles.item}>
                     <span className={styles.label}>Rain</span>
-                    <span className={`${styles.value} ${weather.rainfall ? styles.rain : ''}`}>
-            {weather.rainfall ? 'YES' : 'NO'}
-          </span>
+                    <span className={`${styles.value} ${weather.rainfall ? styles.rain : styles.noRain}`}>
+                        {weather.rainfall ? '🌧 YES' : 'NO'}
+                    </span>
                 </div>
             </div>
         </div>

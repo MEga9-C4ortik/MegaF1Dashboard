@@ -2,44 +2,37 @@
     width: 100%;
 }
 
-.title {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    color: #333;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-bottom: 12px;
-}
-
 .mapWrapper {
     width: 100%;
-    background: #080808;
-    border: 1px solid #1a1a1a;
-    border-radius: 4px;
+    background: #050505;
+    border: 1px solid #111;
+    border-radius: 6px;
     overflow: hidden;
-    min-height: 160px;
+    aspect-ratio: 16 / 7;
     display: flex;
     align-items: center;
     justify-content: center;
+    min-height: 320px;
 }
 
 .svg {
     width: 100%;
-    height: auto;
+    height: 100%;
     display: block;
 }
 
 .loading {
     font-family: 'JetBrains Mono', monospace;
     font-size: 10px;
-    color: #333;
+    color: #1e1e1e;
     letter-spacing: 2px;
     text-transform: uppercase;
-    padding: 40px;
+    padding: 60px;
 }
 
 @media (max-width: 768px) {
     .mapWrapper {
-        min-height: 120px;
+        aspect-ratio: 4 / 3;
+        min-height: 220px;
     }
 }

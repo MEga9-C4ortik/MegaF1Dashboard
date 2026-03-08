@@ -22,7 +22,7 @@
 
 .subtitle {
     font-size: 24px;
-    color: #333;
+    color: #888;
     font-family: 'JetBrains Mono', monospace;
     letter-spacing: 1px;
 }
@@ -89,7 +89,7 @@
 
 .round {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 14px;
+    font-size: 16px;
     color: #eee;
     letter-spacing: 1px;
     text-transform: uppercase;
@@ -124,7 +124,7 @@
 }
 
 .country {
-    font-size: 17px;
+    font-size: 18px;
     color: #eee;
     text-transform: uppercase;
     letter-spacing: 1.5px;
@@ -157,12 +157,12 @@
 
 .date {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 18px;
+    font-size: 24px;
     color: #fff;
 }
 
 .detailsBtn {
-    font-size: 16px;
+    font-size: 20px;
     letter-spacing: 1.5px;
     text-transform: uppercase;
     color: #e10600;
@@ -229,13 +229,12 @@
 }
 .nextDate {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
+    font-size: 20px;
     color: #444;
     letter-spacing: 1px;
     margin-top: 8px;
 }
 
-/* ── Hero: next race card ─────────────────────────────────────────── */
 .hero {
     background: #0d0808;
     border: 1.5px solid rgba(225, 6, 0, 0.5);
@@ -272,7 +271,7 @@
     color: #e10600;
     border: 1px solid rgba(225, 6, 0, 0.4);
     font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
+    font-size: 16px;
     font-weight: 700;
     letter-spacing: 3px;
     padding: 4px 10px;
@@ -282,7 +281,7 @@
 
 .heroRound {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
+    font-size: 18px;
     color: #555;
     letter-spacing: 2px;
     text-transform: uppercase;
@@ -296,15 +295,15 @@
 }
 
 .heroCountry {
-    font-size: 13px;
-    color: #888;
+    font-size: 20px;
+    color: #fff;
     text-transform: uppercase;
     letter-spacing: 2px;
     font-family: 'JetBrains Mono', monospace;
 }
 
 .heroRaceName {
-    font-size: 28px;
+    font-size: 36px;
     font-weight: 700;
     letter-spacing: 1px;
     text-transform: uppercase;
@@ -313,7 +312,7 @@
 }
 
 .heroCircuit {
-    font-size: 15px;
+    font-size: 18px;
     color: #666;
     letter-spacing: 0.5px;
     margin-bottom: 4px;
@@ -330,7 +329,7 @@
 
 .heroCountdownLabel {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
+    font-size: 18px;
     color: #444;
     letter-spacing: 1.5px;
     text-transform: uppercase;
@@ -338,7 +337,7 @@
 
 .heroCountdownTime {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
+    font-size: 16px;
     color: #e10600;
     letter-spacing: 1px;
 }
@@ -370,7 +369,7 @@
 
 .heroSchedLabel {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
+    font-size: 18px;
     color: #ccc;
     letter-spacing: 0.5px;
     width: 130px;
@@ -379,14 +378,14 @@
 
 .heroSchedDate {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
+    font-size: 20px;
     color: #777;
     flex: 1;
 }
 
 .heroSchedBadge {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
+    font-size: 18px;
     font-weight: 700;
     letter-spacing: 1.5px;
     padding: 2px 7px;
@@ -395,7 +394,6 @@
     flex-shrink: 0;
 }
 
-/* ── Mini schedule for upcoming grid cards ───────────────────────── */
 .cardUpcoming {
     border-color: #444;
 }
@@ -420,14 +418,14 @@
 
 .miniLabel {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
+    font-size: 16px;
     color: #999;
     letter-spacing: 0.3px;
 }
 
 .miniDate {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
+    font-size: 16px;
     color: #555;
 }
 

@@ -34,12 +34,16 @@ export const fetchPositions = async (sessionKey, sinceDate = null) => {
 }
 
 export const fetchIntervalsGaps = async (sessionKey) => {
+  // Берём только последние интервалы (достаточно 60 записей — по 3 на пилота)
   const data = await safeFetch(`${BASE_URL}/intervals?session_key=${sessionKey}`);
   return Array.isArray(data) ? data : [];
 }
 
+// Гонка: ~20 пилотов × 70 кругов = ~1400 записей.
+// OpenF1 по умолчанию отдаёт 1000 → пропадает вторая половина.
+// Ставим limit=5000 — с запасом на любую длину сессии.
 export const fetchLaps = async (sessionKey) => {
-  const data = await safeFetch(`${BASE_URL}/laps?session_key=${sessionKey}`);
+  const data = await safeFetch(`${BASE_URL}/laps?session_key=${sessionKey}&limit=5000`);
   return Array.isArray(data) ? data : [];
 }
 
@@ -49,28 +53,30 @@ export const fetchDrivers = async (sessionKey) => {
 }
 
 export const fetchStints = async (sessionKey) => {
-  const data = await safeFetch(`${BASE_URL}/stints?session_key=${sessionKey}`);
+  const data = await safeFetch(`${BASE_URL}/stints?session_key=${sessionKey}&limit=500`);
   return Array.isArray(data) ? data : [];
 }
 
 export const fetchPits = async (sessionKey) => {
-  const data = await safeFetch(`${BASE_URL}/pit?session_key=${sessionKey}`);
+  const data = await safeFetch(`${BASE_URL}/pit?session_key=${sessionKey}&limit=500`);
   return Array.isArray(data) ? data : [];
 }
 
 export const fetchFiaMessages = async (sessionKey) => {
-  const data = await safeFetch(`${BASE_URL}/race_control?session_key=${sessionKey}`);
+  const data = await safeFetch(`${BASE_URL}/race_control?session_key=${sessionKey}&limit=500`);
   return Array.isArray(data) ? data : [];
 }
 
 export const fetchTeamRadio = async (sessionKey) => {
-  const data = await safeFetch(`${BASE_URL}/team_radio?session_key=${sessionKey}`);
+  const data = await safeFetch(`${BASE_URL}/team_radio?session_key=${sessionKey}&limit=500`);
   return Array.isArray(data) ? data : [];
 }
 
+// Weather: сортируем по date и берём последнюю запись
 export const fetchWeather = async (sessionKey) => {
-  const data = await safeFetch(`${BASE_URL}/weather?session_key=${sessionKey}`);
-  return Array.isArray(data) ? data : [];
+  const data = await safeFetch(`${BASE_URL}/weather?session_key=${sessionKey}&limit=500`);
+  if (!Array.isArray(data) || data.length === 0) return [];
+  return data.sort((a, b) => new Date(a.date) - new Date(b.date));
 }
 
 export const fetchTrackLayout = async (sessionKey, driverNumber) => {

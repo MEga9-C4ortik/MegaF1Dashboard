@@ -26,7 +26,7 @@
     background: #111;
     color: #888;
     border: 1px solid #1e1e1e;
-    border-radius: 2px;
+    border-radius: 16px;
     padding: 5px 10px;
     font-size: 20px;
     font-family: 'JetBrains Mono', monospace;
@@ -36,110 +36,99 @@
     transition: border-color 0.15s, color 0.15s;
 }
 
-.select:hover:not(:disabled) {
-    border-color: #e10600;
-}
-
-.select:focus {
-    color: #fff;
-    outline: none;
-    border-color: #e10600;
-}
-
-.select:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-}
+.select:hover:not(:disabled) { border-color: #e10600; }
+.select:focus { color: #fff; outline: none; border-color: #e10600; }
+.select:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .header {
     display: flex;
     align-items: center;
     gap: 24px;
-    padding: 16px 40px;
+    padding: 12px 40px;
     border-bottom: 1px solid #1a1a1a;
     flex-wrap: wrap;
 }
 
 .sessionTabs {
     display: flex;
-    gap: 14px;
+    gap: 12px;
     flex-wrap: wrap;
 }
 
 .sessionTab {
     background: transparent;
-    color: #888;
-    font-size: 18px;
+    color: #555;
+    font-size: 24px;
     font-weight: 600;
     letter-spacing: 1.5px;
     text-transform: uppercase;
-    padding: 6px 14px;
-    border: 1px solid #2a2a2a;
+    padding: 5px 12px;
+    border: 1px solid #333;
     border-radius: 20px;
     font-family: 'JetBrains Mono', monospace;
     cursor: pointer;
     transition: all 0.15s;
 }
 
-.sessionTab:hover {
-    color: #fff;
-    border-color: #444;
-}
+.sessionTab:hover { color: #e10600; border-color: #444; }
 
 .sessionTabActive {
-    color: #fff;
+    color: #e10600;
     border-color: #e10600;
-    background: rgba(225, 6, 0, 0.1);
+    background: rgba(225, 6, 0, 0.07);
 }
 
 .sessionName {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 26px;
-    color: #fff;
+    font-size: 24px;
+    color: #999;
     letter-spacing: 1px;
     white-space: nowrap;
 }
 
-.empty {
-    display:flex;
-    flex-direction: column;
+.weatherBar {
+    display: flex;
+    gap: 32px;
     align-items: center;
-    gap: 16px;
-    justify-content: center;
-    padding: 100px 40px;
+    padding: 10px 40px;
+    border-bottom: 1px solid #111;
+    background: #0a0a0a;
+    flex-wrap: wrap;
 }
 
-.emptyText {
+.weatherItem {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.weatherLabel {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    color: #888;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.weatherValue {
     font-family: 'JetBrains Mono', monospace;
     font-size: 20px;
+    font-weight: 600;
     color: #fff;
-    letter-spacing: 2px;
-    text-transform: uppercase;
 }
 
-.loading {
-    text-align: center;
-    padding: 80px;
-    color: #e10600;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 20px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
+.weatherValueRain {
+    color: #4da6ff;
 }
 
-.loadingSmall {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
+.weatherDim {
     color: #444;
-    letter-spacing: 1px;
 }
 
-.noData {
-    color: #e10600;
-    padding: 40px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    letter-spacing: 2px;
+.mapSection {
+    padding: 16px 40px;
+    border-bottom: 1px solid #111;
+    background: #080808;
 }
 
 .content {
@@ -152,56 +141,70 @@
     flex: 1;
     border-right: 1px solid #1a1a1a;
     min-width: 0;
+    overflow-x: auto;
 }
 
 .right {
-    width: 340px;
-    min-width: 340px;
+    width: 360px;
+    min-width: 360px;
     padding: 20px;
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: 24px;
+}
+
+.empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    justify-content: center;
+    padding: 100px 40px;
+}
+
+.emptyText {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 30px;
+    color: #fff;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.loading {
+    text-align: center;
+    padding: 80px;
+    color: #e10600;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 28px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.loadingSmall {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 26px;
+    color: #e10600;
+    letter-spacing: 1px;
+}
+
+.noData {
+    color: #e10600;
+    padding: 60px 40px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 26px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
 }
 
 @media (max-width: 768px) {
-    .selectorBar {
-        padding: 12px 16px;
-        flex-wrap: wrap;
-        gap: 10px;
-    }
-
-    .select {
-        min-width: 0;
-        flex: 1;
-        font-size: 12px;
-    }
-
-    .header {
-        padding: 12px 16px;
-        gap: 12px;
-    }
-
-    .pitwallLabel {
-        font-size: 22px;
-    }
-
-    .content {
-        flex-direction: column;
-    }
-
-    .right {
-        width: 100%;
-        min-width: unset;
-        padding: 16px;
-        border-top: 1px solid #1a1a1a;
-        gap: 24px;
-        overflow-x: hidden;
-    }
-
-    .left {
-        width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        border-right: none;
-    }
+    .selectorBar { padding: 12px 16px; flex-wrap: wrap; gap: 10px; }
+    .select { min-width: 0; flex: 1; font-size: 12px; }
+    .header { padding: 10px 16px; gap: 10px; }
+    .pitwallLabel { font-size: 22px; }
+    .weatherBar { padding: 10px 16px; gap: 16px; }
+    .mapSection { padding: 12px 16px; }
+    .content { flex-direction: column; }
+    .right { width: 100%; min-width: unset; padding: 16px; border-top: 1px solid #1a1a1a; gap: 20px; }
+    .left { width: 100%; border-right: none; }
 }

@@ -17,10 +17,10 @@ function Navbar({ year, setYear }) {
 
     return (
         <nav className={styles.navbar}>
-            <div className={styles.left}>
+            <Link to="/" className={styles.left}>
                 <img className={styles.logo} src={myLogo} alt="Mega F1 Dashboard" />
                 <span className={styles.title}>Mega F1 Dashboard</span>
-            </div>
+            </Link>
 
             <div className={styles.links}>
                 <Link to="/" className={(location.pathname === '/' || location.pathname === '/calendar') ? styles.linkActive : styles.link}>

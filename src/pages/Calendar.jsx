@@ -61,7 +61,6 @@ function useCountdown(targetDate, targetTime) {
     return left;
 }
 
-// ─── Hero card: next race with full inline schedule ───────────────────
 function NextRaceHero({ race, year }) {
     const navigate = useNavigate();
     const today = Date.now();
@@ -128,7 +127,6 @@ function NextRaceHero({ race, year }) {
     );
 }
 
-// ─── Mini schedule for upcoming grid cards ────────────────────────────
 function MiniSchedule({ race }) {
     const schedule = buildSchedule(race);
     const today = Date.now();
@@ -149,7 +147,6 @@ function MiniSchedule({ race }) {
     );
 }
 
-// ─── Resolve next round index ─────────────────────────────────────────
 async function resolveNextRoundIndex(races, year) {
     const today = new Date();
     const firstUpcoming = races.findIndex(r => new Date(r.date) >= today);
@@ -165,7 +162,6 @@ async function resolveNextRoundIndex(races, year) {
     return firstUpcoming;
 }
 
-// ─── Main Calendar ────────────────────────────────────────────────────
 function Calendar({ year }) {
     const { races, loading, error } = useRaces(year);
     const navigate = useNavigate();
@@ -217,9 +213,8 @@ function Calendar({ year }) {
                                 </span>
                                 <span className={clsx(
                                     styles.badge,
-                                    isPast     ? styles.badgeDone     :
-                                        isNext     ? styles.badgeNext     :
-                                            styles.badgeUpcoming
+                                    isPast ? styles.badgeDone :
+                                        isNext ? styles.badgeNext : styles.badgeUpcoming
                                 )}>
                                     {isPast ? 'Done' : isNext ? 'Next' : 'Upcoming'}
                                 </span>

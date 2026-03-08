@@ -4,29 +4,28 @@
 
 .title {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    color: #333;
+    font-size: 24px;
+    color: #e10600;
     letter-spacing: 2px;
     text-transform: uppercase;
     margin-bottom: 12px;
 }
 
 .grid {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 16px;
 }
 
 .item {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    min-width: 60px;
+    gap: 2px;
 }
 
 .label {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
+    font-size: 20px;
     color: #333;
     letter-spacing: 1.5px;
     text-transform: uppercase;
@@ -34,11 +33,21 @@
 
 .value {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 600;
-    color: #fff;
+    color: #ccc;
+}
+
+.windDir {
+    font-size: 20px;
+    color: #555;
+    font-weight: 400;
 }
 
 .rain {
-    color: #0067ff;
+    color: #4da6ff;
+}
+
+.noRain {
+    color: #444;
 }
