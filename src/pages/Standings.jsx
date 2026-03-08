@@ -50,9 +50,9 @@ function Standings({year}) {
                     </tr>
                     </thead>
                     <tbody>
-                    {drivers.map(d => (
-                        <tr key={d.position} className={getPodiumStyle(d.position)}>
-                            <td className={styles.pos}>{d.position}</td>
+                    {drivers.map((d, i) => (
+                        <tr key={i} className={getPodiumStyle(d.position)}>
+                            <td className={styles.pos}>{d.position ?? i + 1}</td>
                             <td className={styles.driver}>
                                 <span className={styles.driverCode}>{d.Driver.code}</span>
                                 <span className={styles.driverName}>
@@ -79,9 +79,9 @@ function Standings({year}) {
                     </tr>
                     </thead>
                     <tbody>
-                    {constructors.map(c => (
-                        <tr key={c.position} className={getPodiumStyle(c.position)}>
-                            <td className={styles.pos}>{c.position}</td>
+                    {constructors.map((c, i) => (
+                        <tr key={i} className={getPodiumStyle(c.position)}>
+                            <td className={styles.pos}>{c.position ?? i + 1}</td>
                             <td className={styles.team}>{c.Constructor.name}</td>
                             <td className={styles.pts}>{c.points}</td>
                             <td className={styles.wins}>{c.wins}</td>
