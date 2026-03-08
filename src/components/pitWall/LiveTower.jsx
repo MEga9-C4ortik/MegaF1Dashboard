@@ -10,9 +10,6 @@ function getLatestPositions(positions) {
     return Object.values(map).sort((a, b) => a.position - b.position);
 }
 
-// Определяем актуальный stint для водителя на момент currentTime.
-// Stints не имеют date, но имеют lap_number.
-// Используем laps чтобы найти текущий круг → находим stint для этого круга.
 function getCurrentStint(stints, laps, driverNumber, currentTime) {
     const driverStints = stints
         .filter(s => s.driver_number === driverNumber)
@@ -20,12 +17,10 @@ function getCurrentStint(stints, laps, driverNumber, currentTime) {
 
     if (!driverStints.length) return null;
 
-    // Если нет currentTime (pitWall режим) — берём последний stint
     if (!currentTime) {
         return driverStints[driverStints.length - 1];
     }
 
-    // В replay: ищем последний завершённый круг до currentTime
     const driverLaps = laps
         .filter(l => l.driver_number === driverNumber && l.date_start != null)
         .filter(l => new Date(l.date_start) <= currentTime)
@@ -33,9 +28,6 @@ function getCurrentStint(stints, laps, driverNumber, currentTime) {
 
     const currentLapNumber = driverLaps[0]?.lap_number ?? 1;
 
-    // Находим stint который был активен на этом круге
-    // Stint активен если lap_number >= stint.lap_start
-    // и lap_number < следующего stint.lap_start
     let activeStint = driverStints[0];
     for (const stint of driverStints) {
         if (stint.lap_start <= currentLapNumber) {
@@ -53,7 +45,6 @@ function getLatestInterval(intervals, driverNumber) {
     );
 }
 
-// Последний круг до currentTime (или вообще последний в pitWall)
 function getLastLap(laps, driverNumber, currentTime) {
     let driverLaps = laps.filter(
         l => l.driver_number === driverNumber && l.lap_duration != null
@@ -65,7 +56,6 @@ function getLastLap(laps, driverNumber, currentTime) {
     return driverLaps.reduce((a, b) => b.lap_number > a.lap_number ? b : a);
 }
 
-// Лучший круг до currentTime
 function getBestLap(laps, driverNumber, currentTime) {
     let driverLaps = laps.filter(
         l => l.driver_number === driverNumber && l.lap_duration != null
@@ -209,7 +199,7 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
                         </span>
 
                         <span className={styles.interval}>
-                            {index === 0 ? '—' : formatGap(interval?.interval)}
+                            {index === 0 ? 'LEADER' : formatGap(interval?.interval)}
                         </span>
                     </div>
                 );

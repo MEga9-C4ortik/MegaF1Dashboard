@@ -2,16 +2,14 @@ import { useSearchParams } from 'react-router-dom'
 import useSessionBrowser from '../hooks/useSessionBrowser'
 import useLiveData from '../hooks/useLiveData'
 import useReplay from '../hooks/useReplay'
-// WebStorm мог переименовать папку live -> pitwall, обнови пути если надо
-import LiveTower from '../components/pitwall/LiveTower'
-import FiaMessages from '../components/pitwall/FiaMessages'
-import Weather from '../components/pitwall/Weather'
-import RadioMessages from '../components/pitwall/RadioMessages'
-import Map from '../components/pitwall/Map'
-import ReplayControls from '../components/pitwall/ReplayControls'
+import LiveTower from '../components/pitWall/LiveTower'
+import FiaMessages from '../components/pitWall/FiaMessages'
+import Weather from '../components/pitWall/Weather'
+import RadioMessages from '../components/pitWall/RadioMessages'
+import Map from '../components/pitWall/Map'
+import ReplayControls from '../components/pitWall/ReplayControls'
 import styles from './PitWall.module.css'
 
-// year приходит из App.jsx как prop — там же yearSelect в Navbar
 function PitWall({ year }) {
     // Поддержка прямой ссылки из Race page: /pitwall?sessionKey=9149
     const [searchParams] = useSearchParams();
@@ -55,7 +53,6 @@ function PitWall({ year }) {
     return (
         <div className={styles.page}>
 
-            {/* ── Панель выбора GP ── */}
             <div className={styles.selectorBar}>
                 <span className={styles.pitwallLabel}>PIT WALL</span>
 
@@ -76,7 +73,6 @@ function PitWall({ year }) {
                 </select>
             </div>
 
-            {/* ── Табы сессий + название + погода ── */}
             {(sessions.length > 0 || loadingSessions) && (
                 <div className={styles.header}>
                     <div className={styles.sessionTabs}>
@@ -133,7 +129,6 @@ function PitWall({ year }) {
                 <p className={styles.loading}>Loading session data...</p>
             )}
 
-            {/* ── Основной контент ── */}
             {activeSessionKey && !dataLoading && (
                 <div className={styles.content}>
                     <div className={styles.left}>
