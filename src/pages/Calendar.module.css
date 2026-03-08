@@ -234,3 +234,209 @@
     letter-spacing: 1px;
     margin-top: 8px;
 }
+
+/* ── Hero: next race card ─────────────────────────────────────────── */
+.hero {
+    background: #0d0808;
+    border: 1.5px solid rgba(225, 6, 0, 0.5);
+    border-radius: 4px;
+    margin-bottom: 28px;
+    overflow: hidden;
+    position: relative;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 5px;
+    background: #e10600;
+}
+
+.heroTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px 14px 26px;
+    border-bottom: 1px solid rgba(225, 6, 0, 0.15);
+}
+
+.heroMeta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.heroBadge {
+    background: rgba(225, 6, 0, 0.15);
+    color: #e10600;
+    border: 1px solid rgba(225, 6, 0, 0.4);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    padding: 4px 10px;
+    border-radius: 3px;
+    text-transform: uppercase;
+}
+
+.heroRound {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: #555;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.heroInfo {
+    padding: 16px 20px 8px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.heroCountry {
+    font-size: 13px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.heroRaceName {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #e10600;
+    line-height: 1.1;
+}
+
+.heroCircuit {
+    font-size: 15px;
+    color: #666;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.heroCountdown {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px 10px 26px;
+    border-bottom: 1px solid #1a1a1a;
+    background: rgba(225, 6, 0, 0.04);
+}
+
+.heroCountdownLabel {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #444;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.heroCountdownTime {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: #e10600;
+    letter-spacing: 1px;
+}
+
+.heroCountdownTime b {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.heroSchedule {
+    padding: 4px 20px 14px 26px;
+}
+
+.heroSchedRow {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 7px 0;
+    border-bottom: 1px solid #141414;
+}
+
+.heroSchedDone {
+    opacity: 0.35;
+}
+
+.heroSchedNext .heroSchedLabel {
+    color: #e10600;
+}
+
+.heroSchedLabel {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #ccc;
+    letter-spacing: 0.5px;
+    width: 130px;
+    flex-shrink: 0;
+}
+
+.heroSchedDate {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #777;
+    flex: 1;
+}
+
+.heroSchedBadge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+/* ── Mini schedule for upcoming grid cards ───────────────────────── */
+.cardUpcoming {
+    border-color: #444;
+}
+
+.miniSchedule {
+    border-top: 1px solid #1e1e1e;
+    margin-top: 10px;
+    padding-top: 8px;
+    margin-bottom: 12px;
+}
+
+.miniRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3px 0;
+}
+
+.miniRowDone {
+    opacity: 0.3;
+}
+
+.miniLabel {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #999;
+    letter-spacing: 0.3px;
+}
+
+.miniDate {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #555;
+}
+
+.cardBottom {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cardBottom .detailsBtn {
+    align-self: flex-end;
+}

@@ -6,9 +6,6 @@ import useRaceResult from '../hooks/useRaceResult'
 import useOpenF1Sessions from '../hooks/useOpenF1Sessions'
 import styles from './Race.module.css'
 
-// ── Helpers ─────────────────────────────────────────────────────────
-
-// Локальное время юзера
 const formatLocal = (date, time) => {
     if (!date) return '—';
     const dt = new Date(`${date}T${time ?? '00:00:00Z'}`);
@@ -46,7 +43,6 @@ function buildSchedule(race) {
     return sessions.sort((a, b) => new Date(`${a.date}T${a.time ?? '00:00:00Z'}`) - new Date(`${b.date}T${b.time ?? '00:00:00Z'}`));
 }
 
-// ── Countdown hook ───────────────────────────────────────────────────
 function useCountdown(targetDate, targetTime) {
     const [left, setLeft] = useState(null);
 
@@ -72,11 +68,9 @@ function useCountdown(targetDate, targetTime) {
     return left;
 }
 
-// ── Schedule block ───────────────────────────────────────────────────
 function ScheduleBlock({ schedule }) {
     const today = Date.now();
 
-    // Находим следующую сессию для таймера
     const nextSession = schedule.find(s => {
         const dt = new Date(`${s.date}T${s.time ?? '00:00:00Z'}`);
         return dt > today;
@@ -227,7 +221,6 @@ function Race() {
     const raceDate = new Date(`${raceInfo.date}T${raceInfo.time ?? '00:00:00Z'}`);
     const isNextWeekend = raceDate > today || schedule.some(s => new Date(`${s.date}T${s.time ?? '00:00:00Z'}`) > today);
 
-    // Табы — только сессии с данными
     const sessionDoneTime = (s) => {
         const sched = schedule.find(sc => sc.key === s.key);
         if (!sched) return false;
@@ -235,23 +228,21 @@ function Race() {
     };
 
     const tabs = [
-        { key: 'race',        label: 'Race',             data: sessions.race,   fp: null },
-        { key: 'quali',       label: 'Qualifying',       data: sessions.quali,  fp: null },
-        { key: 'sprint',      label: 'Sprint',           data: sessions.sprint, fp: null },
-        { key: 'sprintQuali', label: 'Sprint Quali',     data: null,            fp: fpResults.sprintQuali },
-        { key: 'fp3',         label: 'FP3',              data: null,            fp: fpResults.fp3 },
-        { key: 'fp2',         label: 'FP2',              data: null,            fp: fpResults.fp2 },
-        { key: 'fp1',         label: 'FP1',              data: null,            fp: fpResults.fp1 },
+        { key: 'race',        label: 'Race',                  data: sessions.race,   fp: null },
+        { key: 'quali',       label: 'Qualification',         data: sessions.quali,  fp: null },
+        { key: 'sprint',      label: 'Sprint',                data: sessions.sprint, fp: null },
+        { key: 'sprintQuali', label: 'Sprint Qualification',  data: null,            fp: fpResults.sprintQuali },
+        { key: 'fp3',         label: 'FP3',                   data: null,            fp: fpResults.fp3 },
+        { key: 'fp2',         label: 'FP2',                   data: null,            fp: fpResults.fp2 },
+        { key: 'fp1',         label: 'FP1',                   data: null,            fp: fpResults.fp1 },
     ].filter(tab => tab.data || (tab.fp && tab.fp.length > 0));
 
-    // Если activeSession не доступен — переключиться на первый
     const validTab = tabs.find(t => t.key === activeSession) ? activeSession : tabs[0]?.key;
     const currentTab = tabs.find(t => t.key === validTab);
     const watchSessionKey = sessionKeyMap[validTab];
 
     return (
         <div className={styles.page}>
-            {/* ── Header ── */}
             <div className={clsx(styles.header, isNextWeekend && styles.headerNext)}>
                 <div className={styles.headerTop}>
                     <div>
@@ -269,16 +260,14 @@ function Race() {
                 </div>
 
                 <span className={styles.country}>{raceInfo.Circuit?.Location?.country}</span>
-                <h1 className={styles.raceName}>{raceInfo.raceName}</h1>
+                <span className={styles.raceName}>{raceInfo.raceName}</span>
                 <span className={styles.circuit}>
                     {raceInfo.Circuit?.circuitName} — {raceInfo.Circuit?.Location?.locality}
                 </span>
             </div>
 
-            {/* ── Schedule ── */}
             <ScheduleBlock schedule={schedule} />
 
-            {/* ── Results ── */}
             {tabs.length > 0 && (
                 <div className={styles.content}>
                     <div className={styles.btnHub}>

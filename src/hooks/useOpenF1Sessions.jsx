@@ -84,10 +84,10 @@ function useOpenF1Sessions(year, countryName) {
                 });
                 setSessionKeyMap(map);
 
-                // Фетчим FP классификации параллельно
-                const fpKeys = ['fp1', 'fp2', 'fp3'].filter(k => map[k]);
+                // Фетчим FP + sprintQuali классификации параллельно
+                const fpSessionKeys = ['fp1', 'fp2', 'fp3', 'sprintQuali'].filter(k => map[k]);
                 const fpEntries = await Promise.allSettled(
-                    fpKeys.map(k => buildFPClassification(map[k]).then(r => [k, r]))
+                    fpSessionKeys.map(k => buildFPClassification(map[k]).then(r => [k, r]))
                 );
 
                 const fpMap = {};
