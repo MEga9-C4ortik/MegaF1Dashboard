@@ -36,9 +36,20 @@
     transition: border-color 0.15s, color 0.15s;
 }
 
-.select:hover:not(:disabled) { border-color: #e10600; }
-.select:focus { color: #fff; outline: none; border-color: #e10600; }
-.select:disabled { opacity: 0.4; cursor: not-allowed; }
+.select:hover:not(:disabled) {
+    border-color: #e10600;
+}
+
+.select:focus {
+    color: #fff;
+    outline: none;
+    border-color: #e10600;
+}
+
+.select:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
 
 .header {
     display: flex;
@@ -63,14 +74,17 @@
     letter-spacing: 1.5px;
     text-transform: uppercase;
     padding: 5px 12px;
-    border: 1px solid #333;
+    border: 2px solid #333;
     border-radius: 20px;
     font-family: 'JetBrains Mono', monospace;
     cursor: pointer;
     transition: all 0.15s;
 }
 
-.sessionTab:hover { color: #e10600; border-color: #444; }
+.sessionTab:hover {
+    color: #e10600;
+    border-color: #444;
+}
 
 .sessionTabActive {
     color: #e10600;
