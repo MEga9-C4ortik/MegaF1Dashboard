@@ -124,6 +124,7 @@ function TyreIcon({ compound }) {
 function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentTime }) {
     if (!positions || !drivers) return null;
     const latest = getLatestPositions(positions);
+    const hasIntervals = intervals && intervals.length > 0;
 
     const driversMap = {};
     drivers.forEach(d => { driversMap[d.driver_number] = d; });
@@ -154,8 +155,8 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
                 <span>TYRE</span>
                 <span>LAST LAP</span>
                 <span>BEST LAP</span>
-                <span>GAP</span>
-                <span>INTERVAL</span>
+                {hasIntervals && <span>GAP</span>}
+                {hasIntervals && <span>INTERVAL</span>}
             </div>
 
             {latest.map((pos, index) => {
@@ -207,13 +208,17 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
                             {formatLapTime(bestLap?.lap_duration)}
                         </span>
 
-                        <span className={styles.gap}>
-                            {index === 0 ? 'LEADER' : formatGap(interval?.gap_to_leader)}
-                        </span>
+                        {hasIntervals && (
+                            <span className={styles.gap}>
+                                {index === 0 ? 'LEADER' : formatGap(interval?.gap_to_leader)}
+                            </span>
+                        )}
 
-                        <span className={styles.interval}>
-                            {index === 0 ? 'LEADER' : formatGap(interval?.interval)}
-                        </span>
+                        {hasIntervals && (
+                            <span className={styles.interval}>
+                                {index === 0 ? 'LEADER' : formatGap(interval?.interval)}
+                            </span>
+                        )}
                     </div>
                 );
             })}

@@ -34,14 +34,12 @@ export const fetchPositions = async (sessionKey, sinceDate = null) => {
 }
 
 export const fetchIntervalsGaps = async (sessionKey) => {
-  // Берём только последние интервалы (достаточно 60 записей — по 3 на пилота)
-  const data = await safeFetch(`${BASE_URL}/intervals?session_key=${sessionKey}`);
-  return Array.isArray(data) ? data : [];
+  const data = await safeFetch(`${BASE_URL}/intervals?session_key=${sessionKey}&limit=5000`);
+  const result = Array.isArray(data) ? data : [];
+  console.log(`[intervals] session=${sessionKey} count=${result.length}`, result[0] ?? 'EMPTY');
+  return result;
 }
 
-// Гонка: ~20 пилотов × 70 кругов = ~1400 записей.
-// OpenF1 по умолчанию отдаёт 1000 → пропадает вторая половина.
-// Ставим limit=5000 — с запасом на любую длину сессии.
 export const fetchLaps = async (sessionKey, sinceDate = null) => {
   const url = sinceDate
       ? `${BASE_URL}/laps?session_key=${sessionKey}&date_start>=${sinceDate}&limit=500`
@@ -75,7 +73,6 @@ export const fetchTeamRadio = async (sessionKey) => {
   return Array.isArray(data) ? data : [];
 }
 
-// Weather: сортируем по date и берём последнюю запись
 export const fetchWeather = async (sessionKey) => {
   const data = await safeFetch(`${BASE_URL}/weather?session_key=${sessionKey}&limit=500`);
   if (!Array.isArray(data) || data.length === 0) return [];

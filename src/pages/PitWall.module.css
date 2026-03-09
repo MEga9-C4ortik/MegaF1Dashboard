@@ -82,8 +82,8 @@
 }
 
 .sessionTab:hover {
-    color: #e10600;
-    border-color: #444;
+    color: #fff;
+    border-color: #e10600;
 }
 
 .sessionTabActive {

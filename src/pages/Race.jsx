@@ -121,11 +121,9 @@ function ScheduleBlock({ schedule }) {
     );
 }
 
-// ── Results tables ───────────────────────────────────────────────────
 const FP_SESSIONS = new Set(['fp1', 'fp2', 'fp3', 'sprintQuali']);
 
 function ResultsTable({ session, data, fpResult }) {
-    // FP — данные из OpenF1
     if (FP_SESSIONS.has(session)) {
         if (!fpResult) return <p className={styles.noData}>No data</p>;
         return (
@@ -174,7 +172,6 @@ function ResultsTable({ session, data, fpResult }) {
         );
     }
 
-    // Race / Sprint
     const results = data.Results || data.SprintResults || [];
     return (
         <table className={styles.table}>
@@ -211,9 +208,9 @@ function Race() {
 
     // Инфо о гонке — из результатов если есть, иначе из списка всех гонок
     const raceInfo = sessions.race ?? races.find(r => String(r.round) === String(round));
-    const countryName = raceInfo?.Circuit?.Location?.country;
+    const countryDate = raceInfo?.date;
 
-    const { sessionKeyMap, fpResults } = useOpenF1Sessions(year, countryName);
+    const { sessionKeyMap, fpResults } = useOpenF1Sessions(year, countryDate);
 
     const loading = racesLoading || resultsLoading;
     if (loading) return <p className={styles.loading}>Loading...</p>;
