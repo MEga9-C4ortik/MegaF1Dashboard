@@ -105,17 +105,12 @@ function useLiveData(sessionKey) {
             if (!isMounted.current) return;
 
             let lapsData = null;
-            try { lapsData = await fetchLaps(sessionKey); }
+            try { lapsData = await fetchLaps(sessionKey, initialDynamicDone.current ? sinceDate : null); }
             catch (e) { if (!e.message?.includes('429')) console.error('Laps failed:', e); }
 
             await delay(200);
             if (!isMounted.current) return;
 
-            let wthData = null;
-            try { wthData = await fetchWeather(sessionKey); }
-            catch (e) { if (!e.message?.includes('429')) console.error('Weather failed:', e); }
-
-            if (!isMounted.current) return;
 
             if (posData && posData.length > 0) {
                 if (initialDynamicDone.current) {
@@ -141,15 +136,23 @@ function useLiveData(sessionKey) {
             }
 
             if (lapsData && lapsData.length > 0) {
-                setLaps(lapsData);
-                setCached(sessionKey, { laps: lapsData });
+                if (initialDynamicDone.current) {
+                    setLaps(prev => {
+                        const merged = [...prev, ...lapsData];
+                        const seen = new Set();
+                        return merged.filter(l => {
+                            const key = `${l.driver_number}_${l.lap_number}`;
+                            if (seen.has(key)) return false;
+                            seen.add(key);
+                            return true;
+                        });
+                    });
+                } else {
+                    setLaps(lapsData);
+                    setCached(sessionKey, { laps: lapsData });
+                }
             }
 
-            if (wthData && wthData.length > 0) {
-                const latest = wthData.at(-1) ?? null;
-                setWeather(latest);
-                setCached(sessionKey, { weather: latest });
-            }
 
             if (!initialDynamicDone.current) {
                 initialDynamicDone.current = true;
@@ -187,6 +190,17 @@ function useLiveData(sessionKey) {
             await tryFetch(fetchPits,        setPits,        'pits',        300);
             await tryFetch(fetchFiaMessages, setFiaMessages, 'fiaMessages', 300);
             await tryFetch(fetchTeamRadio,   setRadio,       'radio',       300);
+            // Weather в static — обновляем раз в минуту, не каждые 15с
+            await delay(300);
+            if (!isMounted.current) return;
+            try {
+                const wth = await fetchWeather(sessionKey);
+                if (wth && wth.length > 0 && isMounted.current) {
+                    const latest = wth.at(-1);
+                    setWeather(latest);
+                    setCached(sessionKey, { weather: latest });
+                }
+            } catch (e) { if (!e.message?.includes('429')) console.error('Weather failed:', e); }
 
             if (Object.keys(toCache).length > 0) {
                 setCached(sessionKey, toCache);

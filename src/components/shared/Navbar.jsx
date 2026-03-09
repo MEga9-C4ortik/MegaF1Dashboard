@@ -60,8 +60,10 @@ function Navbar({ year, setYear }) {
                         value={year}
                         onChange={(e) => setYear(Number(e.target.value))}
                     >
-                        {YEARS.map(year => (
-                            <option key={year} value={year}>{year}</option>
+                        {YEARS.map(y => (
+                            <option key={y} value={y}>
+                                {y < 2018 ? `${y} ·` : y}
+                            </option>
                         ))}
                     </select>
                 )}

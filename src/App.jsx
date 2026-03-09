@@ -6,6 +6,7 @@ import Calendar from './pages/Calendar'
 import Race from './pages/Race'
 import Standings from './pages/Standings'
 import PitWall from './pages/PitWall'
+import NotFound from './pages/NotFound'
 
 function App() {
     const currentYear = new Date().getFullYear();
@@ -19,6 +20,7 @@ function App() {
                 <Route path="/standings" element={<Standings year={year} />} />
                 <Route path="/race/:raceId" element={<Race year={year} />} />
                 <Route path="/pitWall" element={<PitWall year={year} />} />
+                <Route path="*" element={<NotFound />} />
             </Routes>
         </BrowserRouter>
     );

@@ -17,7 +17,7 @@ function useSessionBrowser(year, initialSessionKey = null) {
         setMeetings([]);
         setSelectedMeetingKey(null);
         setSessions([]);
-        if (!initialSessionKey) setSelectedSessionKey(null);
+        setSelectedSessionKey(initialSessionKey ?? null);
         setLoadingMeetings(true);
 
         const load = async () => {

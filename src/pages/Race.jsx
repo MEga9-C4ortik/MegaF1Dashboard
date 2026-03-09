@@ -33,7 +33,7 @@ function buildSchedule(race) {
         sessions.push({ key: 'fp2',    label: 'Practice 2',      date: race.SecondPractice?.date, time: race.SecondPractice?.time });
         sessions.push({ key: 'fp3',    label: 'Practice 3',      date: race.ThirdPractice.date,   time: race.ThirdPractice.time });
     } else if (race.SecondPractice?.date) {
-        sessions.push({ key: 'sq',     label: 'Sprint Shootout', date: race.SecondPractice.date,  time: race.SecondPractice.time });
+        sessions.push({ key: 'sq', label: Number(race.season ?? new Date(race.date).getFullYear()) >= 2024 ? 'Sprint Qualifying' : 'Sprint Shootout', date: race.SecondPractice.date, time: race.SecondPractice.time });
     }
     if (race.Sprint?.date)
         sessions.push({ key: 'sprint', label: 'Sprint',          date: race.Sprint.date,          time: race.Sprint.time });
@@ -200,7 +200,10 @@ function ResultsTable({ session, data, fpResult }) {
 function Race() {
     const { raceId } = useParams();
     const navigate = useNavigate();
-    const [year, round] = raceId.split('-');
+    const parts = raceId?.split("-") ?? [];
+    const year = parts[0];
+    const round = parts[1];
+    if (!year || !round || isNaN(Number(round))) return <p className={styles.error}>Invalid race URL</p>;
     const [activeSession, setActiveSession] = useState('race');
 
     const { races, loading: racesLoading } = useRaces(year);

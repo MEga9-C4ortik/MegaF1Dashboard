@@ -13,12 +13,12 @@ export const fetchRaces = async (year) => {
 
 export const fetchDriverStandings = async (year) => {
     const data = await safeFetch(`${BASE_URL}/${year}/driverstandings.json?limit=100`);
-    return data.MRData.StandingsTable.StandingsLists[0].DriverStandings;
+    return data.MRData.StandingsTable.StandingsLists[0]?.DriverStandings ?? [];
 }
 
 export const fetchConstructorStandings = async (year) => {
     const data = await safeFetch(`${BASE_URL}/${year}/constructorstandings.json?limit=100`);
-    return data.MRData.StandingsTable.StandingsLists[0].ConstructorStandings;
+    return data.MRData.StandingsTable.StandingsLists[0]?.ConstructorStandings ?? [];
 }
 
 export const fetchRaceResult = async (year, round) => {

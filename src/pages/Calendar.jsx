@@ -27,7 +27,7 @@ function buildSchedule(race) {
         sessions.push({ key: 'fp2', label: 'Practice 2', date: race.SecondPractice?.date, time: race.SecondPractice?.time });
         sessions.push({ key: 'fp3', label: 'Practice 3', date: race.ThirdPractice.date, time: race.ThirdPractice.time });
     } else if (race.SecondPractice?.date) {
-        sessions.push({ key: 'sq', label: 'Sprint Shootout', date: race.SecondPractice.date, time: race.SecondPractice.time });
+        sessions.push({ key: 'sq', label: Number(race.season ?? new Date(race.date).getFullYear()) >= 2024 ? 'Sprint Qualifying' : 'Sprint Shootout', date: race.SecondPractice.date, time: race.SecondPractice.time });
     }
     if (race.Sprint?.date)
         sessions.push({ key: 'sprint', label: 'Sprint', date: race.Sprint.date, time: race.Sprint.time });

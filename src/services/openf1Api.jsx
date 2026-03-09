@@ -42,8 +42,11 @@ export const fetchIntervalsGaps = async (sessionKey) => {
 // Гонка: ~20 пилотов × 70 кругов = ~1400 записей.
 // OpenF1 по умолчанию отдаёт 1000 → пропадает вторая половина.
 // Ставим limit=5000 — с запасом на любую длину сессии.
-export const fetchLaps = async (sessionKey) => {
-  const data = await safeFetch(`${BASE_URL}/laps?session_key=${sessionKey}&limit=5000`);
+export const fetchLaps = async (sessionKey, sinceDate = null) => {
+  const url = sinceDate
+      ? `${BASE_URL}/laps?session_key=${sessionKey}&date_start>=${sinceDate}&limit=500`
+      : `${BASE_URL}/laps?session_key=${sessionKey}&limit=5000`;
+  const data = await safeFetch(url);
   return Array.isArray(data) ? data : [];
 }
 
