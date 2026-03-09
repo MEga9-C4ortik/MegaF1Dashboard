@@ -372,15 +372,17 @@
     font-size: 18px;
     color: #ccc;
     letter-spacing: 0.5px;
-    width: 130px;
+    width: 80px;
     flex-shrink: 0;
 }
 
 .heroSchedDate {
     font-family: 'JetBrains Mono', monospace;
     font-size: 20px;
+    letter-spacing: 0px;
     color: #777;
-    flex: 1;
+    width: 100px;
+    flex-shrink: 0;
 }
 
 .heroSchedBadge {
@@ -437,4 +439,26 @@
 
 .cardBottom .detailsBtn {
     align-self: flex-end;
+}
+
+@media (max-width: 768px) {
+    .heroSchedLabel {
+        font-size: 12px;
+    }
+
+    .heroCountdownLabel {
+        font-size: 12px;
+    }
+
+    .heroCountdownTime {
+        font-size: 8px;
+    }
+
+    .heroSchedDate {
+        font-size: 12px;
+    }
+
+    .heroSchedBadge {
+        font-size: 10px;
+    }
 }
