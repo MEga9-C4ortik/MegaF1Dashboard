@@ -76,7 +76,7 @@ function NextRaceHero({ race, year }) {
                     <span className={styles.heroRound}>ROUND {String(race.round).padStart(2, '0')}</span>
                 </div>
                 <button
-                    className={styles.detailsBtn}
+                    className={styles.heroDetailsBtn}
                     onClick={() => navigate(`/race/${year}-${race.round}`)}
                 >
                     Full Details →

@@ -263,26 +263,26 @@
 .heroMeta {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 14px;
 }
 
 .heroBadge {
     background: rgba(225, 6, 0, 0.15);
     color: #e10600;
-    border: 1px solid rgba(225, 6, 0, 0.4);
+    border: 1px solid rgba(225, 6, 0, 0.35);
     font-family: 'JetBrains Mono', monospace;
     font-size: 16px;
     font-weight: 700;
     letter-spacing: 3px;
     padding: 4px 10px;
-    border-radius: 3px;
+    border-radius: 4px;
     text-transform: uppercase;
 }
 
 .heroRound {
     font-family: 'JetBrains Mono', monospace;
     font-size: 18px;
-    color: #555;
+    color: #fff;
     letter-spacing: 2px;
     text-transform: uppercase;
 }
@@ -290,6 +290,7 @@
 .heroInfo {
     padding: 16px 20px 8px 26px;
     display: flex;
+    justify-content: space-between;
     flex-direction: column;
     gap: 2px;
 }
@@ -318,10 +319,30 @@
     margin-bottom: 4px;
 }
 
+.heroDetailsBtn {
+    font-size: 20px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #e10600;
+    background: transparent;
+    padding: 4px 10px;
+    border: 3px solid #fff;
+    border-radius: 4px;
+    font-family: 'Rajdhani', sans-serif;
+    transition: all 0.15s;
+}
+
+.heroDetailsBtn:hover {
+    color: #fff;
+    border-color: #e10600;
+    background: rgba(225, 6, 0, 0.08);
+}
+
 .heroCountdown {
     display: flex;
     align-items: center;
-    gap: 12px;
+    justify-content: left;
+    gap: 14px;
     padding: 10px 20px 10px 26px;
     border-bottom: 1px solid #1a1a1a;
     background: rgba(225, 6, 0, 0.04);
@@ -330,7 +351,7 @@
 .heroCountdownLabel {
     font-family: 'JetBrains Mono', monospace;
     font-size: 18px;
-    color: #444;
+    color: #eee;
     letter-spacing: 1.5px;
     text-transform: uppercase;
 }
@@ -445,6 +466,10 @@
 }
 
 @media (max-width: 768px) {
+    .heroDetailsBtn {
+        font-size: 14px;
+    }
+
     .heroCountdownLabel {
         font-size: 12px;
         width: 50%;
