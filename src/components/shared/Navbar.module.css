@@ -95,8 +95,8 @@
     justify-content: center;
     align-items: center;
     gap: 5px;
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     background: transparent;
     border: 1px solid #222;
     border-radius: 4px;
@@ -140,7 +140,7 @@
 
 @media (max-width: 768px) {
     .navbar {
-        padding: 0 20px;
+        padding: 0 10px;
         position: sticky;
         top: 0;
         z-index: 100;
@@ -164,10 +164,12 @@
 
     .burger {
         display: flex;
+
     }
 
     .yearSelect{
         font-size: 16px;
+        width: 75px;
     }
 
     .mobileMenu {
