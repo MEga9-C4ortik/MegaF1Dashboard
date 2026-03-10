@@ -14,10 +14,9 @@ const SESSION_NAME_MAP = {
 
 const meetingMatchesRace = (meeting, raceDate) => {
     if (!meeting.date_start || !raceDate) return false;
-    const race  = new Date(raceDate).getTime();
-    const start = new Date(meeting.date_start).getTime();
-    const diffDays = (race - start) / (1000 * 60 * 60 * 24);
-    // Гонка всегда воскресенье, meeting_start — обычно четверг/пятница → diff 3-4 дня
+    const raceDay  = raceDate.slice(0, 10);
+    const startDay = meeting.date_start.slice(0, 10);
+    const diffDays = (new Date(raceDay) - new Date(startDay)) / (1000 * 60 * 60 * 24);
     return diffDays >= 0 && diffDays <= 7;
 };
 
