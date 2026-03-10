@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import useSessionBrowser from '../hooks/useSessionBrowser'
 import useLiveData from '../hooks/useLiveData'
 import useReplay from '../hooks/useReplay'
@@ -10,8 +10,8 @@ import ReplayControls from '../components/pitWall/ReplayControls'
 import styles from './PitWall.module.css'
 
 function PitWall({ year }) {
-    // Поддержка прямой ссылки из Race page: /pitwall?sessionKey=9149
     const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
     const urlSessionKey = searchParams.get('sessionKey')
         ? Number(searchParams.get('sessionKey'))
         : null;
@@ -22,7 +22,7 @@ function PitWall({ year }) {
         loadingMeetings, loadingSessions,
     } = useSessionBrowser(year, urlSessionKey);
 
-    const activeSessionKey = urlSessionKey ?? selectedSessionKey;
+    const activeSessionKey = selectedSessionKey ?? urlSessionKey;
 
     const {
         positions, intervals, laps, drivers,
@@ -34,8 +34,6 @@ function PitWall({ year }) {
     const ct = replay.currentTime;
     const following = replay.isFollowing;
 
-    // В live-режиме (following=true) — показываем сырые последние данные без фильтрации по времени.
-    // В replay-режиме (following=false) — фильтруем всё по currentTime.
     const displayPositions   = following ? positions : replay.replayPositions;
     const displayIntervals   = following ? intervals : replay.replayIntervals;
     const displayStints      = stints;
@@ -60,7 +58,6 @@ function PitWall({ year }) {
 
     return (
         <div className={styles.page}>
-            {/* ── GP selector ── */}
             <div className={styles.selectorBar}>
                 <span className={styles.pitwallLabel}>PIT WALL</span>
                 <select
@@ -76,7 +73,6 @@ function PitWall({ year }) {
                 </select>
             </div>
 
-            {/* ── Session tabs ── */}
             {(sessions.length > 0 || loadingSessions) && (
                 <div className={styles.header}>
                     <div className={styles.sessionTabs}>
@@ -86,7 +82,10 @@ function PitWall({ year }) {
                                 <button
                                     key={s.session_key}
                                     className={`${styles.sessionTab} ${s.session_key === activeSessionKey ? styles.sessionTabActive : ''}`}
-                                    onClick={() => setSelectedSessionKey(s.session_key)}
+                                    onClick={() => {
+                                        setSelectedSessionKey(s.session_key);
+                                        if (urlSessionKey) navigate('/pitwall', { replace: true });
+                                    }}
                                 >
                                     {s.session_name}
                                 </button>

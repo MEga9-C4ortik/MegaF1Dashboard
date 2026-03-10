@@ -22,12 +22,12 @@ function RadioMessages({ messages, drivers }) {
         <div className={styles.container}>
             <h3 className={styles.title}>Team Radio</h3>
             <div className={styles.list}>
-                {sorted.map((msg, i) => {
+                {sorted.map((msg) => {
                     const driver = driversMap[msg.driver_number];
                     const teamColor = driver?.team_colour ? `#${driver.team_colour}` : '#666'
 
                     return (
-                        <div key={i} className={styles.message} style={{ borderLeftColor: teamColor }}>
+                        <div key={`${msg.driver_number}_${msg.date}`} className={styles.message} style={{ borderLeftColor: teamColor }}>
                             <div className={styles.messageTop}>
                                 <span className={styles.driver} style={{ color: teamColor }}>
                                     {driver?.name_acronym ?? `#${msg.driver_number}`}

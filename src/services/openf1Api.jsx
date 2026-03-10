@@ -90,7 +90,7 @@ export const fetchWeather = async (sessionKey) => {
 }
 
 export const fetchTrackLayout = async (sessionKey, driverNumber) => {
-  const data = await safeFetch(`${BASE_URL}/location?session_key=${sessionKey}&driver_number=${driverNumber}`);
+  const data = await safeFetch(`${BASE_URL}/location?session_key=${sessionKey}&driver_number=${driverNumber}&limit=5000`);
   const arr = Array.isArray(data) ? data : [];
   return arr.filter((_, i) => i % 5 === 0);
 }

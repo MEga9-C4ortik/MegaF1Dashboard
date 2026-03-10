@@ -54,6 +54,10 @@ function useMap(sessionKey, drivers, replayTime = null) {
         setNormParams(null);
 
         const load = async () => {
+            if (getTrackLayoutCache(sessionKey)) {
+                // Уже в кэше — пересчитывать не нужно
+                // (логика ниже с cached уже это обрабатывает, просто return не нужен)
+            }
             try {
                 const cached = getTrackLayoutCache(sessionKey);
                 let points;
@@ -63,8 +67,15 @@ function useMap(sessionKey, drivers, replayTime = null) {
                 } else {
                     await new Promise(r => setTimeout(r, 800));
                     if (!isMounted.current) return;
-                    const driverNum = drivers?.length > 0 ? drivers[0].driver_number : 1;
+
+                    const driverNum = drivers?.length > 0 ? drivers[0].driver_number : null;
+
+                    if (!driverNum) {
+                        if (isMounted.current) setLoading(false);
+                        return;
+                    }
                     points = await fetchTrackLayout(sessionKey, driverNum);
+
                     if (points.length) setTrackLayoutCache(sessionKey, points);
                 }
 
@@ -82,7 +93,7 @@ function useMap(sessionKey, drivers, replayTime = null) {
         }
 
         load();
-    }, [sessionKey]);
+    }, [sessionKey, drivers]);
 
     useEffect(() => {
         if (!sessionKey || !normParams) return;

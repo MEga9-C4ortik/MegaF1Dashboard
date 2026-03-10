@@ -29,12 +29,12 @@ function FIAMessages({ messages }) {
         <div className={styles.container}>
             <h3 className={styles.title}>Race Control</h3>
             <div className={styles.list}>
-                {sorted.map((msg, i) => {
+                {sorted.map((msg) => {
                     const config = flagConfig[msg.flag] ??
                         { color: '#555', icon: '📋', label: msg.flag };
 
                     return (
-                        <div key={i} className={styles.message} style={{ borderLeftColor: config.color }}>
+                        <div key={`${msg.date}_${msg.flag ?? 'msg'}`} className={styles.message} style={{ borderLeftColor: config.color }}>
                             <div className={styles.messageTop}>
                                 <span className={styles.flag} style={{ color: config.color }}>
                                     {config.label}
