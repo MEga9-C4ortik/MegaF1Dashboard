@@ -27,29 +27,38 @@ const getPodiumStyle = (position) =>
 function buildSchedule(race) {
     if (!race) return [];
     const sessions = [];
+
     if (race.FirstPractice?.date)
-        sessions.push({ key: 'fp1',    label: 'Practice 1',      date: race.FirstPractice.date,   time: race.FirstPractice.time });
+        sessions.push({ key: 'fp1', label: 'Practice 1', date: race.FirstPractice.date, time: race.FirstPractice.time });
+
     if (race.ThirdPractice?.date) {
-        sessions.push({ key: 'fp2',    label: 'Practice 2',      date: race.SecondPractice?.date, time: race.SecondPractice?.time });
-        sessions.push({ key: 'fp3',    label: 'Practice 3',      date: race.ThirdPractice.date,   time: race.ThirdPractice.time });
-    } else if (race.SecondPractice?.date) {
-        sessions.push({ key: 'sq', label: Number(race.season ?? new Date(race.date).getFullYear()) >= 2024 ? 'Sprint Qualifying' : 'Sprint Shootout', date: race.SecondPractice.date, time: race.SecondPractice.time });
+        // Обычный уикенд: FP2 + FP3
+        if (race.SecondPractice?.date)
+            sessions.push({ key: 'fp2', label: 'Practice 2', date: race.SecondPractice.date, time: race.SecondPractice.time });
+        sessions.push({ key: 'fp3', label: 'Practice 3', date: race.ThirdPractice.date, time: race.ThirdPractice.time });
+    } else {
+        // Sprint уикенд: SprintQualifying — Ergast 2024+ выдаёт его в отдельном поле.
+        // Старый формат (до 2024): Sprint Quali лежал в SecondPractice.
+        const sqDate = race.SprintQualifying?.date ?? race.SecondPractice?.date;
+        const sqTime = race.SprintQualifying?.time ?? race.SecondPractice?.time;
+        if (sqDate)
+            sessions.push({ key: 'sprintQuali', label: 'Sprint Qualifying', date: sqDate, time: sqTime });
     }
+
     if (race.Sprint?.date)
-        sessions.push({ key: 'sprint', label: 'Sprint',          date: race.Sprint.date,          time: race.Sprint.time });
+        sessions.push({ key: 'sprint', label: 'Sprint', date: race.Sprint.date, time: race.Sprint.time });
     if (race.Qualifying?.date)
-        sessions.push({ key: 'quali',  label: 'Qualifying',      date: race.Qualifying.date,      time: race.Qualifying.time });
+        sessions.push({ key: 'quali', label: 'Qualifying', date: race.Qualifying.date, time: race.Qualifying.time });
     sessions.push({ key: 'race', label: 'Race', date: race.date, time: race.time });
+
     return sessions.sort((a, b) => new Date(`${a.date}T${a.time ?? '00:00:00Z'}`) - new Date(`${b.date}T${b.time ?? '00:00:00Z'}`));
 }
 
 function useCountdown(targetDate, targetTime) {
     const [left, setLeft] = useState(null);
-
     useEffect(() => {
         if (!targetDate) { setLeft(null); return; }
         const target = new Date(`${targetDate}T${targetTime ?? '00:00:00Z'}`);
-
         const tick = () => {
             const diff = target - Date.now();
             if (diff <= 0) { setLeft(null); return; }
@@ -64,18 +73,12 @@ function useCountdown(targetDate, targetTime) {
         const t = setInterval(tick, 1000);
         return () => clearInterval(t);
     }, [targetDate, targetTime]);
-
     return left;
 }
 
 function ScheduleBlock({ schedule }) {
     const today = Date.now();
-
-    const nextSession = schedule.find(s => {
-        const dt = new Date(`${s.date}T${s.time ?? '00:00:00Z'}`);
-        return dt > today;
-    });
-
+    const nextSession = schedule.find(s => new Date(`${s.date}T${s.time ?? '00:00:00Z'}`) > today);
     const countdown = useCountdown(nextSession?.date, nextSession?.time);
 
     return (
@@ -94,7 +97,6 @@ function ScheduleBlock({ schedule }) {
                     </div>
                 )}
             </div>
-
             <div className={styles.scheduleList}>
                 {schedule.map(s => {
                     const isDone = new Date(`${s.date}T${s.time ?? '00:00:00Z'}`) < today;
@@ -102,8 +104,8 @@ function ScheduleBlock({ schedule }) {
                     return (
                         <div key={s.key} className={clsx(
                             styles.scheduleRow,
-                            isDone  && styles.scheduleRowDone,
-                            isNext  && styles.scheduleRowNext,
+                            isDone && styles.scheduleRowDone,
+                            isNext && styles.scheduleRowNext,
                         )}>
                             <span className={styles.scheduleLabel}>{s.label}</span>
                             <span className={styles.scheduleDate}>{formatLocal(s.date, s.time)}</span>
@@ -121,6 +123,8 @@ function ScheduleBlock({ schedule }) {
     );
 }
 
+// Сессии где данные берутся из OpenF1 (лучший круг), а не из Jolpi/Ergast
+// Ключи должны ТОЧНО совпадать с ключами в sessionKeyMap из useOpenF1Sessions
 const FP_SESSIONS = new Set(['fp1', 'fp2', 'fp3', 'sprintQuali']);
 
 function ResultsTable({ session, data, fpResult }) {
@@ -148,7 +152,7 @@ function ResultsTable({ session, data, fpResult }) {
 
     if (!data) return <p className={styles.noData}>No data</p>;
 
-    if (session === 'quali' || session === 'sq') {
+    if (session === 'quali' || session === 'sprintQuali') {
         const results = data.QualifyingResults || [];
         return (
             <table className={styles.table}>
@@ -200,17 +204,19 @@ function Race() {
     const parts = raceId?.split("-") ?? [];
     const year = parts[0];
     const round = parts[1];
-    if (!year || !round || isNaN(Number(round))) return <p className={styles.error}>Invalid race URL</p>;
+
     const [activeSession, setActiveSession] = useState('race');
 
     const { races, loading: racesLoading } = useRaces(year);
     const { sessions, loading: resultsLoading } = useRaceResult(year, round);
 
-    // Инфо о гонке — из результатов если есть, иначе из списка всех гонок
     const raceInfo = sessions.race ?? races.find(r => String(r.round) === String(round));
-    const countryDate = raceInfo?.date;
+    const raceDate = raceInfo?.date;
 
-    const { sessionKeyMap, fpResults } = useOpenF1Sessions(year, countryDate);
+    // raceDate может быть undefined пока грузятся races/sessions — хук сам ждёт через if (!raceDate) return
+    const { sessionKeyMap, fpResults, loading: fpLoading } = useOpenF1Sessions(year, raceDate);
+
+    if (!year || !round || isNaN(Number(round))) return <p className={styles.error}>Invalid race URL</p>;
 
     const loading = racesLoading || resultsLoading;
     if (loading) return <p className={styles.loading}>Loading...</p>;
@@ -218,27 +224,23 @@ function Race() {
 
     const schedule = buildSchedule(raceInfo);
     const today = Date.now();
-    const raceDate = new Date(`${raceInfo.date}T${raceInfo.time ?? '00:00:00Z'}`);
-    const isNextWeekend = raceDate > today || schedule.some(s => new Date(`${s.date}T${s.time ?? '00:00:00Z'}`) > today);
-
-    const sessionDoneTime = (s) => {
-        const sched = schedule.find(sc => sc.key === s.key);
-        if (!sched) return false;
-        return new Date(`${sched.date}T${sched.time ?? '00:00:00Z'}`) < today;
-    };
+    const raceDateTime = new Date(`${raceInfo.date}T${raceInfo.time ?? '00:00:00Z'}`);
+    const isNextWeekend = raceDateTime > today || schedule.some(s => new Date(`${s.date}T${s.time ?? '00:00:00Z'}`) > today);
 
     const tabs = [
-        { key: 'race',        label: 'Race',                  data: sessions.race,   fp: null },
-        { key: 'quali',       label: 'Qualification',         data: sessions.quali,  fp: null },
-        { key: 'sprint',      label: 'Sprint',                data: sessions.sprint, fp: null },
-        { key: 'sprintQuali', label: 'Sprint Qualification',  data: null,            fp: fpResults.sprintQuali },
-        { key: 'fp3',         label: 'FP3',                   data: null,            fp: fpResults.fp3 },
-        { key: 'fp2',         label: 'FP2',                   data: null,            fp: fpResults.fp2 },
-        { key: 'fp1',         label: 'FP1',                   data: null,            fp: fpResults.fp1 },
+        { key: 'race',       label: 'Race',               data: sessions.race,   fp: null },
+        { key: 'quali',      label: 'Qualification',       data: sessions.quali,  fp: null },
+        { key: 'sprint',     label: 'Sprint',              data: sessions.sprint, fp: null },
+        // Ключи fp1/fp2/fp3/sprintQuali должны совпадать с SESSION_NAME_MAP в useOpenF1Sessions
+        { key: 'sprintQuali', label: 'Sprint Qualifying',  data: null, fp: fpResults.sprintQuali },
+        { key: 'fp3',         label: 'FP3',                data: null, fp: fpResults.fp3 },
+        { key: 'fp2',         label: 'FP2',                data: null, fp: fpResults.fp2 },
+        { key: 'fp1',         label: 'FP1',                data: null, fp: fpResults.fp1 },
     ].filter(tab => tab.data || (tab.fp && tab.fp.length > 0));
 
     const validTab = tabs.find(t => t.key === activeSession) ? activeSession : tabs[0]?.key;
     const currentTab = tabs.find(t => t.key === validTab);
+    // sessionKeyMap тоже использует те же ключи (fp1/fp2/fp3/sprintQuali/race/quali/sprint)
     const watchSessionKey = sessionKeyMap[validTab];
 
     return (
@@ -280,6 +282,9 @@ function Race() {
                                 {tab.label}
                             </button>
                         ))}
+                        {fpLoading && (
+                            <span className={styles.fpLoading}>Loading FP data…</span>
+                        )}
                     </div>
                     <div className={styles.results}>
                         <ResultsTable
@@ -289,6 +294,9 @@ function Race() {
                         />
                     </div>
                 </div>
+            )}
+            {tabs.length === 0 && fpLoading && (
+                <p className={styles.loading}>Loading session results…</p>
             )}
         </div>
     );

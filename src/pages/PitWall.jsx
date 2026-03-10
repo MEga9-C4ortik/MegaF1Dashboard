@@ -32,19 +32,22 @@ function PitWall({ year }) {
 
     const replay = useReplay(positions, intervals, activeSessionKey);
     const ct = replay.currentTime;
+    const following = replay.isFollowing;
 
-    const displayPositions  = replay.replayPositions;
-    const displayIntervals  = replay.replayIntervals;
-    const displayStints     = stints;
-    const displayPits       = ct
+    // В live-режиме (following=true) — показываем сырые последние данные без фильтрации по времени.
+    // В replay-режиме (following=false) — фильтруем всё по currentTime.
+    const displayPositions   = following ? positions : replay.replayPositions;
+    const displayIntervals   = following ? intervals : replay.replayIntervals;
+    const displayStints      = stints;
+    const displayPits        = (ct && !following)
         ? pits.filter(p => p.pit_in_time && new Date(p.pit_in_time) <= ct)
         : pits;
-    const displayFiaMessages = ct
+    const displayFiaMessages = (ct && !following)
         ? fiaMessages.filter(m => new Date(m.date) <= ct)
-        : [];
-    const displayRadio = ct
+        : fiaMessages;
+    const displayRadio = (ct && !following)
         ? radio.filter(m => new Date(m.date) <= ct)
-        : [];
+        : radio;
 
     const activeSession = sessions.find(s => s.session_key === activeSessionKey);
 
@@ -174,7 +177,7 @@ function PitWall({ year }) {
                                 intervals={displayIntervals}
                                 laps={laps}
                                 pits={displayPits}
-                                currentTime={ct}
+                                currentTime={following ? null : ct}
                             />
                             : <p className={styles.noData}>NO DATA FOR THIS SESSION</p>
                         }

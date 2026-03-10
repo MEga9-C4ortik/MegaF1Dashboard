@@ -14,6 +14,7 @@
 .headerTop {
     display: flex;
     justify-content: space-between;
+    gap: 8px;
 }
 
 .round {
@@ -22,6 +23,7 @@
     text-transform: uppercase;
     letter-spacing: 2px;
     font-weight: 500;
+    width: 50%;
 }
 
 .sessionBadge {
@@ -42,7 +44,7 @@
 }
 
 .circuit {
-    font-size: 18px;
+    font-size: 20px;
     color: #fff;
     letter-spacing: 1px;
     font-family: 'JetBrains Mono', monospace;
@@ -182,6 +184,17 @@
     text-transform: uppercase;
 }
 
+.fpLoading {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #666;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    align-self: center;
+    padding: 0 8px;
+    opacity: 0.7;
+}
+
 .error {
     text-align: center;
     padding: 80px;
@@ -259,7 +272,7 @@
         font-size: 14px;
     }
 }
-/* ── Watch on Pit Wall button ── */
+
 .watchBar {
     padding: 12px 0 4px 0;
     margin-bottom: 8px;
@@ -284,27 +297,32 @@
     background: #e10600;
     color: #fff;
 }
-/* ══════════════════════════════════════════
-   NEXT WEEKEND — header highlight
-══════════════════════════════════════════ */
+
 .headerNext {
     border-left: 4px solid #e10600;
     background: rgba(225, 6, 0, 0.03);
 }
 
+.nextHeaderTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
 .nextBadge {
     display: inline-block;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
+    font-size: 20px;
     font-weight: 700;
     letter-spacing: 3px;
     color: #e10600;
     margin-bottom: 6px;
+    width: 50%;
 }
 
 .country {
-    font-size: 14px;
-    color: #666;
+    font-size: 18px;
+    color: #999e99;
     text-transform: uppercase;
     letter-spacing: 1.5px;
     font-family: 'JetBrains Mono', monospace;
@@ -319,9 +337,6 @@
     text-transform: uppercase;
 }
 
-/* ══════════════════════════════════════════
-   SCHEDULE BLOCK
-══════════════════════════════════════════ */
 .scheduleBlock {
     padding: 20px 40px 24px;
     border-bottom: 1px solid #1a1a1a;
@@ -338,9 +353,9 @@
 
 .blockTitle {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
+    font-size: 24px;
     letter-spacing: 3px;
-    color: #333;
+    color: #919191;
     text-transform: uppercase;
 }
 
@@ -352,21 +367,21 @@
 
 .countdownLabel {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: #444;
+    font-size: 22px;
+    color: #999e99;
     letter-spacing: 1px;
     text-transform: uppercase;
 }
 
 .countdownTime {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
+    font-size: 18px;
     color: #e10600;
     letter-spacing: 1px;
 }
 
 .countdownTime b {
-    font-size: 16px;
+    font-size: 24px;
     font-weight: 700;
 }
 
@@ -394,23 +409,23 @@
 
 .scheduleLabel {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
+    font-size: 20px;
     color: #fff;
     letter-spacing: 0.5px;
-    width: 120px;
+    width: 45%;
     flex-shrink: 0;
 }
 
 .scheduleDate {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
+    font-size: 20px;
     color: #fff;
     flex: 1;
 }
 
 .scheduleBadge {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 700;
     letter-spacing: 1.5px;
     padding: 2px 7px;
@@ -446,8 +461,16 @@
     }
 
     .scheduleDate {
-        font-size: 12px;
+        font-size: 16px;
         width: 100%;
+    }
+
+    .scheduleLabel {
+        font-size: 16px;
+    }
+
+    .scheduleBadge {
+        font-size: 16px;
     }
 
     .scheduleHeader {

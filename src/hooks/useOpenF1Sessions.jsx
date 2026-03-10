@@ -1,4 +1,3 @@
-// src/hooks/useOpenF1Sessions.jsx
 import { useState, useEffect } from 'react'
 import { fetchMeetings, fetchSessionsByMeeting, fetchLaps, fetchDrivers } from '../services/openf1Api'
 
@@ -13,20 +12,23 @@ const SESSION_NAME_MAP = {
     'Sprint Shootout':   'sprintQuali',
 };
 
-// Матчим по дате: ищем митинг где date_start за 0–7 дней до дня гонки
 const meetingMatchesRace = (meeting, raceDate) => {
     if (!meeting.date_start || !raceDate) return false;
-    const race = new Date(raceDate).getTime();
+    const race  = new Date(raceDate).getTime();
     const start = new Date(meeting.date_start).getTime();
     const diffDays = (race - start) / (1000 * 60 * 60 * 24);
+    // Гонка всегда воскресенье, meeting_start — обычно четверг/пятница → diff 3-4 дня
     return diffDays >= 0 && diffDays <= 7;
 };
 
+const delay = ms => new Promise(r => setTimeout(r, ms));
+
+// Лучший круг каждого пилота для FP классификации
 async function buildFPClassification(sessionKey) {
-    const [laps, drivers] = await Promise.all([
-        fetchLaps(sessionKey),
-        fetchDrivers(sessionKey),
-    ]);
+    // Последовательно! Параллельные запросы к OpenF1 → 429 → тихий провал
+    const laps = await fetchLaps(sessionKey);
+    await delay(400);
+    const drivers = await fetchDrivers(sessionKey);
 
     const driversMap = {};
     drivers.forEach(d => { driversMap[d.driver_number] = d; });
@@ -45,25 +47,26 @@ async function buildFPClassification(sessionKey) {
         .map((lap, idx) => {
             const d = driversMap[lap.driver_number];
             return {
-                position:      idx + 1,
+                position:     idx + 1,
                 driver_number: lap.driver_number,
-                nameAcronym:   d?.name_acronym ?? String(lap.driver_number),
-                familyName:    d?.last_name ?? '',
-                teamName:      d?.team_name ?? '',
-                teamColour:    d?.team_colour ?? null,
-                bestLap:       lap.lap_duration,
+                nameAcronym:  d?.name_acronym ?? String(lap.driver_number),
+                familyName:   d?.last_name ?? '',
+                teamName:     d?.team_name ?? '',
+                teamColour:   d?.team_colour ?? null,
+                bestLap:      lap.lap_duration,
             };
         });
 }
 
-// Принимает raceDate вместо countryName
 function useOpenF1Sessions(year, raceDate) {
     const [sessionKeyMap, setSessionKeyMap] = useState({});
-    const [fpResults, setFpResults] = useState({});
+    const [fpResults, setFpResults] = useState({});  // { fp1: [...], fp2: [...], fp3: [...] }
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (!year || !raceDate) return;
+
+        let cancelled = false; // Защита от race condition при быстрой смене гонки
 
         setLoading(true);
         setSessionKeyMap({});
@@ -72,14 +75,18 @@ function useOpenF1Sessions(year, raceDate) {
         const load = async () => {
             try {
                 const meetings = await fetchMeetings(Number(year));
+                if (cancelled) return;
+
                 const match = meetings.find(m => meetingMatchesRace(m, raceDate));
 
                 if (!match) {
-                    console.warn(`OpenF1: no meeting found for race date "${raceDate}" in ${year}`);
+                    console.warn(`OpenF1: no meeting found for raceDate="${raceDate}" in ${year}`);
                     return;
                 }
 
                 const sessions = await fetchSessionsByMeeting(match.meeting_key);
+                if (cancelled) return;
+
                 const map = {};
                 sessions.forEach(s => {
                     const key = SESSION_NAME_MAP[s.session_name];
@@ -87,28 +94,32 @@ function useOpenF1Sessions(year, raceDate) {
                 });
                 setSessionKeyMap(map);
 
+                // Фетчим FP + sprintQuali классификации ПОСЛЕДОВАТЕЛЬНО с задержками
+                // Параллельный запуск → 429 от OpenF1 → Promise.allSettled глотает ошибку → пусто
                 const fpSessionKeys = ['fp1', 'fp2', 'fp3', 'sprintQuali'].filter(k => map[k]);
-                const fpEntries = await Promise.allSettled(
-                    fpSessionKeys.map(k => buildFPClassification(map[k]).then(r => [k, r]))
-                );
-
                 const fpMap = {};
-                fpEntries.forEach(result => {
-                    if (result.status === 'fulfilled') {
-                        const [k, data] = result.value;
+                for (const k of fpSessionKeys) {
+                    if (cancelled) return;
+                    try {
+                        await delay(500); // задержка между сессиями
+                        const data = await buildFPClassification(map[k]);
                         if (data.length > 0) fpMap[k] = data;
+                    } catch (err) {
+                        console.error(`FP classification failed for ${k}:`, err);
                     }
-                });
+                }
                 setFpResults(fpMap);
 
             } catch (err) {
-                console.error('useOpenF1Sessions failed:', err);
+                if (!cancelled) console.error('useOpenF1Sessions failed:', err);
             } finally {
-                setLoading(false);
+                if (!cancelled) setLoading(false);
             }
         };
 
         load();
+
+        return () => { cancelled = true; };
     }, [year, raceDate]);
 
     return { sessionKeyMap, fpResults, loading };

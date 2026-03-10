@@ -98,7 +98,7 @@ function useLiveData(sessionKey) {
 
             // Один запрос — оба поля: interval + gap_to_leader
             let intData = null;
-            try { intData = await fetchIntervalsGaps(sessionKey); }
+            try { intData = await fetchIntervalsGaps(sessionKey, sinceDate); }
             catch (e) { if (!e.message?.includes('429')) console.error('Intervals failed:', e); }
 
             await delay(200);
@@ -131,8 +131,21 @@ function useLiveData(sessionKey) {
             }
 
             if (intData && intData.length > 0) {
-                setIntervals(intData);
-                setCached(sessionKey, { intervals: intData });
+                if (initialDynamicDone.current) {
+                    setIntervals(prev => {
+                        const merged = [...prev, ...intData];
+                        const seen = new Set();
+                        return merged.filter(i => {
+                            const key = `${i.driver_number}_${i.date}`;
+                            if (seen.has(key)) return false;
+                            seen.add(key);
+                            return true;
+                        });
+                    });
+                } else {
+                    setIntervals(intData);
+                    setCached(sessionKey, { intervals: intData });
+                }
             }
 
             if (lapsData && lapsData.length > 0) {
@@ -163,11 +176,26 @@ function useLiveData(sessionKey) {
         }
     }, [sessionKey]);
 
+    const loadWeather = useCallback(async () => {
+        if (!sessionKey) return;
+        try {
+            const wth = await fetchWeather(sessionKey);
+            if (wth && wth.length > 0 && isMounted.current) {
+                const latest = wth.at(-1);
+                setWeather(latest);
+                setCached(sessionKey, { weather: latest });
+            }
+        } catch (e) {
+            if (!e.message?.includes('429')) console.error('Weather failed:', e);
+        }
+    }, [sessionKey]);
+
     const loadStatic = useCallback(async () => {
         if (!sessionKey) return;
 
         if (hasStaticCache(sessionKey)) {
             setLoading(false);
+            // Даже при наличии кэша — погода обновляется через свой таймер отдельно
             return;
         }
 
@@ -190,17 +218,6 @@ function useLiveData(sessionKey) {
             await tryFetch(fetchPits,        setPits,        'pits',        300);
             await tryFetch(fetchFiaMessages, setFiaMessages, 'fiaMessages', 300);
             await tryFetch(fetchTeamRadio,   setRadio,       'radio',       300);
-            // Weather в static — обновляем раз в минуту, не каждые 15с
-            await delay(300);
-            if (!isMounted.current) return;
-            try {
-                const wth = await fetchWeather(sessionKey);
-                if (wth && wth.length > 0 && isMounted.current) {
-                    const latest = wth.at(-1);
-                    setWeather(latest);
-                    setCached(sessionKey, { weather: latest });
-                }
-            } catch (e) { if (!e.message?.includes('429')) console.error('Weather failed:', e); }
 
             if (Object.keys(toCache).length > 0) {
                 setCached(sessionKey, toCache);
@@ -214,15 +231,23 @@ function useLiveData(sessionKey) {
 
     useEffect(() => {
         if (!sessionKey) return;
-        loadDynamic();
-        loadStatic();
+        // Динамика → статика → погода последовательно, иначе 429 на OpenF1
+        const init = async () => {
+            await loadDynamic();
+            await loadStatic();
+            await loadWeather(); // погода последней, чтобы не 429-иться
+        };
+        init();
         const dynamicTimer = setInterval(loadDynamic, DYNAMIC_INTERVAL);
         const staticTimer  = setInterval(loadStatic,  STATIC_INTERVAL);
+        // Погода — раз в минуту, отдельно от static-данных
+        const weatherTimer = setInterval(loadWeather, STATIC_INTERVAL);
         return () => {
             clearInterval(dynamicTimer);
             clearInterval(staticTimer);
+            clearInterval(weatherTimer);
         };
-    }, [loadDynamic, loadStatic, sessionKey]);
+    }, [loadDynamic, loadStatic, loadWeather, sessionKey]);
 
     const hasData = drivers.length > 0 || positions.length > 0;
 

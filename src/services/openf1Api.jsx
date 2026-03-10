@@ -2,6 +2,8 @@ const BASE_URL = 'https://api.openf1.org/v1'
 
 const safeFetch = async (url) => {
   const res = await fetch(url);
+  // OpenF1 возвращает 404 когда данных нет (а не пустой массив) — трактуем как []
+  if (res.status === 404) return [];
   if (!res.ok) {
     throw new Error(`HTTP ${res.status} for ${url}`);
   }
@@ -33,13 +35,20 @@ export const fetchPositions = async (sessionKey, sinceDate = null) => {
   return Array.isArray(data) ? data : [];
 }
 
-export const fetchIntervalsGaps = async (sessionKey) => {
-  const data = await safeFetch(`${BASE_URL}/intervals?session_key=${sessionKey}&limit=5000`);
-  const result = Array.isArray(data) ? data : [];
-  console.log(`[intervals] session=${sessionKey} count=${result.length}`, result[0] ?? 'EMPTY');
-  return result;
+export const fetchIntervalsGaps = async (sessionKey, sinceDate = null) => {
+  // Гонка 90 мин × 20 пилотов × каждые 5с = ~21600 записей.
+  // Первый загруз: limit=25000 чтобы не обрезать.
+  // Инкрементально: только свежие записи как laps/positions.
+  const url = sinceDate
+      ? `${BASE_URL}/intervals?session_key=${sessionKey}&date>=${sinceDate}&limit=1000`
+      : `${BASE_URL}/intervals?session_key=${sessionKey}&limit=25000`;
+  const data = await safeFetch(url);
+  return Array.isArray(data) ? data : [];
 }
 
+// Гонка: ~20 пилотов × 70 кругов = ~1400 записей.
+// OpenF1 по умолчанию отдаёт 1000 → пропадает вторая половина.
+// Ставим limit=5000 — с запасом на любую длину сессии.
 export const fetchLaps = async (sessionKey, sinceDate = null) => {
   const url = sinceDate
       ? `${BASE_URL}/laps?session_key=${sessionKey}&date_start>=${sinceDate}&limit=500`
@@ -73,6 +82,7 @@ export const fetchTeamRadio = async (sessionKey) => {
   return Array.isArray(data) ? data : [];
 }
 
+// Weather: сортируем по date и берём последнюю запись
 export const fetchWeather = async (sessionKey) => {
   const data = await safeFetch(`${BASE_URL}/weather?session_key=${sessionKey}&limit=500`);
   if (!Array.isArray(data) || data.length === 0) return [];
