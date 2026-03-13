@@ -1,4 +1,5 @@
 const BASE_URL = 'https://api.openf1.org/v1'
+const QUEUE_DELAY = 300;
 
 const delay = ms => new Promise(r => setTimeout(r, ms));
 
@@ -8,17 +9,19 @@ const safeFetch = async (url) => {
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     const res = await enqueue(() => fetch(url));
 
-    if (res.status === 404) return [];
+    if (res.status === 404) {
+      console.log("Error 404: " + res.status);
+      return [];
+    }
     if (res.ok) return res.json();
 
-    // На какие статусы делаем retry?
     const shouldRetry = res.status === 429 || res.status >= 500;
 
     if (!shouldRetry || attempt === MAX_ATTEMPTS) {
       throw new Error(`HTTP ${res.status} for ${url}`);
     }
 
-    await delay(1000 * Math.pow(2, attempt - 1));
+    await delay(QUEUE_DELAY * Math.pow(2, attempt - 1));
   }
 };
 
@@ -35,7 +38,7 @@ async function worker() {
     } catch(e) {
       reject(e);
     }
-    await delay(300);
+    await delay(QUEUE_DELAY);
   }
   isRunning = false;
 }
