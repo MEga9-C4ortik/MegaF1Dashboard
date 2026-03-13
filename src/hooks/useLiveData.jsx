@@ -109,12 +109,7 @@ function useLiveData(sessionKey) {
             await delay(200);
             if (!isMounted.current) return;
 
-            let weatherData = null;
-            try {
-                weatherData = await fetchWeather(sessionKey, sinceDate);
-            } catch(e) {
-                if
-            }
+
 
             await delay(200);
             if (!isMounted.current) return;
