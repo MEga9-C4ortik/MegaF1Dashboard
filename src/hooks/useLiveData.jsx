@@ -90,16 +90,31 @@ function useLiveData(sessionKey) {
 
         try {
             let posData = null;
-            try { posData = await fetchPositions(sessionKey, sinceDate); }
-            catch (e) { if (!e.message?.includes('429')) console.error('Positions failed:', e); }
+            try {
+                posData = await fetchPositions(sessionKey, sinceDate);
+            } catch (e) {
+                if (!e.message?.includes('429')) console.error('Positions failed:', e);
+            }
 
             await delay(200);
             if (!isMounted.current) return;
 
-            // Один запрос — оба поля: interval + gap_to_leader
             let intData = null;
-            try { intData = await fetchIntervalsGaps(sessionKey, sinceDate); }
-            catch (e) { if (!e.message?.includes('429')) console.error('Intervals failed:', e); }
+            try {
+                intData = await fetchIntervalsGaps(sessionKey, sinceDate);
+            } catch(e) {
+                if (!e.message?.includes('429')) console.error('Intervals failed:', e);
+            }
+
+            await delay(200);
+            if (!isMounted.current) return;
+
+            let weatherData = null;
+            try {
+                weatherData = await fetchWeather(sessionKey, sinceDate);
+            } catch(e) {
+                if
+            }
 
             await delay(200);
             if (!isMounted.current) return;
@@ -110,7 +125,6 @@ function useLiveData(sessionKey) {
 
             await delay(200);
             if (!isMounted.current) return;
-
 
             if (posData && posData.length > 0) {
                 if (initialDynamicDone.current) {
@@ -231,17 +245,13 @@ function useLiveData(sessionKey) {
 
     useEffect(() => {
         if (!sessionKey) return;
-        // Динамика → статика → погода последовательно, иначе 429 на OpenF1
         const init = async () => {
             await loadDynamic();
             await loadStatic();
-            await loadWeather(); // погода последней, чтобы не 429-иться
         };
         init();
         const dynamicTimer = setInterval(loadDynamic, DYNAMIC_INTERVAL);
         const staticTimer  = setInterval(loadStatic,  STATIC_INTERVAL);
-        // Погода — раз в минуту, отдельно от static-данных
-        const weatherTimer = setInterval(loadWeather, STATIC_INTERVAL);
         return () => {
             clearInterval(dynamicTimer);
             clearInterval(staticTimer);
