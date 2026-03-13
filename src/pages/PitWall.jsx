@@ -34,8 +34,8 @@ function PitWall({ year }) {
     const replay = useReplay(positions, intervals, activeSessionKey);
     const ct = replay.currentTime;
 
-    const displayPositions   = (positions.length > 0) ? replay.replayPositions : null;
-    const displayIntervals   = (intervals.length > 0) ? replay.replayIntervals : null;
+    const displayPositions   = (positions.length > 0) ? replay.replayPositions : [];
+    const displayIntervals   = (intervals.length > 0) ? replay.replayIntervals : [];
     const displayStints      = stints;
     const displayPits        = (ct)
         ? pits.filter(p => p.pit_in_time && new Date(p.pit_in_time) <= ct)

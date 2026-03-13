@@ -112,18 +112,21 @@ export const fetchFiaMessages = async (sessionKey) => {
 }
 
 export const fetchTeamRadio = async (sessionKey) => {
-  const data = await safeFetch(`${BASE_URL}/team_radio?meeting_key=${sessionKey}`);
+  const data = await safeFetch(`${BASE_URL}/team_radio?session_key=${sessionKey}`);
   return Array.isArray(data) ? data : [];
 }
 
 export const fetchWeather = async (sessionKey, sinceDate) => {
-  const data = await safeFetch(`${BASE_URL}/weather?meeting_key=${sessionKey}&date=${sinceDate}`);
+  const url = sinceDate
+      ? `${BASE_URL}/weather?session_key=${sessionKey}&date>=${sinceDate}`
+      : `${BASE_URL}/weather?session_key=${sessionKey}`;
+  const data = await safeFetch(url);
   if (!Array.isArray(data) || data.length === 0) return [];
   return data.sort((a, b) => new Date(a.date) - new Date(b.date));
 }
 
 export const fetchTrackLayout = async (sessionKey, driverNumber) => {
-  const data = await safeFetch(`${BASE_URL}/location?meeting_key=${sessionKey}&driver_number=${driverNumber}`);
+  const data = await safeFetch(`${BASE_URL}/location?session_key=${sessionKey}&driver_number=${driverNumber}`);
   const arr = Array.isArray(data) ? data : [];
   return arr.filter((_, i) => i % 5 === 0);
 }

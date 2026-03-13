@@ -46,7 +46,7 @@ function useLiveData(sessionKey) {
             setPits([]);
             setFiaMessages([]);
             setRadio([]);
-            setWeather(null);
+            setWeather([]);
             setLoading(false);
             return () => { isMounted.current = false; };
         }
@@ -75,7 +75,7 @@ function useLiveData(sessionKey) {
             setPits([]);
             setFiaMessages([]);
             setRadio([]);
-            setWeather(null);
+            setWeather([]);
         }
 
         return () => { isMounted.current = false; };
