@@ -9,8 +9,6 @@ function useReplay(allPositions, allIntervals = [], sessionKey = null) {
 
     const speedRef    = useRef(1);
     const initialized = useRef(false);
-    // isFollowing = true: автоматически следуем за последними данными (live режим)
-    // false: пользователь вручную перемотал/запустил replay
     const isFollowing = useRef(true);
     const [followingState, setFollowingState] = useState(true);
 
@@ -32,20 +30,18 @@ function useReplay(allPositions, allIntervals = [], sessionKey = null) {
         initialized.current = false;
         isFollowing.current = true;
         setFollowingState(false);
-    }, [sessionKey]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [sessionKey]);
 
     useEffect(() => {
-        if (!maxTime) return;
+        if (!minTime || !maxTime) return;
         if (!initialized.current) {
             initialized.current = true;
-            setCurrentTime(maxTime);
-        } else if (isFollowing.current && !isPlaying) {
-            setCurrentTime(maxTime);
+            setCurrentTime(minTime);
         }
-    }, [maxTime]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [minTime, maxTime]);
 
     useEffect(() => {
-        if (!isPlaying || !maxTime) return;
+        if (!isPlaying || !maxTime || !minTime) return;
         const timer = setInterval(() => {
             setCurrentTime(prev => {
                 if (!prev) return prev;

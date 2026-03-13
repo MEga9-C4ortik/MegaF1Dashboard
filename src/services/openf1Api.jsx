@@ -1,5 +1,5 @@
 const BASE_URL = 'https://api.openf1.org/v1'
-const QUEUE_DELAY = 300;
+const QUEUE_DELAY = 700;
 
 const delay = ms => new Promise(r => setTimeout(r, ms));
 
@@ -21,7 +21,7 @@ const safeFetch = async (url) => {
       throw new Error(`HTTP ${res.status} for ${url}`);
     }
 
-    await delay(QUEUE_DELAY * Math.pow(2, attempt - 1));
+    await delay(2000 * Math.pow(2, attempt - 1));
   }
 };
 
@@ -52,8 +52,7 @@ function enqueue(fn) {
 
 export const fetchCurrentSession = async () => {
   const data = await safeFetch(`${BASE_URL}/sessions?session_key=latest`);
-  let res = queue(data);
-  return Array.isArray(res) && res.length > 0 ? res[0] : null;
+  return Array.isArray(data) && data.length > 0 ? data[0] : null;
 };
 
 export const fetchSessionsByMeeting = async (meetingKey) => {

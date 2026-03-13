@@ -162,10 +162,10 @@ function useLiveData(sessionKey) {
             if (weatherData && weatherData.length > 0) {
                 if (initialDynamicDone.current) {
                     setWeather(prev => {
-                        const merged = [...prev, ...intData];
+                        const merged = [...prev, ...weatherData];
                         const seen = new Set();
                         return merged.filter(i => {
-                            const key = `${i.driver_number}_${i.date}`;
+                            const key = `${i.date}`;
                             if (seen.has(key)) return false;
                             seen.add(key);
                             return true;
@@ -202,20 +202,6 @@ function useLiveData(sessionKey) {
 
         } catch (err) {
             console.error('Dynamic fetch error:', err);
-        }
-    }, [sessionKey]);
-
-    const loadWeather = useCallback(async () => {
-        if (!sessionKey) return;
-        try {
-            const wth = await fetchWeather(sessionKey);
-            if (wth && wth.length > 0 && isMounted.current) {
-                const latest = wth.at(-1);
-                setWeather(latest);
-                setCached(sessionKey, { weather: latest });
-            }
-        } catch (e) {
-            if (!e.message?.includes('429')) console.error('Weather failed:', e);
         }
     }, [sessionKey]);
 
@@ -269,9 +255,8 @@ function useLiveData(sessionKey) {
         return () => {
             clearInterval(dynamicTimer);
             clearInterval(staticTimer);
-            clearInterval(weatherTimer);
         };
-    }, [loadDynamic, loadStatic, loadWeather, sessionKey]);
+    }, [loadDynamic, loadStatic, sessionKey]);
 
     const hasData = drivers.length > 0 || positions.length > 0;
 
