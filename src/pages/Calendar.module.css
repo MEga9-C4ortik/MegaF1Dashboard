@@ -467,26 +467,26 @@
 
 @media (max-width: 768px) {
     .heroDetailsBtn {
-        font-size: 14px;
+        font-size: 12px;
     }
 
     .heroCountdownLabel {
-        font-size: 12px;
-        width: 50%;
-    }
-
-    .heroCountdownTime {
         font-size: 10px;
         width: 50%;
     }
 
+    .heroCountdownTime {
+        font-size: 9px;
+        width: 50%;
+    }
+
     .heroSchedLabel {
-        font-size: 15px;
+        font-size: 12px;
         width: 90px;
     }
 
     .heroSchedDate {
-        font-size: 15px;
+        font-size: 12px;
         width: 90px;
     }
 

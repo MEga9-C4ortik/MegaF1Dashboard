@@ -22,7 +22,7 @@ function useLiveData(sessionKey) {
     const [positions, setPositions]     = useState([]);
     const [intervals, setIntervals]     = useState([]);
     const [laps, setLaps]               = useState([]);
-    const [weather, setWeather]         = useState(null);
+    const [weather, setWeather]         = useState([]);
     const [drivers, setDrivers]         = useState([]);
     const [stints, setStints]           = useState([]);
     const [pits, setPits]               = useState([]);
@@ -109,14 +109,24 @@ function useLiveData(sessionKey) {
             await delay(200);
             if (!isMounted.current) return;
 
-
+            let weatherData = null;
+            try {
+                weatherData = await fetchWeather(sessionKey, sinceDate);
+            } catch (e) {
+                if (!e.message?.includes('429')) console.error('Weather failed:', e);
+            }
 
             await delay(200);
             if (!isMounted.current) return;
 
             let lapsData = null;
-            try { lapsData = await fetchLaps(sessionKey, initialDynamicDone.current ? sinceDate : null); }
-            catch (e) { if (!e.message?.includes('429')) console.error('Laps failed:', e); }
+            try {
+                lapsData = await fetchLaps(sessionKey, initialDynamicDone.current
+                    ? sinceDate : null);
+            }
+            catch (e) {
+                if (!e.message?.includes('429')) console.error('Laps failed:', e);
+            }
 
             await delay(200);
             if (!isMounted.current) return;
@@ -154,6 +164,24 @@ function useLiveData(sessionKey) {
                 } else {
                     setIntervals(intData);
                     setCached(sessionKey, { intervals: intData });
+                }
+            }
+
+            if (weatherData && weatherData.length > 0) {
+                if (initialDynamicDone.current) {
+                    setWeather(prev => {
+                        const merged = [...prev, ...intData];
+                        const seen = new Set();
+                        return merged.filter(i => {
+                            const key = `${i.driver_number}_${i.date}`;
+                            if (seen.has(key)) return false;
+                            seen.add(key);
+                            return true;
+                        });
+                    });
+                } else {
+                    setWeather(weatherData);
+                    setCached(sessionKey, { weather: weatherData });
                 }
             }
 
@@ -204,7 +232,6 @@ function useLiveData(sessionKey) {
 
         if (hasStaticCache(sessionKey)) {
             setLoading(false);
-            // Даже при наличии кэша — погода обновляется через свой таймер отдельно
             return;
         }
 

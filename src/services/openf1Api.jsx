@@ -1,19 +1,56 @@
 const BASE_URL = 'https://api.openf1.org/v1'
 
+const delay = ms => new Promise(r => setTimeout(r, ms));
+
 const safeFetch = async (url) => {
-  for(let i = 0; i < 5; i++) {
-    const res = await fetch(url);
+  const MAX_ATTEMPTS = 5;
+
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    const res = await enqueue(() => fetch(url));
+
     if (res.status === 404) return [];
-    if (!res.ok) {
+    if (res.ok) return res.json();
+
+    // На какие статусы делаем retry?
+    const shouldRetry = res.status === 429 || res.status >= 500;
+
+    if (!shouldRetry || attempt === MAX_ATTEMPTS) {
       throw new Error(`HTTP ${res.status} for ${url}`);
     }
-    return res.json();
+
+    await delay(1000 * Math.pow(2, attempt - 1));
   }
+};
+
+const queue = [];
+let isRunning = false;
+
+async function worker() {
+  isRunning = true;
+  while (queue.length > 0) {
+    const { fn, resolve, reject } = queue.shift();
+    try {
+      const result = await fn();
+      resolve(result);
+    } catch(e) {
+      reject(e);
+    }
+    await delay(300);
+  }
+  isRunning = false;
+}
+
+function enqueue(fn) {
+  return new Promise((resolve, reject) => {
+    queue.push({ fn, resolve, reject });
+    if (!isRunning) worker();
+  });
 }
 
 export const fetchCurrentSession = async () => {
   const data = await safeFetch(`${BASE_URL}/sessions?session_key=latest`);
-  return Array.isArray(data) && data.length > 0 ? data[0] : null;
+  let res = queue(data);
+  return Array.isArray(res) && res.length > 0 ? res[0] : null;
 };
 
 export const fetchSessionsByMeeting = async (meetingKey) => {
