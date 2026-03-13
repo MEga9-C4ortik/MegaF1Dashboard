@@ -95,8 +95,6 @@ function useLiveData(sessionKey) {
             } catch (e) {
                 if (!e.message?.includes('429')) console.error('Positions failed:', e);
             }
-
-            await delay(200);
             if (!isMounted.current) return;
 
             let intData = null;
@@ -105,8 +103,6 @@ function useLiveData(sessionKey) {
             } catch(e) {
                 if (!e.message?.includes('429')) console.error('Intervals failed:', e);
             }
-
-            await delay(200);
             if (!isMounted.current) return;
 
             let weatherData = null;
@@ -115,8 +111,6 @@ function useLiveData(sessionKey) {
             } catch (e) {
                 if (!e.message?.includes('429')) console.error('Weather failed:', e);
             }
-
-            await delay(200);
             if (!isMounted.current) return;
 
             let lapsData = null;
@@ -127,8 +121,6 @@ function useLiveData(sessionKey) {
             catch (e) {
                 if (!e.message?.includes('429')) console.error('Laps failed:', e);
             }
-
-            await delay(200);
             if (!isMounted.current) return;
 
             if (posData && posData.length > 0) {
