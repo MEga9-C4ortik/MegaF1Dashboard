@@ -93,6 +93,14 @@ function PitWall({ year }) {
                 </div>
             )}
 
+            <Weather weather={weather.at(-1)} />
+
+            {activeSessionKey && !dataLoading && (
+                <div className={styles.mapSection}>
+                    <Map sessionKey={activeSessionKey} drivers={drivers} replayTime={ct} />
+                </div>
+            )}
+
             {activeSessionKey && !dataLoading && positions.length > 0 && (
                 <ReplayControls
                     isPlaying={replay.isPlaying}
@@ -108,12 +116,6 @@ function PitWall({ year }) {
                 />
             )}
 
-            {activeSessionKey && !dataLoading && (
-                <div className={styles.mapSection}>
-                    <Map sessionKey={activeSessionKey} drivers={drivers} replayTime={ct} />
-                </div>
-            )}
-
             {!activeSessionKey && !loadingMeetings && (
                 <div className={styles.empty}>
                     <span className={styles.emptyText}>Select a session to watch.</span>
@@ -127,7 +129,6 @@ function PitWall({ year }) {
 
             {activeSessionKey && !dataLoading && (
                 <div className={styles.content}>
-                    <Weather weather={weather.at(-1)} />
                     <div className={styles.left}>
                         {displayPositions.length > 0 && drivers.length > 0
                             ? <LiveTower
