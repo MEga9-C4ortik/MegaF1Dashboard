@@ -215,8 +215,7 @@ function useLiveData(sessionKey) {
 
         try {
             const toCache = {};
-            const tryFetch = async (fn, setter, key, delayMs = 300) => {
-                await delay(delayMs);
+            const tryFetch = async (fn, setter, key) => {
                 if (!isMounted.current) return;
                 try {
                     const data = await fn(sessionKey);
@@ -227,11 +226,11 @@ function useLiveData(sessionKey) {
                 }
             };
 
-            await tryFetch(fetchDrivers,     setDrivers,     'drivers',     0);
-            await tryFetch(fetchStints,      setStints,      'stints',      300);
-            await tryFetch(fetchPits,        setPits,        'pits',        300);
-            await tryFetch(fetchFiaMessages, setFiaMessages, 'fiaMessages', 300);
-            await tryFetch(fetchTeamRadio,   setRadio,       'radio',       300);
+            await tryFetch(fetchDrivers,     setDrivers,     'drivers');
+            await tryFetch(fetchStints,      setStints,      'stints');
+            await tryFetch(fetchPits,        setPits,        'pits');
+            await tryFetch(fetchFiaMessages, setFiaMessages, 'fiaMessages');
+            await tryFetch(fetchTeamRadio,   setRadio,       'radio');
 
             if (Object.keys(toCache).length > 0) {
                 setCached(sessionKey, toCache);

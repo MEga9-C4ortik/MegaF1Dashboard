@@ -100,45 +100,6 @@
     white-space: nowrap;
 }
 
-.weatherBar {
-    display: flex;
-    gap: 32px;
-    align-items: center;
-    padding: 10px 40px;
-    border-bottom: 1px solid #111;
-    background: #0a0a0a;
-    flex-wrap: wrap;
-}
-
-.weatherItem {
-    display: flex;
-    align-items: baseline;
-    gap: 6px;
-}
-
-.weatherLabel {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 18px;
-    color: #888;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-}
-
-.weatherValue {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 20px;
-    font-weight: 600;
-    color: #fff;
-}
-
-.weatherValueRain {
-    color: #4da6ff;
-}
-
-.weatherDim {
-    color: #444;
-}
-
 .mapSection {
     padding: 16px 40px;
     border-bottom: 1px solid #111;

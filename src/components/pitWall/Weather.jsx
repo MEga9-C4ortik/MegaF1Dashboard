@@ -1,52 +1,47 @@
 import styles from './Weather.module.css'
 
-function windDirLabel(deg) {
-    if (deg == null) return '—';
-    const dirs = ['N','NE','E','SE','S','SW','W','NW'];
-    return dirs[Math.round(deg / 45) % 8];
-}
-
 function Weather({ weather }) {
     if (!weather) return null;
 
-    return (
-        <div className={styles.panel}>
-            <h3 className={styles.title}>Weather</h3>
+    function windDir(deg) {
+        if (deg == null) return '';
+        const dirs = ['N','NE','E','SE','S','SW','W','NW'];
+        return ' ' + dirs[Math.round(deg / 45) % 8];
+    }
 
-            <div className={styles.grid}>
-                <div className={styles.item}>
-                    <span className={styles.label}>Air</span>
-                    <span className={styles.value}>{weather.air_temperature ?? '—'}°C</span>
+    return (
+        (weather) && (
+            <div className={styles.weatherBar}>
+                <div className={styles.weatherItem}>
+                    <span className={styles.weatherLabel}>Air</span>
+                    <span className={styles.weatherValue}>{weather.air_temperature ?? '—'}°C</span>
                 </div>
-                <div className={styles.item}>
-                    <span className={styles.label}>Track</span>
-                    <span className={styles.value}>{weather.track_temperature ?? '—'}°C</span>
+                <div className={styles.weatherItem}>
+                    <span className={styles.weatherLabel}>Track</span>
+                    <span className={styles.weatherValue}>{weather.track_temperature ?? '—'}°C</span>
                 </div>
-                <div className={styles.item}>
-                    <span className={styles.label}>Humidity</span>
-                    <span className={styles.value}>{weather.humidity ?? '—'}%</span>
+                <div className={styles.weatherItem}>
+                    <span className={styles.weatherLabel}>Humidity</span>
+                    <span className={styles.weatherValue}>{weather.humidity ?? '—'}%</span>
                 </div>
-                <div className={styles.item}>
-                    <span className={styles.label}>Wind</span>
-                    <span className={styles.value}>
-                        {weather.wind_speed ?? '—'} m/s
-                        {weather.wind_direction != null && (
-                            <span className={styles.windDir}> {windDirLabel(weather.wind_direction)}</span>
-                        )}
-                    </span>
+                <div className={styles.weatherItem}>
+                    <span className={styles.weatherLabel}>Wind</span>
+                    <span className={styles.weatherValue}>
+                            {weather.wind_speed ?? '—'} m/s{windDir(weather.wind_direction)}
+                        </span>
                 </div>
-                <div className={styles.item}>
-                    <span className={styles.label}>Pressure</span>
-                    <span className={styles.value}>{weather.pressure != null ? `${weather.pressure} hPa` : '—'}</span>
+                <div className={styles.weatherItem}>
+                    <span className={styles.weatherLabel}>Pressure</span>
+                    <span className={styles.weatherValue}>{weather.pressure != null ? `${weather.pressure} hPa` : '—'}</span>
                 </div>
-                <div className={styles.item}>
-                    <span className={styles.label}>Rain</span>
-                    <span className={`${styles.value} ${weather.rainfall ? styles.rain : styles.noRain}`}>
-                        {weather.rainfall ? '🌧 YES' : 'NO'}
-                    </span>
+                <div className={styles.weatherItem}>
+                    <span className={styles.weatherLabel}>Rain</span>
+                    <span className={`${styles.weatherValue} ${weather.rainfall ? styles.weatherValueRain : styles.weatherDim}`}>
+                            {weather.rainfall ? '⛆ YES' : 'NO'}
+                        </span>
                 </div>
             </div>
-        </div>
+        )
     )
 }
 

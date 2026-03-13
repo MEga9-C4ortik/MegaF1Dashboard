@@ -8,6 +8,7 @@ import RadioMessages from '../components/pitWall/RadioMessages'
 import Map from '../components/pitWall/Map'
 import ReplayControls from '../components/pitWall/ReplayControls'
 import styles from './PitWall.module.css'
+import Weather from "../components/pitWall/Weather.jsx";
 
 function PitWall({ year }) {
     const [searchParams] = useSearchParams();
@@ -32,29 +33,21 @@ function PitWall({ year }) {
 
     const replay = useReplay(positions, intervals, activeSessionKey);
     const ct = replay.currentTime;
-    const following = replay.isFollowing;
 
-    const displayPositions   = following ? positions : replay.replayPositions;
-    const displayIntervals   = following ? intervals : replay.replayIntervals;
+    const displayPositions   = (positions.length > 0) ? replay.replayPositions : null;
+    const displayIntervals   = (intervals.length > 0) ? replay.replayIntervals : null;
     const displayStints      = stints;
-    const displayPits        = (ct && !following)
+    const displayPits        = (ct)
         ? pits.filter(p => p.pit_in_time && new Date(p.pit_in_time) <= ct)
         : pits;
-    const displayFiaMessages = (ct && !following)
+    const displayFiaMessages = (ct)
         ? fiaMessages.filter(m => new Date(m.date) <= ct)
         : fiaMessages;
-    const displayRadio = (ct && !following)
+    const displayRadio = (ct)
         ? radio.filter(m => new Date(m.date) <= ct)
         : radio;
 
     const activeSession = sessions.find(s => s.session_key === activeSessionKey);
-
-
-    function windDir(deg) {
-        if (deg == null) return '';
-        const dirs = ['N','NE','E','SE','S','SW','W','NW'];
-        return ' ' + dirs[Math.round(deg / 45) % 8];
-    }
 
     return (
         <div className={styles.page}>
@@ -100,39 +93,6 @@ function PitWall({ year }) {
                 </div>
             )}
 
-            {weather && (
-                <div className={styles.weatherBar}>
-                    <div className={styles.weatherItem}>
-                        <span className={styles.weatherLabel}>Air</span>
-                        <span className={styles.weatherValue}>{weather.air_temperature ?? '—'}°C</span>
-                    </div>
-                    <div className={styles.weatherItem}>
-                        <span className={styles.weatherLabel}>Track</span>
-                        <span className={styles.weatherValue}>{weather.track_temperature ?? '—'}°C</span>
-                    </div>
-                    <div className={styles.weatherItem}>
-                        <span className={styles.weatherLabel}>Humidity</span>
-                        <span className={styles.weatherValue}>{weather.humidity ?? '—'}%</span>
-                    </div>
-                    <div className={styles.weatherItem}>
-                        <span className={styles.weatherLabel}>Wind</span>
-                        <span className={styles.weatherValue}>
-                            {weather.wind_speed ?? '—'} m/s{windDir(weather.wind_direction)}
-                        </span>
-                    </div>
-                    <div className={styles.weatherItem}>
-                        <span className={styles.weatherLabel}>Pressure</span>
-                        <span className={styles.weatherValue}>{weather.pressure != null ? `${weather.pressure} hPa` : '—'}</span>
-                    </div>
-                    <div className={styles.weatherItem}>
-                        <span className={styles.weatherLabel}>Rain</span>
-                        <span className={`${styles.weatherValue} ${weather.rainfall ? styles.weatherValueRain : styles.weatherDim}`}>
-                            {weather.rainfall ? '⛆ YES' : 'NO'}
-                        </span>
-                    </div>
-                </div>
-            )}
-
             {activeSessionKey && !dataLoading && positions.length > 0 && (
                 <ReplayControls
                     isPlaying={replay.isPlaying}
@@ -167,6 +127,7 @@ function PitWall({ year }) {
 
             {activeSessionKey && !dataLoading && (
                 <div className={styles.content}>
+                    <Weather weather={weather.at(-1)} />
                     <div className={styles.left}>
                         {displayPositions.length > 0 && drivers.length > 0
                             ? <LiveTower
@@ -176,7 +137,7 @@ function PitWall({ year }) {
                                 intervals={displayIntervals}
                                 laps={laps}
                                 pits={displayPits}
-                                currentTime={following ? null : ct}
+                                currentTime={ct}
                             />
                             : <p className={styles.noData}>NO DATA FOR THIS SESSION</p>
                         }
