@@ -93,7 +93,7 @@ function PitWall({ year }) {
                 </div>
             )}
 
-            <Weather weather={weather.at(-1)} />
+            <Weather weather={weather.at(ct)} />
 
             {activeSessionKey && !dataLoading && (
                 <div className={styles.mapSection}>

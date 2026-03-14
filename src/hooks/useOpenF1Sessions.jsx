@@ -9,7 +9,6 @@ const SESSION_NAME_MAP = {
     'Practice 3':        'fp3',
     'Sprint':            'sprint',
     'Sprint Qualifying': 'sprintQuali',
-    'Sprint Shootout':   'sprintQuali',
 };
 
 const meetingMatchesRace = (meeting, raceDate) => {
@@ -22,11 +21,8 @@ const meetingMatchesRace = (meeting, raceDate) => {
 
 const delay = ms => new Promise(r => setTimeout(r, ms));
 
-// Лучший круг каждого пилота для FP классификации
 async function buildFPClassification(sessionKey) {
-    // Последовательно! Параллельные запросы к OpenF1 → 429 → тихий провал
     const laps = await fetchLaps(sessionKey);
-    await delay(400);
     const drivers = await fetchDrivers(sessionKey);
 
     const driversMap = {};
@@ -65,7 +61,7 @@ function useOpenF1Sessions(year, raceDate) {
     useEffect(() => {
         if (!year || !raceDate) return;
 
-        let cancelled = false; // Защита от race condition при быстрой смене гонки
+        let cancelled = false;
 
         setLoading(true);
         setSessionKeyMap({});
@@ -93,14 +89,11 @@ function useOpenF1Sessions(year, raceDate) {
                 });
                 setSessionKeyMap(map);
 
-                // Фетчим FP + sprintQuali классификации ПОСЛЕДОВАТЕЛЬНО с задержками
-                // Параллельный запуск → 429 от OpenF1 → Promise.allSettled глотает ошибку → пусто
                 const fpSessionKeys = ['fp1', 'fp2', 'fp3', 'sprintQuali'].filter(k => map[k]);
                 const fpMap = {};
                 for (const k of fpSessionKeys) {
                     if (cancelled) return;
                     try {
-                        await delay(500); // задержка между сессиями
                         const data = await buildFPClassification(map[k]);
                         if (data.length > 0) fpMap[k] = data;
                     } catch (err) {

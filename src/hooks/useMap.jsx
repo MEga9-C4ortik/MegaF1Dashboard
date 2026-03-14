@@ -14,7 +14,7 @@ function buildNormParams(points) {
     const scaleX = (W - PAD * 2) / rangeX;
     const scaleY = (H - PAD * 2) / rangeY;
     const scale = Math.min(scaleX, scaleY);
-    // Центрируем трассу в viewport
+    //centralizing
     const offsetX = (W - rangeX * scale) / 2 - minX * scale;
     const offsetY = (H - rangeY * scale) / 2 - minY * scale;
     return { minX, minY, scale, offsetX, offsetY };
