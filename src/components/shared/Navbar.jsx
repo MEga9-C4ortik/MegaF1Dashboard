@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import myLogo from '../../assets/myLogo.svg'
+import logo from '../../assets/myLogo.svg'
 import styles from './Navbar.module.css'
 
 function Navbar({ year, setYear }) {
@@ -18,7 +18,7 @@ function Navbar({ year, setYear }) {
     return (
         <nav className={styles.navbar}>
             <Link to="/" className={styles.left}>
-                <img className={styles.logo} src={myLogo} alt="Mega F1 Dashboard" />
+                <img className={styles.logo} src={logo} alt="Mega F1 Dashboard" />
                 <span className={styles.title}>Mega F1 Dashboard</span>
             </Link>
 

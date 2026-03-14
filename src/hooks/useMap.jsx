@@ -95,6 +95,9 @@ function useMap(sessionKey, drivers, replayTime = null) {
         load();
     }, [sessionKey, drivers]);
 
+    const replayTimeRef = useRef(replayTime);
+    replayTimeRef.current = replayTime;
+
     useEffect(() => {
         if (!sessionKey || !normParams) return;
 
@@ -103,7 +106,7 @@ function useMap(sessionKey, drivers, replayTime = null) {
 
         const loadLocations = async () => {
             try {
-                const raw = await fetchDriverLocations(sessionKey, replayTime);
+                const raw = await fetchDriverLocations(sessionKey, replayTimeRef.current);
                 if (!raw.length || !isMounted.current) return;
 
                 const latest = {};
@@ -137,10 +140,10 @@ function useMap(sessionKey, drivers, replayTime = null) {
 
         loadLocations();
 
-        if (replayTime) return;
+        if (replayTimeRef.current) return;
         const interval = setInterval(loadLocations, 5000);
         return () => clearInterval(interval);
-    }, [sessionKey, normParams, drivers, replayTime]);
+    }, [sessionKey, normParams, drivers]);
 
     return { trackPath, driverDots, loading, W, H };
 }
