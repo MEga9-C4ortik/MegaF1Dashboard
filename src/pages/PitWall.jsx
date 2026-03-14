@@ -1,4 +1,5 @@
 import { useSearchParams, useNavigate } from 'react-router-dom'
+import { useMemo } from "react";
 import useSessionBrowser from '../hooks/useSessionBrowser'
 import useLiveData from '../hooks/useLiveData'
 import useReplay from '../hooks/useReplay'

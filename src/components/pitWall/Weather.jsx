@@ -1,16 +1,4 @@
-import { useMemo } from "react";
 import styles from './Weather.module.css'
-
-
-function Component({ weather, ct }) {
-    const currentWeather = useMemo(() => {
-        return weather
-            .filter(w => new Date(w.date) <= ct)
-            .at(-1);
-    }, [weather, ct]);
-
-    return <Weather weather={currentWeather} />;
-}
 
 function Weather({ weather }) {
     if (!weather) return null;
