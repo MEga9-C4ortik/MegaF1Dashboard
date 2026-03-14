@@ -46,6 +46,11 @@ function PitWall({ year }) {
     const displayRadio = (ct)
         ? radio.filter(m => new Date(m.date) <= ct)
         : radio;
+    const currentWeather = useMemo(() => {
+        if (!weather.length) return null;
+        if (!ct) return weather.at(-1);
+        return weather.filter(w => new Date(w.date) <= ct).at(-1);
+    }, [weather, ct]);
 
     const activeSession = sessions.find(s => s.session_key === activeSessionKey);
 
@@ -93,7 +98,7 @@ function PitWall({ year }) {
                 </div>
             )}
 
-            <Weather weather={weather.at(ct)} />
+            <Weather weather={currentWeather} />
 
             {activeSessionKey && !dataLoading && (
                 <div className={styles.mapSection}>
