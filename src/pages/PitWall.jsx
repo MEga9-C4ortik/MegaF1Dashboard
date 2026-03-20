@@ -149,18 +149,18 @@ function PitWall({ year }) {
                         </div>
 
                         <div className={`${styles.rightPanel} ${mobileTab !== 'tower' ? styles.mobileHidden : ''}`}>
-                            displayPositions.length > 0 && drivers.length > 0
-                            ? <LiveTower
-                            positions={displayPositions}
-                            drivers={drivers}
-                            stints={displayStints}
-                            intervals={displayIntervals}
-                            laps={laps}
-                            pits={displayPits}
-                            currentTime={ct}
-                        />
-                            : <p className={styles.noData}>NO DATA FOR THIS SESSION</p>
-                            )
+                            {displayPositions.length > 0 && drivers.length > 0
+                                ? <LiveTower
+                                    positions={displayPositions}
+                                    drivers={drivers}
+                                    stints={displayStints}
+                                    intervals={displayIntervals}
+                                    laps={laps}
+                                    pits={displayPits}
+                                    currentTime={ct}
+                                />
+                                : <p className={styles.noData}>NO DATA FOR THIS SESSION</p>
+                            }
                         </div>
                     </div>
 
