@@ -246,7 +246,7 @@ function Race() {
                     {watchSessionKey && (
                         <button
                             className={styles.watchBtn}
-                            onClick={() => navigate(`/pitWall?sessionKey=${watchSessionKey}`)}
+                            onClick={() => navigate(`/pitwall?sessionKey=${watchSessionKey}`)}
                         >
                             ▶ Watch on Pit Wall
                         </button>
