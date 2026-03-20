@@ -29,7 +29,7 @@ function Navbar({ year, setYear }) {
                 <Link to="/standings" className={location.pathname === '/standings' ? styles.linkActive : styles.link}>
                     Standings
                 </Link>
-                <Link to="/pitWall" className={location.pathname === '/pitWall' ? styles.linkActive : styles.link}>
+                <Link to="/pitwall" className={location.pathname === '/pitWall' ? styles.linkActive : styles.link}>
                     Pit Wall
                 </Link>
             </div>
