@@ -221,6 +221,39 @@
     text-transform: uppercase;
 }
 
+.messagesAccordion {
+    border-top: 1px solid #1a1a1a;
+}
+
+.messagesToggle {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 24px;
+    background: #0d0d0d;
+    color: #555;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    transition: color 0.15s;
+}
+
+.messagesToggle:hover {
+    color: #fff;
+}
+
+.messagesContent {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    padding: 20px 24px;
+    border-top: 1px solid #1a1a1a;
+}
+
 .mobileTabs {
     display: none;
 }
@@ -245,6 +278,10 @@
     .header {
         padding: 10px 16px;
         gap: 10px;
+    }
+
+    .sessionTab {
+        font-size: 12px;
     }
 
     .pitwallLabel {
@@ -300,9 +337,7 @@
         border-right: none;
     }
 
-    .right {
-        width: 100%;
-        border-left: none;
-        border-top: 1px solid #1a1a1a;
+    .messagesContent {
+        grid-template-columns: 1fr;
     }
 }

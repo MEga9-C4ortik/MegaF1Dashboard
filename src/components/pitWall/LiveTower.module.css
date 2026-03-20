@@ -17,7 +17,7 @@
 .row {
     display: grid;
     grid-template-columns: 44px 1fr 160px;
-    padding: 10px 16px;
+    padding: 6px 16px;
     border-bottom: 1px solid #111;
     border-left: 3px solid transparent;
     transition: background 0.1s, border-left-color 0.3s;
@@ -79,6 +79,43 @@
 .tyreAge {
     font-size: 16px;
     color: #666;
+}
+
+.viewSwitch {
+    display: flex;
+    border-bottom: 1px solid #1a1a1a;
+}
+
+.viewBtn, .viewBtnActive {
+    flex: 1;
+    padding: 6px 0;
+    background: transparent;
+    border: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: #777;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s;
+}
+
+.viewBtn:hover {
+    color: #888;
+}
+
+.viewBtnActive {
+    color: #e10600;
+    border-bottom-color: #e10600;
+}
+
+.thirdCol {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-variant-numeric: tabular-nums;
+    font-size: 22px;
 }
 
 .pitBadge {
