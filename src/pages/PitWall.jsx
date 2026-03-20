@@ -13,6 +13,7 @@ import Weather from "../components/pitWall/Weather.jsx";
 
 function PitWall({ year }) {
     const [searchParams] = useSearchParams();
+    const [rightTab, setRightTab] = useState('tower'); // 'tower' | 'messages'
     const [mobileTab, setMobileTab] = useState('map'); // 'map' | 'tower'
     const navigate = useNavigate();
     const urlSessionKey = searchParams.get('sessionKey')
@@ -142,27 +143,42 @@ function PitWall({ year }) {
                     </div>
 
                     <div className={styles.mapAndTower}>
-                        <div className={styles.mapColumn}>
+                        <div className={`${styles.mapColumn} ${mobileTab !== 'map' ? styles.mobileHidden : ''}`}>
                             <Map sessionKey={activeSessionKey} drivers={drivers} replayTime={ct} />
                         </div>
 
-                        <div className={styles.towerColumn}>
-                            {displayPositions.length > 0 && drivers.length > 0
-                                ? <LiveTower
-                                    positions={displayPositions}
-                                    drivers={drivers}
-                                    stints={displayStints}
-                                    intervals={displayIntervals}
-                                    laps={laps}
-                                    pits={displayPits}
-                                    currentTime={ct}
-                                />
-                                : <p className={styles.noData}>NO DATA FOR THIS SESSION</p>
-                            }
-                        </div>
-                        <div className={styles.right}>
-                            <FiaMessages messages={displayFiaMessages} />
-                            <RadioMessages messages={displayRadio} drivers={drivers} />
+                        <div className={`${styles.rightPanel} ${mobileTab !== 'tower' ? styles.mobileHidden : ''}`}>
+                            <div className={styles.rightTabs}>
+                                <button
+                                    className={`${styles.rightTab} ${rightTab === 'tower' ? styles.rightTabActive : ''}`}
+                                    onClick={() => setRightTab('tower')}
+                                >TOWER</button>
+                                <button
+                                    className={`${styles.rightTab} ${rightTab === 'messages' ? styles.rightTabActive : ''}`}
+                                    onClick={() => setRightTab('messages')}
+                                >MESSAGES</button>
+                            </div>
+
+                            {rightTab === 'tower' && (
+                                displayPositions.length > 0 && drivers.length > 0
+                                    ? <LiveTower
+                                        positions={displayPositions}
+                                        drivers={drivers}
+                                        stints={displayStints}
+                                        intervals={displayIntervals}
+                                        laps={laps}
+                                        pits={displayPits}
+                                        currentTime={ct}
+                                    />
+                                    : <p className={styles.noData}>NO DATA FOR THIS SESSION</p>
+                            )}
+
+                            {rightTab === 'messages' && (
+                                <div className={styles.messagesPanel}>
+                                    <FiaMessages messages={displayFiaMessages} />
+                                    <RadioMessages messages={displayRadio} drivers={drivers} />
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

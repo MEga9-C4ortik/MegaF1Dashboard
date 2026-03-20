@@ -1,3 +1,4 @@
+import {useState} from 'react';
 import styles from './LiveTower.module.css'
 
 function getLatestPositions(positions) {
@@ -37,7 +38,6 @@ function getCurrentStint(stints, laps, driverNumber, currentTime) {
     return activeStint;
 }
 
-// Текущий возраст резины: tyre_age_at_start + круги проеханные в этом стинте
 function getCurrentTyreAge(laps, driverNumber, stint, currentTime) {
     if (!stint) return null;
     let driverLaps = laps.filter(l => l.driver_number === driverNumber && l.lap_duration != null);
@@ -120,8 +120,9 @@ function TyreIcon({ compound }) {
     );
 }
 
-// currentTime передаётся только в replay режиме
 function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentTime }) {
+    const [view, setView] = useState('laps'); // 'laps' | 'gaps' | 'tyre'
+
     if (!positions || !drivers) return null;
     const latest = getLatestPositions(positions);
     const hasIntervals = intervals && intervals.length > 0;
@@ -129,12 +130,10 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
     const driversMap = {};
     drivers.forEach(d => { driversMap[d.driver_number] = d; });
 
-    // В replay: пит-стопы только те что уже случились
     const relevantPits = currentTime
         ? pits.filter(p => p.pit_in_time && new Date(p.pit_in_time) <= currentTime)
         : pits;
 
-    // Кто сейчас в пите: пит без pit_out_time ИЛИ pit_out_time после currentTime
     const inPitNow = new Set(
         relevantPits
             .filter(p => !p.pit_out_time || (currentTime && new Date(p.pit_out_time) > currentTime))
@@ -152,11 +151,17 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
             <div className={styles.towerHeader}>
                 <span>POS</span>
                 <span>DRIVER</span>
-                <span>TYRE</span>
-                <span>LAST LAP</span>
-                <span>BEST LAP</span>
-                {hasIntervals && <span>GAP</span>}
-                {hasIntervals && <span>INTERVAL</span>}
+                <span>
+                    {view === 'laps' && 'LAST / BEST'}
+                    {view === 'gaps' && 'GAP / INT'}
+                    {view === 'tyre' && 'TYRE'}
+                </span>
+            </div>
+
+            <div className={styles.viewSwitch}>
+                <button className={view === 'laps' ? styles.viewBtnActive : styles.viewBtn} onClick={() => setView('laps')}>LAPS</button>
+                <button className={view === 'gaps' ? styles.viewBtnActive : styles.viewBtn} onClick={() => setView('gaps')}>GAPS</button>
+                <button className={view === 'tyre' ? styles.viewBtnActive : styles.viewBtn} onClick={() => setView('tyre')}>TYRE</button>
             </div>
 
             {latest.map((pos, index) => {
@@ -190,35 +195,26 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
                             <span className={styles.team} style={{ color: teamColor }}>{driver?.team_name ?? ''}</span>
                         </span>
 
-                        <span className={styles.tyreCell}>
-                            {isInPit
-                                ? <span className={styles.pitBadge}>PIT</span>
-                                : <TyreIcon compound={stint?.compound} />
-                            }
-                            {!isInPit && stint && (
-                                <span className={styles.tyreAge}>{tyreAge ?? 0}L</span>
+                        <span className={styles.thirdCol}>
+                            {view === 'laps' && <>
+                                <span style={{ color: lastLapColor }}>{formatLapTime(lastLap?.lap_duration)}</span>
+                                <span className={styles.bestLap} style={{ color: isPurple ? '#c084fc' : undefined }}>
+                                    {formatLapTime(bestLap?.lap_duration)}
+                                </span>
+                            </>}
+                            {view === 'gaps' && <>
+                                <span className={styles.gap}>{index === 0 ? 'LEADER' : formatGap(interval?.gap_to_leader)}</span>
+                                <span className={styles.interval}>{index === 0 ? '—' : formatGap(interval?.interval)}</span>
+                            </>}
+                            {view === 'tyre' && (
+                                <span className={styles.tyreCell}>
+                                    {isInPit ?
+                                        <span className={styles.pitBadge}>PIT</span>
+                                        : <TyreIcon compound={stint?.compound} />}
+                                    {!isInPit && stint && <span className={styles.tyreAge}>{tyreAge ?? 0}L</span>}
+                                </span>
                             )}
                         </span>
-
-                        <span className={styles.lapTime} style={{ color: lastLapColor }}>
-                            {formatLapTime(lastLap?.lap_duration)}
-                        </span>
-
-                        <span className={styles.bestLap} style={{ color: isPurple ? '#c084fc' : undefined }}>
-                            {formatLapTime(bestLap?.lap_duration)}
-                        </span>
-
-                        {hasIntervals && (
-                            <span className={styles.gap}>
-                                {index === 0 ? 'LEADER' : formatGap(interval?.gap_to_leader)}
-                            </span>
-                        )}
-
-                        {hasIntervals && (
-                            <span className={styles.interval}>
-                                {index === 0 ? 'LEADER' : formatGap(interval?.interval)}
-                            </span>
-                        )}
                     </div>
                 );
             })}
