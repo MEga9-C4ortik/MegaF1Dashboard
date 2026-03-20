@@ -22,6 +22,7 @@
     border-left: 3px solid transparent;
     transition: background 0.1s, border-left-color 0.3s;
     align-items: center;
+    gap: 18px;
 }
 
 .row:hover {

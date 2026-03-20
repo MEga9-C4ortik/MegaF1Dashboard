@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { fetchTrackLayout, fetchDriverLocations } from '../services/openf1Api'
 import { getTrackLayoutCache, setTrackLayoutCache } from '../services/SessionCache'
 
-const W = 900, H = 600, PAD = 36;
+const W = 800, H = 800, PAD = 40;
 
 function buildNormParams(points) {
     const xs = points.map(p => p.x);
@@ -40,6 +40,7 @@ function useMap(sessionKey, drivers, replayTime = null) {
     const [normParams, setNormParams] = useState(null);
     const [loading, setLoading] = useState(true);
     const isMounted = useRef(true);
+    const firstDriverNum = drivers?.[0]?.driver_number ?? null;
 
     useEffect(() => {
         isMounted.current = true;
@@ -54,13 +55,10 @@ function useMap(sessionKey, drivers, replayTime = null) {
         setNormParams(null);
 
         const load = async () => {
-            if (getTrackLayoutCache(sessionKey)) {
-                // Уже в кэше — пересчитывать не нужно
-                // (логика ниже с cached уже это обрабатывает, просто return не нужен)
-            }
             try {
                 const cached = getTrackLayoutCache(sessionKey);
-                let points;
+                let points = [];
+                const MIN_POINTS = 700;
 
                 if (cached) {
                     points = cached;
@@ -68,15 +66,20 @@ function useMap(sessionKey, drivers, replayTime = null) {
                     await new Promise(r => setTimeout(r, 800));
                     if (!isMounted.current) return;
 
-                    const driverNum = drivers?.length > 0 ? drivers[0].driver_number : null;
-
-                    if (!driverNum) {
-                        if (isMounted.current) setLoading(false);
-                        return;
+                    for (const driver of drivers) {
+                        const candidate = await fetchTrackLayout(sessionKey, driver.driver_number);
+                        if (candidate.length >= MIN_POINTS) {
+                            points = candidate;
+                            break;
+                        }
                     }
-                    points = await fetchTrackLayout(sessionKey, driverNum);
 
-                    if (points.length) setTrackLayoutCache(sessionKey, points);
+                    if (points.length < MIN_POINTS) {
+                        if( isMounted.current ) setLoading(false);
+                        return;
+                    } else {
+                        setTrackLayoutCache(sessionKey, points);
+                    }
                 }
 
                 if (!points.length || !isMounted.current) return;
@@ -93,7 +96,7 @@ function useMap(sessionKey, drivers, replayTime = null) {
         }
 
         load();
-    }, [sessionKey, drivers]);
+    }, [sessionKey, firstDriverNum]);
 
     const replayTimeRef = useRef(replayTime);
     replayTimeRef.current = replayTime;

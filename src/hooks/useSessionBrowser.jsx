@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react'
 import { fetchMeetings, fetchSessionsByMeeting } from '../services/openf1Api'
 
-// year — приходит снаружи как prop (из App через PitWall)
-// initialSessionKey — если пришли с Race page по ссылке (?sessionKey=XXXX)
 function useSessionBrowser(year, initialSessionKey = null) {
     const [meetings, setMeetings] = useState([]);
     const [selectedMeetingKey, setSelectedMeetingKey] = useState(null);
@@ -32,7 +30,7 @@ function useSessionBrowser(year, initialSessionKey = null) {
         };
 
         load();
-    }, [year]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [year, initialSessionKey]);
 
     useEffect(() => {
         if (!selectedMeetingKey) return;

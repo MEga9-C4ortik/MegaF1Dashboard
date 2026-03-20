@@ -29,7 +29,7 @@ function useReplay(allPositions, allIntervals = [], sessionKey = null) {
         setSpeed(1);
         initialized.current = false;
         isFollowing.current = true;
-        setFollowingState(false);
+        setFollowingState(true);
     }, [sessionKey]);
 
     useEffect(() => {

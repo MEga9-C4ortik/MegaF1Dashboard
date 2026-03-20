@@ -19,7 +19,7 @@ function App() {
                 <Route path="/" element={<Calendar year={year} />} />
                 <Route path="/standings" element={<Standings year={year} />} />
                 <Route path="/race/:raceId" element={<Race year={year} />} />
-                <Route path="/pitWall" element={<PitWall year={year} />} />
+                <Route path="/pitwall" element={<PitWall year={year} />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
         </BrowserRouter>
