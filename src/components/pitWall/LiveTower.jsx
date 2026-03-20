@@ -164,38 +164,39 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
                 <button className={view === 'tyre' ? styles.viewBtnActive : styles.viewBtn} onClick={() => setView('tyre')}>TYRE</button>
             </div>
 
-            {latest.map((pos, index) => {
-                const driver    = driversMap[pos.driver_number];
-                const stint     = getCurrentStint(stints, laps, pos.driver_number, currentTime);
-                const tyreAge   = getCurrentTyreAge(laps, pos.driver_number, stint, currentTime);
-                const interval  = getLatestInterval(intervals, pos.driver_number);
-                const lastLap   = getLastLap(laps, pos.driver_number, currentTime);
-                const bestLap   = getBestLap(laps, pos.driver_number, currentTime);
-                const isInPit   = inPitNow.has(pos.driver_number);
-                const teamColor = driver?.team_colour ? `#${driver.team_colour}` : '#666';
+            <div className={styles.towerBody}>
+                {latest.map((pos, index) => {
+                    const driver    = driversMap[pos.driver_number];
+                    const stint     = getCurrentStint(stints, laps, pos.driver_number, currentTime);
+                    const tyreAge   = getCurrentTyreAge(laps, pos.driver_number, stint, currentTime);
+                    const interval  = getLatestInterval(intervals, pos.driver_number);
+                    const lastLap   = getLastLap(laps, pos.driver_number, currentTime);
+                    const bestLap   = getBestLap(laps, pos.driver_number, currentTime);
+                    const isInPit   = inPitNow.has(pos.driver_number);
+                    const teamColor = driver?.team_colour ? `#${driver.team_colour}` : '#666';
 
-                const isPurple = bestLap && sessionBestTime != null
-                    && bestLap.lap_duration === sessionBestTime;
+                    const isPurple = bestLap && sessionBestTime != null
+                        && bestLap.lap_duration === sessionBestTime;
 
-                const isPersonalBest = lastLap && bestLap
-                    && lastLap.lap_number === bestLap.lap_number;
+                    const isPersonalBest = lastLap && bestLap
+                        && lastLap.lap_number === bestLap.lap_number;
 
-                const lastLapColor = isPurple ? '#c084fc' : isPersonalBest ? '#4ade80' : undefined;
+                    const lastLapColor = isPurple ? '#c084fc' : isPersonalBest ? '#4ade80' : undefined;
 
-                return (
-                    <div
-                        key={pos.driver_number}
-                        className={`${styles.row} ${isInPit ? styles.rowPit : ''}`}
-                        style={{ borderLeftColor: teamColor }}
-                    >
-                        <span className={styles.pos}>{pos.position}</span>
+                    return (
+                        <div
+                            key={pos.driver_number}
+                            className={`${styles.row} ${isInPit ? styles.rowPit : ''}`}
+                            style={{ borderLeftColor: teamColor }}
+                        >
+                            <span className={styles.pos}>{pos.position}</span>
 
-                        <span className={styles.driver}>
+                            <span className={styles.driver}>
                             <span className={styles.acronym}>{driver?.name_acronym ?? pos.driver_number}</span>
                             <span className={styles.team} style={{ color: teamColor }}>{driver?.team_name ?? ''}</span>
                         </span>
 
-                        <span className={styles.thirdCol}>
+                            <span className={styles.thirdCol}>
                             {view === 'laps' && <>
                                 <span className={styles.lapTime} style={{ color: lastLapColor }}>
                                     {formatLapTime(lastLap?.lap_duration)}
@@ -204,22 +205,23 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
                                     {formatLapTime(bestLap?.lap_duration)}
                                 </span>
                             </>}
-                            {view === 'gaps' && <>
-                                <span className={styles.interval}>{index === 0 ? 'LEADER' : formatGap(interval?.interval)}</span>
-                                <span className={styles.gap}>{index === 0 ? '' : formatGap(interval?.gap_to_leader)}</span>
-                            </>}
-                            {view === 'tyre' && (
-                                <span className={styles.tyreCell}>
+                                {view === 'gaps' && <>
+                                    <span className={styles.interval}>{index === 0 ? 'LEADER' : formatGap(interval?.interval)}</span>
+                                    <span className={styles.gap}>{index === 0 ? '' : formatGap(interval?.gap_to_leader)}</span>
+                                </>}
+                                {view === 'tyre' && (
+                                    <span className={styles.tyreCell}>
                                     {isInPit ?
                                         <span className={styles.pitBadge}>PIT</span>
                                         : <TyreIcon compound={stint?.compound} />}
-                                    {!isInPit && stint && <span className={styles.tyreAge}>{tyreAge ?? 0}L</span>}
+                                        {!isInPit && stint && <span className={styles.tyreAge}>{tyreAge ?? 0}L</span>}
                                 </span>
-                            )}
+                                )}
                         </span>
-                    </div>
-                );
-            })}
+                        </div>
+                    );
+                })}
+            </div>
         </div>
     );
 }

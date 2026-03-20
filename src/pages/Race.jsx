@@ -32,13 +32,10 @@ function buildSchedule(race) {
         sessions.push({ key: 'fp1', label: 'Practice 1', date: race.FirstPractice.date, time: race.FirstPractice.time });
 
     if (race.ThirdPractice?.date) {
-        // Обычный уикенд: FP2 + FP3
         if (race.SecondPractice?.date)
             sessions.push({ key: 'fp2', label: 'Practice 2', date: race.SecondPractice.date, time: race.SecondPractice.time });
         sessions.push({ key: 'fp3', label: 'Practice 3', date: race.ThirdPractice.date, time: race.ThirdPractice.time });
     } else {
-        // Sprint уикенд: SprintQualifying — Ergast 2024+ выдаёт его в отдельном поле.
-        // Старый формат (до 2024): Sprint Quali лежал в SecondPractice.
         const sqDate = race.SprintQualifying?.date ?? race.SecondPractice?.date;
         const sqTime = race.SprintQualifying?.time ?? race.SecondPractice?.time;
         if (sqDate)
@@ -123,8 +120,6 @@ function ScheduleBlock({ schedule }) {
     );
 }
 
-// Сессии где данные берутся из OpenF1 (лучший круг), а не из Jolpi/Ergast
-// Ключи должны ТОЧНО совпадать с ключами в sessionKeyMap из useOpenF1Sessions
 const FP_SESSIONS = new Set(['fp1', 'fp2', 'fp3', 'sprintQuali']);
 
 function ResultsTable({ session, data, fpResult }) {
@@ -213,7 +208,6 @@ function Race() {
     const raceInfo = sessions.race ?? races.find(r => String(r.round) === String(round));
     const raceDate = raceInfo?.date;
 
-    // raceDate может быть undefined пока грузятся races/sessions — хук сам ждёт через if (!raceDate) return
     const { sessionKeyMap, fpResults, loading: fpLoading } = useOpenF1Sessions(year, raceDate);
 
     if (!year || !round || isNaN(Number(round))) return <p className={styles.error}>Invalid race URL</p>;
@@ -231,7 +225,6 @@ function Race() {
         { key: 'race',       label: 'Race',               data: sessions.race,   fp: null },
         { key: 'quali',      label: 'Qualification',       data: sessions.quali,  fp: null },
         { key: 'sprint',     label: 'Sprint',              data: sessions.sprint, fp: null },
-        // Ключи fp1/fp2/fp3/sprintQuali должны совпадать с SESSION_NAME_MAP в useOpenF1Sessions
         { key: 'sprintQuali', label: 'Sprint Qualifying',  data: null, fp: fpResults.sprintQuali },
         { key: 'fp3',         label: 'FP3',                data: null, fp: fpResults.fp3 },
         { key: 'fp2',         label: 'FP2',                data: null, fp: fpResults.fp2 },
@@ -240,7 +233,6 @@ function Race() {
 
     const validTab = tabs.find(t => t.key === activeSession) ? activeSession : tabs[0]?.key;
     const currentTab = tabs.find(t => t.key === validTab);
-    // sessionKeyMap тоже использует те же ключи (fp1/fp2/fp3/sprintQuali/race/quali/sprint)
     const watchSessionKey = sessionKeyMap[validTab];
 
     return (

@@ -14,6 +14,12 @@
     border-bottom: 1px solid #1a1a1a;
 }
 
+.towerBody {
+    overflow-y: auto;
+    max-height: calc(100vh - 220px);
+    flex: 1;
+}
+
 .row {
     display: grid;
     grid-template-columns: 44px 1fr 160px;
@@ -115,7 +121,7 @@
     flex-direction: column;
     gap: 1px;
     font-variant-numeric: tabular-nums;
-    font-size: 14px;  /* было 22px */
+    font-size: 14px;
     color: #eee;
 }
 
@@ -163,11 +169,6 @@
 }
 
 @media (max-width: 900px) {
-    .tower {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
     .towerHeader,
     .row {
         min-width: 620px;
