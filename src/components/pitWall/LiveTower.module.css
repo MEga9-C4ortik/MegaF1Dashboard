@@ -158,7 +158,6 @@
 }
 
 @media (max-width: 900px) {
-    .towerHeader,
     .row {
         min-width: 620px;
     }

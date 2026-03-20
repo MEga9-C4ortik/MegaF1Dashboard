@@ -108,8 +108,6 @@ function useMap(sessionKey, drivers, replayTime = null) {
         drivers?.forEach(d => { driversMap[d.driver_number] = d });
 
         const loadLocations = async () => {
-            // В начале load():
-            console.log('load() called, drivers:', drivers.length, 'firstDriverNum:', firstDriverNum);
             try {
                 const raw = await fetchDriverLocations(sessionKey, replayTimeRef.current);
                 if (!raw.length || !isMounted.current) return;
@@ -148,7 +146,7 @@ function useMap(sessionKey, drivers, replayTime = null) {
         if (replayTimeRef.current) return;
         const interval = setInterval(loadLocations, 5000);
         return () => clearInterval(interval);
-    }, [sessionKey, normParams, drivers]);
+    }, [sessionKey, normParams, firstDriverNum]);
 
     return { trackPath, driverDots, loading, W, H };
 }

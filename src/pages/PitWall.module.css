@@ -126,12 +126,6 @@
     border-right: 1px solid #1a1a1a;
 }
 
-.towerColumn {
-    flex: 1;
-    min-width: 0;
-    overflow-x: auto;
-}
-
 .rightPanel {
     flex: 1;
     min-width: 0;
@@ -286,15 +280,6 @@
 
     .pitwallLabel {
         font-size: 22px;
-    }
-
-    .weatherBar {
-        padding: 10px 16px;
-        gap: 16px;
-    }
-
-    .mapSection {
-        padding: 12px 16px;
     }
 
     .content {

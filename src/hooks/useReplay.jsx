@@ -51,7 +51,7 @@ function useReplay(allPositions, allIntervals = [], sessionKey = null) {
             });
         }, TICK_MS);
         return () => clearInterval(timer);
-    }, [isPlaying, maxTime]);
+    }, [isPlaying, maxTime.getTime()]);
 
     const replayPositions = useMemo(() => {
         if (!currentTime || !allPositions?.length) return [];

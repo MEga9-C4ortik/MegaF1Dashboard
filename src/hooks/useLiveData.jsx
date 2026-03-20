@@ -16,8 +16,6 @@ const DYNAMIC_INTERVAL = 15000;
 const STATIC_INTERVAL  = 60000;
 const INCREMENTAL_WINDOW_SEC = 35;
 
-const delay = (ms) => new Promise(r => setTimeout(r, ms));
-
 function useLiveData(sessionKey) {
     const [positions, setPositions]     = useState([]);
     const [intervals, setIntervals]     = useState([]);
