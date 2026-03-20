@@ -108,24 +108,28 @@
 
 .content {
     display: flex;
-    gap: 0;
+    flex-direction: row;
     align-items: flex-start;
+    gap: 0;
 }
 
-.left {
-    flex: 1;
+.mapAndTower {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.mapColumn {
+    flex: 0 0 auto;
+    width: min(45%, 500px);
     border-right: 1px solid #1a1a1a;
+}
+
+.towerColumn {
+    flex: 1;
     min-width: 0;
     overflow-x: auto;
-}
-
-.right {
-    width: 360px;
-    min-width: 360px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
 }
 
 .empty {
@@ -172,6 +176,10 @@
     text-transform: uppercase;
 }
 
+.mobileTabs {
+    display: none;
+}
+
 @media (max-width: 768px) {
     .page {
         padding-bottom: 70px;
@@ -211,15 +219,38 @@
         flex-direction: column;
     }
 
-    .right {
-        width: 100%;
-        min-width: unset;
-        padding: 16px;
-        border-top: 1px solid #1a1a1a;
-        gap: 20px;
+    .mobileTabs {
+        display: flex;
+        border-bottom: 1px solid #1a1a1a;
     }
 
-    .left {
+    .mobileTab {
+        flex: 1;
+        padding: 12px;
+        background: transparent;
+        color: #555;
+        border: none;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 13px;
+        letter-spacing: 2px;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+    }
+
+    .mobileTabActive {
+        color: #e10600;
+        border-bottom-color: #e10600;
+    }
+
+    .mobileHidden {
+        display: none;
+    }
+
+    .mapAndTower {
+        flex-direction: column;
+    }
+
+    .mapColumn {
         width: 100%;
         border-right: none;
     }

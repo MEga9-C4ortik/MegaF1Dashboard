@@ -13,6 +13,7 @@ import Weather from "../components/pitWall/Weather.jsx";
 
 function PitWall({ year }) {
     const [searchParams] = useSearchParams();
+    const [mobileTab, setMobileTab] = useState('map'); // 'map' | 'tower'
     const navigate = useNavigate();
     const urlSessionKey = searchParams.get('sessionKey')
         ? Number(searchParams.get('sessionKey'))
@@ -101,12 +102,6 @@ function PitWall({ year }) {
 
             <Weather weather={currentWeather} />
 
-            {activeSessionKey && !dataLoading && (
-                <div className={styles.mapSection}>
-                    <Map sessionKey={activeSessionKey} drivers={drivers} replayTime={ct} />
-                </div>
-            )}
-
             {activeSessionKey && !dataLoading && positions.length > 0 && (
                 <ReplayControls
                     isPlaying={replay.isPlaying}
@@ -135,28 +130,45 @@ function PitWall({ year }) {
 
             {activeSessionKey && !dataLoading && (
                 <div className={styles.content}>
-                    <div className={styles.left}>
-                        {displayPositions.length > 0 && drivers.length > 0
-                            ? <LiveTower
-                                positions={displayPositions}
-                                drivers={drivers}
-                                stints={displayStints}
-                                intervals={displayIntervals}
-                                laps={laps}
-                                pits={displayPits}
-                                currentTime={ct}
-                            />
-                            : <p className={styles.noData}>NO DATA FOR THIS SESSION</p>
-                        }
+                    <div className={styles.mobileTabs}>
+                        <button
+                            className={`${styles.mobileTab} ${mobileTab === 'map' ? styles.mobileTabActive : ''}`}
+                            onClick={() => setMobileTab('map')}
+                        >MAP</button>
+                        <button
+                            className={`${styles.mobileTab} ${mobileTab === 'tower' ? styles.mobileTabActive : ''}`}
+                            onClick={() => setMobileTab('tower')}
+                        >TOWER</button>
                     </div>
-                    <div className={styles.right}>
-                        <FiaMessages messages={displayFiaMessages} />
-                        <RadioMessages messages={displayRadio} drivers={drivers} />
+
+                    <div className={styles.mapAndTower}>
+                        <div className={styles.mapColumn}>
+                            <Map sessionKey={activeSessionKey} drivers={drivers} replayTime={ct} />
+                        </div>
+
+                        <div className={styles.towerColumn}>
+                            {displayPositions.length > 0 && drivers.length > 0
+                                ? <LiveTower
+                                    positions={displayPositions}
+                                    drivers={drivers}
+                                    stints={displayStints}
+                                    intervals={displayIntervals}
+                                    laps={laps}
+                                    pits={displayPits}
+                                    currentTime={ct}
+                                />
+                                : <p className={styles.noData}>NO DATA FOR THIS SESSION</p>
+                            }
+                        </div>
+                        <div className={styles.right}>
+                            <FiaMessages messages={displayFiaMessages} />
+                            <RadioMessages messages={displayRadio} drivers={drivers} />
+                        </div>
                     </div>
                 </div>
             )}
         </div>
-    );
+    )
 }
 
 export default PitWall;
