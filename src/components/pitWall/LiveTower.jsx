@@ -148,16 +148,6 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
 
     return (
         <div className={styles.tower}>
-            <div className={styles.towerHeader}>
-                <span>POS</span>
-                <span>DRIVER</span>
-                <span>
-                    {view === 'laps' && 'LAST / BEST'}
-                    {view === 'gaps' && 'GAP / INT'}
-                    {view === 'tyre' && 'TYRE'}
-                </span>
-            </div>
-
             <div className={styles.viewSwitch}>
                 <button className={view === 'laps' ? styles.viewBtnActive : styles.viewBtn} onClick={() => setView('laps')}>LAPS</button>
                 <button className={view === 'gaps' ? styles.viewBtnActive : styles.viewBtn} onClick={() => setView('gaps')}>GAPS</button>

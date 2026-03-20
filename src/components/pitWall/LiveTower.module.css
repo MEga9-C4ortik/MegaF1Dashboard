@@ -3,17 +3,6 @@
     font-family: 'JetBrains Mono', monospace;
 }
 
-.towerHeader {
-    display: grid;
-    grid-template-columns: 44px 1fr 160px;
-    padding: 6px 16px;
-    font-size: 16px;
-    color: #777;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    border-bottom: 1px solid #1a1a1a;
-}
-
 .towerBody {
     overflow-y: auto;
     max-height: calc(100vh - 220px);
