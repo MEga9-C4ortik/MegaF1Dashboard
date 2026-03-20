@@ -58,7 +58,7 @@ function useMap(sessionKey, drivers, replayTime = null) {
             try {
                 const cached = getTrackLayoutCache(sessionKey);
                 let points = [];
-                const MIN_POINTS = 700;
+                const MIN_POINTS = 1000;
 
                 if (cached) {
                     points = cached;
