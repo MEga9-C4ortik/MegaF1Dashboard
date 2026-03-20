@@ -113,9 +113,10 @@
 .thirdCol {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 1px;
     font-variant-numeric: tabular-nums;
-    font-size: 22px;
+    font-size: 14px;  /* было 22px */
+    color: #eee;
 }
 
 .pitBadge {

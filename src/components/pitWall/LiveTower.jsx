@@ -197,14 +197,16 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
 
                         <span className={styles.thirdCol}>
                             {view === 'laps' && <>
-                                <span style={{ color: lastLapColor }}>{formatLapTime(lastLap?.lap_duration)}</span>
+                                <span className={styles.lapTime} style={{ color: lastLapColor }}>
+                                    {formatLapTime(lastLap?.lap_duration)}
+                                </span>
                                 <span className={styles.bestLap} style={{ color: isPurple ? '#c084fc' : undefined }}>
                                     {formatLapTime(bestLap?.lap_duration)}
                                 </span>
                             </>}
                             {view === 'gaps' && <>
-                                <span className={styles.gap}>{index === 0 ? 'LEADER' : formatGap(interval?.gap_to_leader)}</span>
-                                <span className={styles.interval}>{index === 0 ? '—' : formatGap(interval?.interval)}</span>
+                                <span className={styles.interval}>{index === 0 ? 'LEADER' : formatGap(interval?.interval)}</span>
+                                <span className={styles.gap}>{index === 0 ? '' : formatGap(interval?.gap_to_leader)}</span>
                             </>}
                             {view === 'tyre' && (
                                 <span className={styles.tyreCell}>
