@@ -11,10 +11,11 @@
 
 .colHeader {
     display: grid;
-    grid-template-columns: 36px 1fr 65px 110px 110px;
+    grid-template-columns: 36px minmax(0, 1fr) 65px 110px 110px;
     padding: 5px 12px;
     gap: 8px;
     border-bottom: 2px solid #1a1a1a;
+    border-left: 3px solid transparent;
     font-size: 14px;
     color: #777;
     letter-spacing: 1.5px;
@@ -24,7 +25,7 @@
 
 .row {
     display: grid;
-    grid-template-columns: 36px 1fr 65px 110px 110px;
+    grid-template-columns: 36px minmax(0, 1fr) 65px 110px 110px;
     padding: 6px 12px;
     border-bottom: 1px solid #111;
     border-left: 3px solid transparent;
@@ -38,7 +39,7 @@
 }
 
 .rowPit {
-    opacity: 0.5;
+    opacity: 0.6;
     background: #0a0a0a;
 }
 
@@ -142,6 +143,22 @@
     border-radius: 2px;
 }
 
+.pitTimeLive {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffc800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.5px;
+}
+
+.pitTimeDone {
+    font-size: 20px;
+    font-weight: 600;
+    color: #888;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.5px;
+}
+
 .empty {
     text-align: center;
     padding: 40px;
@@ -153,25 +170,28 @@
 
 @media (max-width: 768px) {
     .colHeader {
-        grid-template-columns: 28px 1fr 50px 88px 88px;
+        grid-template-columns: 28px minmax(0, 1fr) 50px 88px 88px;
         padding: 4px 8px;
         gap: 5px;
         font-size: 9px;
     }
 
     .row {
-        grid-template-columns: 28px 1fr 50px 88px 88px;
+        grid-template-columns: 28px minmax(0, 1fr) 50px 88px 88px;
         padding: 5px 8px;
         gap: 5px;
     }
 
-    .pos      { font-size: 13px; }
-    .acronym  { font-size: 12px; }
-    .team     { font-size: 9px; }
-    .lapTime  { font-size: 11px; }
-    .bestLap  { font-size: 10px; }
-    .interval { font-size: 11px; }
-    .gap      { font-size: 10px; }
+    .pos           { font-size: 13px; }
+    .acronym       { font-size: 12px; }
+    .team          { font-size: 9px; }
+    .lapTime       { font-size: 11px; }
+    .bestLap       { font-size: 10px; }
+    .interval      { font-size: 11px; }
+    .gap           { font-size: 10px; }
+    .pitTimeLive   { font-size: 11px; }
+    .pitTimeDone   { font-size: 11px; }
+    .pitBadge      { font-size: 11px; }
 
     .tyre {
         width: 18px;
@@ -179,6 +199,5 @@
         font-size: 14px;
     }
 
-    .tyreAge  { font-size: 12px; }
-    .pitBadge { font-size: 12px; }
+    .tyreAge { font-size: 12px; }
 }
