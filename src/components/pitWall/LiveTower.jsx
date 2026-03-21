@@ -1,4 +1,3 @@
-import {useState} from 'react';
 import styles from './LiveTower.module.css'
 
 function getLatestPositions(positions) {
@@ -121,11 +120,9 @@ function TyreIcon({ compound }) {
 }
 
 function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentTime }) {
-    const [view, setView] = useState('laps'); // 'laps' | 'gaps' | 'tyre'
-
     if (!positions || !drivers) return null;
+
     const latest = getLatestPositions(positions);
-    const hasIntervals = intervals && intervals.length > 0;
 
     const driversMap = {};
     drivers.forEach(d => { driversMap[d.driver_number] = d; });
@@ -148,21 +145,23 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
 
     return (
         <div className={styles.tower}>
-            <div className={styles.viewSwitch}>
-                <button className={view === 'laps' ? styles.viewBtnActive : styles.viewBtn} onClick={() => setView('laps')}>LAPS</button>
-                <button className={view === 'gaps' ? styles.viewBtnActive : styles.viewBtn} onClick={() => setView('gaps')}>GAPS</button>
-                <button className={view === 'tyre' ? styles.viewBtnActive : styles.viewBtn} onClick={() => setView('tyre')}>TYRE</button>
+            <div className={styles.colHeader}>
+                <span>POS</span>
+                <span>DRIVER</span>
+                <span>TYRE</span>
+                <span>LAP / BEST</span>
+                <span>GAP / LEAD</span>
             </div>
 
             <div className={styles.towerBody}>
                 {latest.map((pos, index) => {
-                    const driver    = driversMap[pos.driver_number];
-                    const stint     = getCurrentStint(stints, laps, pos.driver_number, currentTime);
-                    const tyreAge   = getCurrentTyreAge(laps, pos.driver_number, stint, currentTime);
-                    const interval  = getLatestInterval(intervals, pos.driver_number);
-                    const lastLap   = getLastLap(laps, pos.driver_number, currentTime);
-                    const bestLap   = getBestLap(laps, pos.driver_number, currentTime);
-                    const isInPit   = inPitNow.has(pos.driver_number);
+                    const driver   = driversMap[pos.driver_number];
+                    const stint    = getCurrentStint(stints, laps, pos.driver_number, currentTime);
+                    const tyreAge  = getCurrentTyreAge(laps, pos.driver_number, stint, currentTime);
+                    const interval = getLatestInterval(intervals, pos.driver_number);
+                    const lastLap  = getLastLap(laps, pos.driver_number, currentTime);
+                    const bestLap  = getBestLap(laps, pos.driver_number, currentTime);
+                    const isInPit  = inPitNow.has(pos.driver_number);
                     const teamColor = driver?.team_colour ? `#${driver.team_colour}` : '#666';
 
                     const isPurple = bestLap && sessionBestTime != null
@@ -182,32 +181,42 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
                             <span className={styles.pos}>{pos.position}</span>
 
                             <span className={styles.driver}>
-                            <span className={styles.acronym}>{driver?.name_acronym ?? pos.driver_number}</span>
-                            <span className={styles.team} style={{ color: teamColor }}>{driver?.team_name ?? ''}</span>
-                        </span>
+                                <span className={styles.acronym}>
+                                    {driver?.name_acronym ?? pos.driver_number}
+                                </span>
+                                <span className={styles.team} style={{ color: teamColor }}>
+                                    {driver?.team_name ?? ''}
+                                </span>
+                            </span>
 
-                            <span className={styles.thirdCol}>
-                            {view === 'laps' && <>
+                            <span className={styles.tyreCol}>
+                                {isInPit ? (
+                                    <span className={styles.pitBadge}>PIT</span>
+                                ) : (
+                                    <>
+                                        <TyreIcon compound={stint?.compound} />
+                                        <span className={styles.tyreAge}>{tyreAge ?? 0}L</span>
+                                    </>
+                                )}
+                            </span>
+
+                            <span className={styles.lapsCol}>
                                 <span className={styles.lapTime} style={{ color: lastLapColor }}>
                                     {formatLapTime(lastLap?.lap_duration)}
                                 </span>
                                 <span className={styles.bestLap} style={{ color: isPurple ? '#c084fc' : undefined }}>
                                     {formatLapTime(bestLap?.lap_duration)}
                                 </span>
-                            </>}
-                                {view === 'gaps' && <>
-                                    <span className={styles.interval}>{index === 0 ? 'LEADER' : formatGap(interval?.interval)}</span>
-                                    <span className={styles.gap}>{index === 0 ? '' : formatGap(interval?.gap_to_leader)}</span>
-                                </>}
-                                {view === 'tyre' && (
-                                    <span className={styles.tyreCell}>
-                                    {isInPit ?
-                                        <span className={styles.pitBadge}>PIT</span>
-                                        : <TyreIcon compound={stint?.compound} />}
-                                        {!isInPit && stint && <span className={styles.tyreAge}>{tyreAge ?? 0}L</span>}
+                            </span>
+
+                            <span className={styles.gapsCol}>
+                                <span className={styles.interval}>
+                                    {index === 0 ? 'LEADER' : formatGap(interval?.interval)}
                                 </span>
-                                )}
-                        </span>
+                                <span className={styles.gap}>
+                                    {index === 0 ? '' : formatGap(interval?.gap_to_leader)}
+                                </span>
+                            </span>
                         </div>
                     );
                 })}

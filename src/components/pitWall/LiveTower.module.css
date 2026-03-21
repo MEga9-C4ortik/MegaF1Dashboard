@@ -5,19 +5,32 @@
 
 .towerBody {
     overflow-y: auto;
-    max-height: calc(100vh - 220px);
-    flex: 1;
+    max-height: calc(100vh - 176px);
+    border-bottom: #222 solid 2px;
+}
+
+.colHeader {
+    display: grid;
+    grid-template-columns: 36px 1fr 65px 110px 110px;
+    padding: 5px 12px;
+    gap: 8px;
+    border-bottom: 2px solid #1a1a1a;
+    font-size: 14px;
+    color: #777;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    align-items: center;
 }
 
 .row {
     display: grid;
-    grid-template-columns: 44px 120px 1fr;
-    padding: 6px 16px;
+    grid-template-columns: 36px 1fr 65px 110px 110px;
+    padding: 6px 12px;
     border-bottom: 1px solid #111;
     border-left: 3px solid transparent;
     transition: background 0.1s, border-left-color 0.3s;
     align-items: center;
-    gap: 18px;
+    gap: 8px;
 }
 
 .row:hover {
@@ -25,127 +38,108 @@
 }
 
 .rowPit {
-    opacity: 0.6;
+    opacity: 0.5;
     background: #0a0a0a;
 }
 
 .pos {
-    font-size: 18px;
+    font-size: 16px;
     color: #fff;
 }
 
 .driver {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 1px;
+    min-width: 0;
 }
 
 .acronym {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 700;
     color: #fff;
     letter-spacing: 1px;
 }
 
 .team {
-    font-size: 18px;
-    letter-spacing: 0.5px;
-    opacity: 0.8;
+    font-size: 14px;
+    letter-spacing: 0.3px;
+    opacity: 0.7;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.tyreCell {
+.tyreCol {
     display: flex;
-    align-items: center;
-    gap: 5px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
 }
 
 .tyre {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 26px;
-    height: 26px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     border: 2px solid;
-    font-size: 14px;
-    font-weight: 1000;
+    font-size: 16px;
+    font-weight: 700;
 }
 
 .tyreAge {
-    font-size: 16px;
-    color: #666;
+    font-size: 15px;
+    color: #555;
 }
 
-.viewSwitch {
-    display: flex;
-    border-bottom: 1px solid #1a1a1a;
-}
-
-.viewBtn, .viewBtnActive {
-    flex: 1;
-    padding: 6px 0;
-    background: transparent;
-    border: none;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 18px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    cursor: pointer;
-    color: #777;
-    border-bottom: 2px solid transparent;
-    transition: color 0.15s;
-}
-
-.viewBtn:hover {
-    color: #888;
-}
-
-.viewBtnActive {
-    color: #e10600;
-    border-bottom-color: #e10600;
-}
-
-.thirdCol {
+.lapsCol {
     display: flex;
     flex-direction: column;
     gap: 1px;
     font-variant-numeric: tabular-nums;
-    font-size: 14px;
-    color: #eee;
 }
 
-.pitBadge {
-    font-size: 18px;
-    font-weight: 700;
-    color: #ffc800;
-    letter-spacing: 1px;
-    border: 1px solid rgba(255, 200, 0, 0.3);
-    padding: 2px 6px;
-    border-radius: 2px;
+.gapsCol {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    font-variant-numeric: tabular-nums;
 }
 
 .lapTime {
-    font-size: 16px;
+    font-size: 20px;
     color: #eee;
     font-variant-numeric: tabular-nums;
 }
 
 .bestLap {
-    font-size: 16px;
-    color: #777;
-    font-variant-numeric: tabular-nums;
-}
-
-.gap {
-    font-size: 16px;
-    color: #888;
+    font-size: 20px;
+    color: #555;
     font-variant-numeric: tabular-nums;
 }
 
 .interval {
-    font-size: 16px;
+    font-size: 18px;
     color: #fff;
     font-variant-numeric: tabular-nums;
+}
+
+.gap {
+    font-size: 18px;
+    color: #666;
+    font-variant-numeric: tabular-nums;
+}
+
+.pitBadge {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffc800;
+    letter-spacing: 1px;
+    border: 1px solid rgba(255, 200, 0, 0.3);
+    padding: 2px 4px;
+    border-radius: 2px;
 }
 
 .empty {
@@ -158,22 +152,33 @@
 }
 
 @media (max-width: 768px) {
-    .row {
-        grid-template-columns: 32px 1fr 120px;
-        padding: 5px 8px;
-        gap: 8px;
-    }
-    .acronym {
-        font-size: 13px;
+    .colHeader {
+        grid-template-columns: 28px 1fr 50px 88px 88px;
+        padding: 4px 8px;
+        gap: 5px;
+        font-size: 9px;
     }
 
-    .team {
-        font-size: 11px;
+    .row {
+        grid-template-columns: 28px 1fr 50px 88px 88px;
+        padding: 5px 8px;
+        gap: 5px;
     }
-    .lapTime, .bestLap, .interval, .gap {
-        font-size: 12px;
-    }
-    .pos {
+
+    .pos      { font-size: 13px; }
+    .acronym  { font-size: 12px; }
+    .team     { font-size: 9px; }
+    .lapTime  { font-size: 11px; }
+    .bestLap  { font-size: 10px; }
+    .interval { font-size: 11px; }
+    .gap      { font-size: 10px; }
+
+    .tyre {
+        width: 18px;
+        height: 18px;
         font-size: 14px;
     }
+
+    .tyreAge  { font-size: 12px; }
+    .pitBadge { font-size: 12px; }
 }
