@@ -20,15 +20,6 @@ function PitWall({ year }) {
         ? Number(searchParams.get('sessionKey'))
         : null;
 
-    const replayMinTime = useMemo(() => {
-        if (!laps.length) return null;
-        const firstLap = laps
-            .filter(l => l.lap_number === 1 && l.date_start)
-            .map(l => new Date(l.date_start).getTime());
-        if (!firstLap.length) return null;
-        return new Date(Math.min(...firstLap) - 10_000); // -10 сек буфер
-    }, [laps]);
-
     const {
         meetings, selectedMeetingKey, setSelectedMeetingKey,
         sessions, selectedSessionKey, setSelectedSessionKey,
@@ -42,6 +33,15 @@ function PitWall({ year }) {
         stints, pits, fiaMessages, radio,
         weather, loading: dataLoading,
     } = useLiveData(activeSessionKey);
+
+    const replayMinTime = useMemo(() => {
+        if (!laps.length) return null;
+        const firstLap = laps
+            .filter(l => l.lap_number === 1 && l.date_start)
+            .map(l => new Date(l.date_start).getTime());
+        if (!firstLap.length) return null;
+        return new Date(Math.min(...firstLap) - 10_000); // -10 сек буфер
+    }, [laps]);
 
     const replay = useReplay(positions, replayMinTime, intervals, activeSessionKey);
     const ct = replay.currentTime;

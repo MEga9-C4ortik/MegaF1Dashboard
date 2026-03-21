@@ -156,3 +156,24 @@
     letter-spacing: 2px;
     text-transform: uppercase;
 }
+
+@media (max-width: 768px) {
+    .row {
+        grid-template-columns: 32px 1fr 120px;
+        padding: 5px 8px;
+        gap: 8px;
+    }
+    .acronym {
+        font-size: 13px;
+    }
+
+    .team {
+        font-size: 11px;
+    }
+    .lapTime, .bestLap, .interval, .gap {
+        font-size: 12px;
+    }
+    .pos {
+        font-size: 14px;
+    }
+}
