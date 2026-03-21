@@ -13,13 +13,21 @@ import Weather from "../components/pitWall/Weather.jsx";
 
 function PitWall({ year }) {
     const [searchParams] = useSearchParams();
-    const [rightTab, setRightTab] = useState('tower'); // 'tower' | 'messages'
     const [mobileTab, setMobileTab] = useState('map'); // 'map' | 'tower'
     const [messagesOpen, setMessagesOpen] = useState(false);
     const navigate = useNavigate();
     const urlSessionKey = searchParams.get('sessionKey')
         ? Number(searchParams.get('sessionKey'))
         : null;
+
+    const replayMinTime = useMemo(() => {
+        if (!laps.length) return null;
+        const firstLap = laps
+            .filter(l => l.lap_number === 1 && l.date_start)
+            .map(l => new Date(l.date_start).getTime());
+        if (!firstLap.length) return null;
+        return new Date(Math.min(...firstLap) - 10_000); // -10 сек буфер
+    }, [laps]);
 
     const {
         meetings, selectedMeetingKey, setSelectedMeetingKey,
@@ -35,7 +43,7 @@ function PitWall({ year }) {
         weather, loading: dataLoading,
     } = useLiveData(activeSessionKey);
 
-    const replay = useReplay(positions, intervals, activeSessionKey);
+    const replay = useReplay(positions, replayMinTime, intervals, activeSessionKey);
     const ct = replay.currentTime;
 
     const displayPositions   = (positions.length > 0) ? replay.replayPositions : [];

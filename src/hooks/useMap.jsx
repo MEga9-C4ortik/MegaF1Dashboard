@@ -63,7 +63,6 @@ function useMap(sessionKey, drivers, replayTime = null) {
                 if (cached) {
                     points = cached;
                 } else {
-                    await new Promise(r => setTimeout(r, 800));
                     if (!isMounted.current) return;
 
                     for (const driver of drivers) {

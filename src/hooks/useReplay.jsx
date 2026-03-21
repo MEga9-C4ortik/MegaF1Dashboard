@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 
 const TICK_MS = 500;
 
-function useReplay(allPositions, allIntervals = [], sessionKey = null) {
+function useReplay(allPositions, minTime, allIntervals = [], sessionKey = null) {
     const [isPlaying, setIsPlaying]     = useState(false);
     const [speed, setSpeed]             = useState(1);
     const [currentTime, setCurrentTime] = useState(null);
@@ -14,13 +14,10 @@ function useReplay(allPositions, allIntervals = [], sessionKey = null) {
 
     useEffect(() => { speedRef.current = speed; }, [speed]);
 
-    const { minTime, maxTime } = useMemo(() => {
-        if (!allPositions || allPositions.length === 0) return { minTime: null, maxTime: null };
+    const maxTime = useMemo(() => {
+        if (!allPositions || allPositions.length === 0) return null;
         const times = allPositions.map(p => new Date(p.date).getTime()).filter(Boolean);
-        return {
-            minTime: new Date(Math.min(...times)),
-            maxTime: new Date(Math.max(...times)),
-        };
+        return new Date(Math.max(...times));
     }, [allPositions]);
 
     useEffect(() => {
