@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import styles from './LiveTower.module.css'
 
 function getLatestPositions(positions) {
@@ -89,6 +90,16 @@ function getSessionBestLapTime(laps, currentTime) {
     return Math.min(...validLaps.map(l => l.lap_duration));
 }
 
+// Последний пит-стоп пилота относительно currentTime
+function getActivePit(pits, driverNumber, currentTime) {
+    const ct = currentTime ?? new Date();
+    const driverPits = pits
+        .filter(p => p.driver_number === driverNumber && p.pit_in_time)
+        .filter(p => new Date(p.pit_in_time) <= ct)
+        .sort((a, b) => new Date(b.pit_in_time) - new Date(a.pit_in_time));
+    return driverPits[0] ?? null;
+}
+
 function formatLapTime(seconds) {
     if (seconds == null) return '—';
     const mins = Math.floor(seconds / 60);
@@ -119,6 +130,45 @@ function TyreIcon({ compound }) {
     );
 }
 
+function PitTimer({ pit, currentTime }) {
+    const [elapsed, setElapsed] = useState(0);
+
+    const inT  = pit?.pit_in_time  ? new Date(pit.pit_in_time).getTime()  : null;
+    const outT = pit?.pit_out_time ? new Date(pit.pit_out_time).getTime() : null;
+    const isDone = !!outT;
+
+    useEffect(() => {
+        if (!inT) return;
+
+        if (isDone) {
+            const dur = pit.pit_duration != null
+                ? pit.pit_duration
+                : (outT - inT) / 1000;
+            setElapsed(dur);
+            return;
+        }
+
+        if (currentTime) {
+            const ct = currentTime instanceof Date ? currentTime.getTime() : new Date(currentTime).getTime();
+            setElapsed(Math.max(0, (ct - inT) / 1000));
+            return;
+        }
+
+        const tick = () => setElapsed(Math.max(0, (Date.now() - inT) / 1000));
+        tick();
+        const timer = setInterval(tick, 100);
+        return () => clearInterval(timer);
+    }, [inT, outT, isDone, currentTime, pit]);
+
+    const secs = elapsed.toFixed(1);
+
+    return (
+        <span className={isDone ? styles.pitTimeDone : styles.pitTimeLive}>
+            {secs}s
+        </span>
+    );
+}
+
 function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentTime }) {
     if (!positions || !drivers) return null;
 
@@ -127,15 +177,17 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
     const driversMap = {};
     drivers.forEach(d => { driversMap[d.driver_number] = d; });
 
-    const relevantPits = currentTime
-        ? pits.filter(p => p.pit_in_time && new Date(p.pit_in_time) <= currentTime)
-        : pits;
+    const inPitNow = new Set();
+    pits.forEach(p => {
+        if (!p.pit_in_time) return;
+        const inT  = new Date(p.pit_in_time);
+        const outT = p.pit_out_time ? new Date(p.pit_out_time) : null;
+        const ct   = currentTime ?? new Date();
 
-    const inPitNow = new Set(
-        relevantPits
-            .filter(p => !p.pit_out_time || (currentTime && new Date(p.pit_out_time) > currentTime))
-            .map(p => p.driver_number)
-    );
+        if (inT <= ct && (!outT || outT > ct)) {
+            inPitNow.add(p.driver_number);
+        }
+    });
 
     const sessionBestTime = getSessionBestLapTime(laps, currentTime);
 
@@ -155,14 +207,18 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
 
             <div className={styles.towerBody}>
                 {latest.map((pos, index) => {
-                    const driver   = driversMap[pos.driver_number];
-                    const stint    = getCurrentStint(stints, laps, pos.driver_number, currentTime);
-                    const tyreAge  = getCurrentTyreAge(laps, pos.driver_number, stint, currentTime);
-                    const interval = getLatestInterval(intervals, pos.driver_number);
-                    const lastLap  = getLastLap(laps, pos.driver_number, currentTime);
-                    const bestLap  = getBestLap(laps, pos.driver_number, currentTime);
-                    const isInPit  = inPitNow.has(pos.driver_number);
+                    const driver    = driversMap[pos.driver_number];
+                    const stint     = getCurrentStint(stints, laps, pos.driver_number, currentTime);
+                    const tyreAge   = getCurrentTyreAge(laps, pos.driver_number, stint, currentTime);
+                    const interval  = getLatestInterval(intervals, pos.driver_number);
+                    const lastLap   = getLastLap(laps, pos.driver_number, currentTime);
+                    const bestLap   = getBestLap(laps, pos.driver_number, currentTime);
+                    const isInPit   = inPitNow.has(pos.driver_number);
                     const teamColor = driver?.team_colour ? `#${driver.team_colour}` : '#666';
+
+                    const activePit = isInPit
+                        ? getActivePit(pits, pos.driver_number, currentTime)
+                        : null;
 
                     const isPurple = bestLap && sessionBestTime != null
                         && bestLap.lap_duration === sessionBestTime;
@@ -201,12 +257,24 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
                             </span>
 
                             <span className={styles.lapsCol}>
-                                <span className={styles.lapTime} style={{ color: lastLapColor }}>
-                                    {formatLapTime(lastLap?.lap_duration)}
-                                </span>
-                                <span className={styles.bestLap} style={{ color: isPurple ? '#c084fc' : undefined }}>
-                                    {formatLapTime(bestLap?.lap_duration)}
-                                </span>
+                                {isInPit && activePit ? (
+                                    // Во время пита — таймер вместо лап-тайма
+                                    <>
+                                        <PitTimer pit={activePit} currentTime={currentTime} />
+                                        <span className={styles.bestLap}>
+                                            {formatLapTime(bestLap?.lap_duration)}
+                                        </span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span className={styles.lapTime} style={{ color: lastLapColor }}>
+                                            {formatLapTime(lastLap?.lap_duration)}
+                                        </span>
+                                        <span className={styles.bestLap} style={{ color: isPurple ? '#c084fc' : undefined }}>
+                                            {formatLapTime(bestLap?.lap_duration)}
+                                        </span>
+                                    </>
+                                )}
                             </span>
 
                             <span className={styles.gapsCol}>
