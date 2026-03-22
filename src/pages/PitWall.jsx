@@ -8,8 +8,8 @@ import FiaMessages from '../components/pitWall/FiaMessages'
 import RadioMessages from '../components/pitWall/RadioMessages'
 import Map from '../components/pitWall/Map'
 import ReplayControls from '../components/pitWall/ReplayControls'
-import styles from './PitWall.module.css'
 import Weather from "../components/pitWall/Weather.jsx";
+import styles from './PitWall.module.css'
 
 function PitWall({ year }) {
     const [searchParams] = useSearchParams();
@@ -40,24 +40,30 @@ function PitWall({ year }) {
             .filter(l => l.lap_number === 1 && l.date_start)
             .map(l => new Date(l.date_start).getTime());
         if (!firstLap.length) return null;
-        return new Date(Math.min(...firstLap) - 10_000); // -10 сек буфер
+        return new Date(firstLap.reduce((min, cur) => cur < min ? cur : min, +Infinity) - 10_000); // -10 сек буфер
     }, [laps]);
 
     const replay = useReplay(positions, replayMinTime, intervals, activeSessionKey);
     const ct = replay.currentTime;
 
-    const displayPositions   = (positions.length > 0) ? replay.replayPositions : [];
-    const displayIntervals   = (intervals.length > 0) ? replay.replayIntervals : [];
-    const displayStints      = stints;
-    const displayPits        = (ct)
-        ? pits.filter(p => p.pit_in_time && new Date(p.pit_in_time) <= ct)
-        : pits;
-    const displayFiaMessages = (ct)
-        ? fiaMessages.filter(m => new Date(m.date) <= ct)
-        : fiaMessages;
-    const displayRadio = (ct)
-        ? radio.filter(m => new Date(m.date) <= ct)
-        : radio;
+    const displayPositions = (positions.length > 0) ? replay.replayPositions : [];
+    const displayIntervals = (intervals.length > 0) ? replay.replayIntervals : [];
+    const displayStints = stints;
+    const displayPits = useMemo(() => {
+        return ct
+            ? pits.filter(p => p.pit_in_time && new Date(p.pit_in_time) <= ct)
+            : pits;
+    }, [ct]);
+    const displayFiaMessages = useMemo(() => {
+        return ct
+            ? fiaMessages.filter(m => new Date(m.date) <= ct)
+            : fiaMessages;
+    },[ct]);
+    const displayRadio = useMemo(() => {
+        return ct
+            ? radio.filter(m => new Date(m.date) <= ct)
+            : radio;
+    }, [ct]);
     const currentWeather = useMemo(() => {
         if (!weather.length) return null;
         if (!ct) return weather.at(-1);

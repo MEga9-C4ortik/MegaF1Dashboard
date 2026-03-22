@@ -50,11 +50,6 @@ function enqueue(fn) {
   });
 }
 
-export const fetchCurrentSession = async () => {
-  const data = await safeFetch(`${BASE_URL}/sessions?session_key=latest`);
-  return Array.isArray(data) && data.length > 0 ? data[0] : null;
-};
-
 export const fetchSessionsByMeeting = async (meetingKey) => {
   const data = await safeFetch(`${BASE_URL}/sessions?meeting_key=${meetingKey}`);
   return Array.isArray(data) ? data : [];

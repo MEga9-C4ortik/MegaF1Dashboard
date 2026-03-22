@@ -87,10 +87,9 @@ function getSessionBestLapTime(laps, currentTime) {
         validLaps = validLaps.filter(l => l.date_start && new Date(l.date_start) <= currentTime);
     }
     if (!validLaps.length) return null;
-    return Math.min(...validLaps.map(l => l.lap_duration));
+    return validLaps.reduce((min, cur) => cur < min ? cur : min, +Infinity).map(l => l.lap_duration);
 }
 
-// Последний пит-стоп пилота относительно currentTime
 function getActivePit(pits, driverNumber, currentTime) {
     const ct = currentTime ?? new Date();
     const driverPits = pits

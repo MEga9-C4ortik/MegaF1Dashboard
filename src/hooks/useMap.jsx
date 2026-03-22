@@ -103,42 +103,41 @@ function useMap(sessionKey, drivers, replayTime = null) {
     const driversMap = {};
     drivers?.forEach(d => { driversMap[d.driver_number] = d });
 
-    const loadLocations = async () => {
-        try {
-            const raw = await fetchDriverLocations(sessionKey, replayTimeRef.current);
-            if (!raw.length || !isMounted.current) return;
-
-            const latest = {};
-            raw.forEach(loc => {
-                if (!latest[loc.driver_number] ||
-                    loc.date > latest[loc.driver_number].date) {
-                    latest[loc.driver_number] = loc;
-                }
-            });
-
-            const dots = Object.values(latest).map(loc => {
-                const { px, py } = normPoint(loc.x, loc.y, normParams);
-                const driver = driversMap[loc.driver_number];
-                const color = driver?.team_colour ? `#${driver.team_colour}` : null;
-                return {
-                    driver_number: loc.driver_number,
-                    px, py,
-                    color,
-                    acronym: driver?.name_acronym ?? null,
-                    number: loc.driver_number,
-                };
-            });
-
-            if (isMounted.current) setDriverDots(dots);
-        } catch (err) {
-            if (!err.message?.includes('429')) {
-                console.error('Driver locations failed:', err);
-            }
-        }
-    }
-
     useEffect(() => {
         if (!sessionKey || !normParams) return;
+        const loadLocations = async () => {
+            try {
+                const raw = await fetchDriverLocations(sessionKey, replayTimeRef.current);
+                if (!raw.length || !isMounted.current) return;
+
+                const latest = {};
+                raw.forEach(loc => {
+                    if (!latest[loc.driver_number] ||
+                        loc.date > latest[loc.driver_number].date) {
+                        latest[loc.driver_number] = loc;
+                    }
+                });
+
+                const dots = Object.values(latest).map(loc => {
+                    const { px, py } = normPoint(loc.x, loc.y, normParams);
+                    const driver = driversMap[loc.driver_number];
+                    const color = driver?.team_colour ? `#${driver.team_colour}` : null;
+                    return {
+                        driver_number: loc.driver_number,
+                        px, py,
+                        color,
+                        acronym: driver?.name_acronym ?? null,
+                        number: loc.driver_number,
+                    };
+                });
+
+                if (isMounted.current) setDriverDots(dots);
+            } catch (err) {
+                if (!err.message?.includes('429')) {
+                    console.error('Driver locations failed:', err);
+                }
+            }
+        };
         loadLocations();
     }, [sessionKey, normParams, firstDriverNum, replayTime]);
 
