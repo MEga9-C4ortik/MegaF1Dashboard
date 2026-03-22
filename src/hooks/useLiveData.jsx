@@ -12,9 +12,7 @@ import {
 } from '../services/openf1Api'
 import { getCached, setCached, hasStaticCache } from '../services/SessionCache'
 
-const DYNAMIC_INTERVAL = 15000;
-const STATIC_INTERVAL  = 60000;
-const INCREMENTAL_WINDOW_SEC = 35;
+const addTs = (items) => items.map(p => p._ts != null ? p : { ...p, _ts: Date.parse(p.date) });
 
 function useLiveData(sessionKey) {
     const [positions, setPositions]     = useState([]);
@@ -28,23 +26,15 @@ function useLiveData(sessionKey) {
     const [radio, setRadio]             = useState([]);
     const [loading, setLoading]         = useState(false);
 
-    const initialDynamicDone = useRef(false);
     const isMounted = useRef(true);
 
     useEffect(() => {
         isMounted.current = true;
-        initialDynamicDone.current = false;
 
         if (!sessionKey) {
-            setPositions([]);
-            setIntervals([]);
-            setLaps([]);
-            setDrivers([]);
-            setStints([]);
-            setPits([]);
-            setFiaMessages([]);
-            setRadio([]);
-            setWeather([]);
+            setPositions([]); setIntervals([]); setLaps([]);
+            setDrivers([]); setStints([]); setPits([]);
+            setFiaMessages([]); setRadio([]); setWeather([]);
             setLoading(false);
             return () => { isMounted.current = false; };
         }
@@ -53,158 +43,73 @@ function useLiveData(sessionKey) {
 
         const cached = getCached(sessionKey);
         if (cached) {
+            if (cached.positions)   setPositions(addTs(cached.positions));
+            if (cached.intervals)   setIntervals(addTs(cached.intervals));
+            if (cached.laps)        setLaps(cached.laps);
+            if (cached.weather)     setWeather(cached.weather);
             if (cached.drivers)     setDrivers(cached.drivers);
             if (cached.stints)      setStints(cached.stints);
             if (cached.pits)        setPits(cached.pits);
             if (cached.fiaMessages) setFiaMessages(cached.fiaMessages);
             if (cached.radio)       setRadio(cached.radio);
-            if (cached.positions)   setPositions(cached.positions);
-            if (cached.intervals)   setIntervals(cached.intervals);
-            if (cached.laps)        setLaps(cached.laps);
-            if (cached.weather)     setWeather(cached.weather);
             setLoading(false);
-            if (cached.drivers?.length) initialDynamicDone.current = true;
         } else {
-            setPositions([]);
-            setIntervals([]);
-            setLaps([]);
-            setDrivers([]);
-            setStints([]);
-            setPits([]);
-            setFiaMessages([]);
-            setRadio([]);
-            setWeather([]);
+            setPositions([]); setIntervals([]); setLaps([]);
+            setDrivers([]); setStints([]); setPits([]);
+            setFiaMessages([]); setRadio([]); setWeather([]);
         }
 
         return () => { isMounted.current = false; };
     }, [sessionKey]);
 
+    // Dynamic data: positions, intervals, weather, laps
     const loadDynamic = useCallback(async () => {
         if (!sessionKey) return;
-
-        const sinceDate = initialDynamicDone.current
-            ? new Date(Date.now() - INCREMENTAL_WINDOW_SEC * 1000).toISOString()
-            : null;
-
         try {
             let posData = null;
-            try {
-                posData = await fetchPositions(sessionKey, sinceDate);
-            } catch (e) {
-                if (!e.message?.includes('429')) console.error('Positions failed:', e);
-            }
+            try { posData = await fetchPositions(sessionKey); }
+            catch (e) { if (!e.message?.includes('429')) console.error('Positions failed:', e); }
             if (!isMounted.current) return;
 
             let intData = null;
-            try {
-                intData = await fetchIntervalsGaps(sessionKey, sinceDate);
-            } catch(e) {
-                if (!e.message?.includes('429')) console.error('Intervals failed:', e);
-            }
+            try { intData = await fetchIntervalsGaps(sessionKey); }
+            catch (e) { if (!e.message?.includes('429')) console.error('Intervals failed:', e); }
             if (!isMounted.current) return;
 
             let weatherData = null;
-            try {
-                weatherData = await fetchWeather(sessionKey, sinceDate);
-            } catch (e) {
-                if (!e.message?.includes('429')) console.error('Weather failed:', e);
-            }
+            try { weatherData = await fetchWeather(sessionKey); }
+            catch (e) { if (!e.message?.includes('429')) console.error('Weather failed:', e); }
             if (!isMounted.current) return;
 
             let lapsData = null;
-            try {
-                lapsData = await fetchLaps(sessionKey, initialDynamicDone.current
-                    ? sinceDate : null);
-            }
-            catch (e) {
-                if (!e.message?.includes('429')) console.error('Laps failed:', e);
-            }
+            try { lapsData = await fetchLaps(sessionKey); }
+            catch (e) { if (!e.message?.includes('429')) console.error('Laps failed:', e); }
             if (!isMounted.current) return;
 
-            if (posData && posData.length > 0) {
-                if (initialDynamicDone.current) {
-                    setPositions(prev => {
-                        const merged = [...prev, ...posData.map(p => ({ ...p, _ts: Date.parse(p.date) }))];
-                        const seen = new Set();
-                        return merged.filter(p => {
-                            const key = `${p.driver_number}_${p.date}`;
-                            if (seen.has(key)) return false;
-                            seen.add(key);
-                            return true;
-                        });
-                    });
-                } else {
-                    const withTs = posData.map(p => ({ ...p, _ts: Date.parse(p.date) }));
-                    setPositions(withTs);
-                    setCached(sessionKey, { positions: withTs });
-                }
+            if (posData?.length) {
+                const withTs = addTs(posData);
+                setPositions(withTs);
+                setCached(sessionKey, { positions: withTs });
             }
-
-            if (intData && intData.length > 0) {
-                if (initialDynamicDone.current) {
-                    setIntervals(prev => {
-                        const merged = [...prev, ...intData.map(i => ({ ...i, _ts: Date.parse(i.date) }))];
-                        const seen = new Set();
-                        return merged.filter(i => {
-                            const key = `${i.driver_number}_${i.date}`;
-                            if (seen.has(key)) return false;
-                            seen.add(key);
-                            return true;
-                        });
-                    });
-                } else {
-                    const withTs = intData.map(i => ({ ...i, _ts: Date.parse(i.date) }));
-                    setIntervals(withTs);
-                    setCached(sessionKey, { intervals: withTs });
-                }
+            if (intData?.length) {
+                const withTs = addTs(intData);
+                setIntervals(withTs);
+                setCached(sessionKey, { intervals: withTs });
             }
-
-            if (weatherData && weatherData.length > 0) {
-                if (initialDynamicDone.current) {
-                    setWeather(prev => {
-                        const merged = [...prev, ...weatherData];
-                        const seen = new Set();
-                        return merged.filter(i => {
-                            const key = `${i.date}`;
-                            if (seen.has(key)) return false;
-                            seen.add(key);
-                            return true;
-                        });
-                    });
-                } else {
-                    setWeather(weatherData);
-                    setCached(sessionKey, { weather: weatherData });
-                }
+            if (weatherData?.length) {
+                setWeather(weatherData);
+                setCached(sessionKey, { weather: weatherData });
             }
-
-            if (lapsData && lapsData.length > 0) {
-                if (initialDynamicDone.current) {
-                    setLaps(prev => {
-                        const merged = [...prev, ...lapsData];
-                        const seen = new Set();
-                        return merged.filter(l => {
-                            const key = `${l.driver_number}_${l.lap_number}`;
-                            if (seen.has(key)) return false;
-                            seen.add(key);
-                            return true;
-                        });
-                    });
-                } else {
-                    setLaps(lapsData);
-                    setCached(sessionKey, { laps: lapsData });
-                }
+            if (lapsData?.length) {
+                setLaps(lapsData);
+                setCached(sessionKey, { laps: lapsData });
             }
-
-
-            if (!initialDynamicDone.current) {
-                initialDynamicDone.current = true;
-            }
-
         } catch (err) {
             console.error('Dynamic fetch error:', err);
         }
     }, [sessionKey]);
 
+    // Static data: drivers, stints, pits, fia, radio
     const loadStatic = useCallback(async () => {
         if (!sessionKey) return;
 
@@ -242,6 +147,7 @@ function useLiveData(sessionKey) {
         }
     }, [sessionKey]);
 
+
     useEffect(() => {
         if (!sessionKey) return;
         const init = async () => {
@@ -249,12 +155,6 @@ function useLiveData(sessionKey) {
             await loadStatic();
         };
         init();
-        const dynamicTimer = setInterval(loadDynamic, DYNAMIC_INTERVAL);
-        const staticTimer  = setInterval(loadStatic,  STATIC_INTERVAL);
-        return () => {
-            clearInterval(dynamicTimer);
-            clearInterval(staticTimer);
-        };
     }, [loadDynamic, loadStatic, sessionKey]);
 
     const hasData = drivers.length > 0 || positions.length > 0;

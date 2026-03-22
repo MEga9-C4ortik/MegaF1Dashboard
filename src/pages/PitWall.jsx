@@ -51,7 +51,7 @@ function PitWall({ year }) {
     const displayStints = stints;
     const displayPits = useMemo(() => {
         return ct
-            ? pits.filter(p => p.pit_in_time && new Date(p.pit_in_time) <= ct)
+            ? pits.filter(p => p.date && new Date(p.date) <= ct)
             : pits;
     }, [ct, pits]);
     const displayFiaMessages = useMemo(() => {

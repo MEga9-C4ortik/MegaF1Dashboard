@@ -92,11 +92,9 @@ function getSessionBestLapTime(laps, currentTime) {
 
 function getActivePit(pits, driverNumber, currentTime) {
     const ct = currentTime ?? new Date();
-    const driverPits = pits
-        .filter(p => p.driver_number === driverNumber && p.pit_in_time)
-        .filter(p => new Date(p.pit_in_time) <= ct)
-        .sort((a, b) => new Date(b.pit_in_time) - new Date(a.pit_in_time));
-    return driverPits[0] ?? null;
+    return pits
+        .filter(p => p.driver_number === driverNumber && p.date && new Date(p.date) <= ct)
+        .sort((a, b) => new Date(b.date) - new Date(a.date))[0] ?? null;
 }
 
 function formatLapTime(seconds) {
@@ -132,38 +130,29 @@ function TyreIcon({ compound }) {
 function PitTimer({ pit, currentTime }) {
     const [elapsed, setElapsed] = useState(0);
 
-    const inT  = pit?.pit_in_time  ? new Date(pit.pit_in_time).getTime()  : null;
-    const outT = pit?.pit_out_time ? new Date(pit.pit_out_time).getTime() : null;
-    const isDone = !!outT;
+    const inT    = pit?.date ? new Date(pit.date).getTime() : null;
+    const isDone = pit?.pit_duration != null;
 
     useEffect(() => {
         if (!inT) return;
-
         if (isDone) {
-            const dur = pit.pit_duration != null
-                ? pit.pit_duration
-                : (outT - inT) / 1000;
-            setElapsed(dur);
+            setElapsed(pit.pit_duration);
             return;
         }
-
         if (currentTime) {
             const ct = currentTime instanceof Date ? currentTime.getTime() : new Date(currentTime).getTime();
             setElapsed(Math.max(0, (ct - inT) / 1000));
             return;
         }
-
         const tick = () => setElapsed(Math.max(0, (Date.now() - inT) / 1000));
         tick();
         const timer = setInterval(tick, 100);
         return () => clearInterval(timer);
-    }, [inT, outT, isDone, currentTime, pit]);
-
-    const secs = elapsed.toFixed(1);
+    }, [inT, isDone, currentTime, pit]);
 
     return (
         <span className={isDone ? styles.pitTimeDone : styles.pitTimeLive}>
-            {secs}s
+            {elapsed.toFixed(1)}s
         </span>
     );
 }
@@ -182,11 +171,10 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
 
     const inPitNow = new Set();
     pits.forEach(p => {
-        if (!p.pit_in_time) return;
-        const inT  = new Date(p.pit_in_time);
-        const outT = p.pit_out_time ? new Date(p.pit_out_time) : null;
-        const ct   = currentTime ?? new Date();
-
+        if (!p.date) return;
+        const inT = new Date(p.date).getTime();
+        const outT = p.pit_duration != null ? inT + p.pit_duration * 1000 : null;
+        const ct = currentTime?.getTime() ?? Date.now();
         if (inT <= ct && (!outT || outT > ct)) {
             inPitNow.add(p.driver_number);
         }
@@ -208,11 +196,10 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
                 <span>GAP / LEAD</span>
             </div>
 
-            {leaderCurrentLap != null && totalRaceLaps != null && (
-                <div className={styles.lapCounter}>
-                    LAP {leaderCurrentLap} / {totalRaceLaps}
-                </div>
-            )}
+
+            <div className={styles.lapCounter}>
+                LAP {leaderCurrentLap ?? 0} / {totalRaceLaps ?? '—'}
+            </div>
 
             <div className={styles.towerBody}>
                 {latest.map((pos, index) => {
