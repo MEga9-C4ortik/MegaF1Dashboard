@@ -17,17 +17,14 @@ function getCurrentStint(stints, laps, driverNumber, currentTime) {
         .sort((a, b) => a.stint_number - b.stint_number);
 
     if (!driverStints.length) return null;
-
-    if (!currentTime) {
-        return driverStints[driverStints.length - 1];
-    }
+    if (!currentTime) return driverStints[driverStints.length - 1];
 
     const driverLaps = laps
-        .filter(l => l.driver_number === driverNumber && l.date_start != null)
-        .filter(l => new Date(l.date_start) <= currentTime)
+        .filter(l => l.driver_number === driverNumber && l.lap_duration != null)
+        .filter(l => !l.date_start || new Date(l.date_start) <= currentTime)
         .sort((a, b) => b.lap_number - a.lap_number);
 
-    const currentLapNumber = driverLaps[0]?.lap_number ?? 1;
+    const currentLapNumber = driverLaps[0]?.lap_number ?? 0;
 
     let activeStint = driverStints[0];
     for (const stint of driverStints) {
@@ -40,13 +37,19 @@ function getCurrentStint(stints, laps, driverNumber, currentTime) {
 
 function getCurrentTyreAge(laps, driverNumber, stint, currentTime) {
     if (!stint) return null;
-    let driverLaps = laps.filter(l => l.driver_number === driverNumber && l.lap_duration != null);
+
+    let driverLaps = laps.filter(l =>
+        l.driver_number === driverNumber &&
+        l.lap_duration != null
+    );
     if (currentTime) {
-        driverLaps = driverLaps.filter(l => l.date_start && new Date(l.date_start) <= currentTime);
+        driverLaps = driverLaps.filter(l =>
+            !l.date_start || new Date(l.date_start) <= currentTime
+        );
     }
-    const maxLap = driverLaps.length > 0 ? Math.max(...driverLaps.map(l => l.lap_number)) : stint.lap_start;
-    const lapsOnStint = Math.max(0, maxLap - stint.lap_start + 1);
-    return (stint.tyre_age_at_start ?? 0) + lapsOnStint;
+
+    const stintLaps = driverLaps.filter(l => l.lap_number >= stint.lap_start);
+    return (stint.tyre_age_at_start ?? 0) + stintLaps.length;
 }
 
 function getLatestInterval(intervals, driverNumber) {
@@ -62,7 +65,7 @@ function getLastLap(laps, driverNumber, currentTime) {
         l => l.driver_number === driverNumber && l.lap_duration != null
     );
     if (currentTime) {
-        driverLaps = driverLaps.filter(l => l.date_start && new Date(l.date_start) <= currentTime);
+        driverLaps = driverLaps.filter(l => !l.date_start || new Date(l.date_start) <= currentTime);
     }
     if (!driverLaps.length) return null;
     return driverLaps.reduce((a, b) => b.lap_number > a.lap_number ? b : a);
@@ -73,7 +76,7 @@ function getBestLap(laps, driverNumber, currentTime) {
         l => l.driver_number === driverNumber && l.lap_duration != null
     );
     if (currentTime) {
-        driverLaps = driverLaps.filter(l => l.date_start && new Date(l.date_start) <= currentTime);
+        driverLaps = driverLaps.filter(l => !l.date_start || new Date(l.date_start) <= currentTime);
     }
     if (!driverLaps.length) return null;
     return driverLaps.reduce((best, cur) =>
@@ -84,7 +87,7 @@ function getBestLap(laps, driverNumber, currentTime) {
 function getSessionBestLapTime(laps, currentTime) {
     let validLaps = laps.filter(l => l.lap_duration != null);
     if (currentTime) {
-        validLaps = validLaps.filter(l => l.date_start && new Date(l.date_start) <= currentTime);
+        validLaps = validLaps.filter(l => !l.date_start || new Date(l.date_start) <= currentTime);
     }
     if (!validLaps.length) return null;
     return validLaps.reduce((min, cur) => cur.lap_duration < min ? cur.lap_duration : min, +Infinity);
@@ -173,9 +176,10 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
     pits.forEach(p => {
         if (!p.date) return;
         const inT = new Date(p.date).getTime();
-        const outT = p.pit_duration != null ? inT + p.pit_duration * 1000 : null;
+        if (p.pit_duration == null) return;
+        const outT = inT + p.pit_duration * 1000;
         const ct = currentTime?.getTime() ?? Date.now();
-        if (inT <= ct && (!outT || outT > ct)) {
+        if (inT <= ct && outT > ct) {
             inPitNow.add(p.driver_number);
         }
     });
@@ -195,7 +199,6 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
                 <span>LAP / BEST</span>
                 <span>GAP / LEAD</span>
             </div>
-
 
             <div className={styles.lapCounter}>
                 LAP {leaderCurrentLap ?? 0} / {totalRaceLaps ?? '—'}

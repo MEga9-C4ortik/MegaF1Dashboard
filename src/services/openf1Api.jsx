@@ -101,8 +101,8 @@ export const fetchTrackLayout = async (sessionKey, driverNumber) => {
   return arr.filter((_, i) => i % 5 === 0);
 }
 
-export const fetchAllDriverLocations = async (sessionKey) => {
-  const data = await safeFetch(`${BASE_URL}/location?session_key=${sessionKey}`);
+export const fetchDriverAllLocations = async (sessionKey, driverNumber) => {
+  const data = await safeFetch(`${BASE_URL}/location?session_key=${sessionKey}&driver_number=${driverNumber}`);
   const arr = Array.isArray(data) ? data : [];
   return arr
       .filter((_, i) => i % 3 === 0)

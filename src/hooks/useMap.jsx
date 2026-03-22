@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
-import { fetchTrackLayout, fetchAllDriverLocations } from '../services/openf1Api'
+import { fetchTrackLayout, fetchDriverAllLocations } from '../services/openf1Api'
 import {
     getTrackLayoutCache, setTrackLayoutCache,
     getLocationCache, setLocationCache
@@ -10,8 +10,10 @@ const W = 800, H = 800, PAD = 40;
 function buildNormParams(points) {
     const xs = points.map(p => p.x);
     const ys = points.map(p => p.y);
-    const minX = Math.min(...xs), maxX = Math.max(...xs);
-    const minY = Math.min(...ys), maxY = Math.max(...ys);
+    const minX = xs.reduce((a, b) => a < b ? a : b, Infinity);
+    const maxX = xs.reduce((a, b) => a > b ? a : b, -Infinity);
+    const minY = ys.reduce((a, b) => a < b ? a : b, Infinity);
+    const maxY = ys.reduce((a, b) => a > b ? a : b, -Infinity);
     const rangeX = maxX - minX || 1;
     const rangeY = maxY - minY || 1;
     const scaleX = (W - PAD * 2) / rangeX;
@@ -37,10 +39,10 @@ function pointsToPath(points) {
 }
 
 function useMap(sessionKey, drivers, replayTime = null) {
-    const [trackPath, setTrackPath]     = useState('');
-    const [allLocations, setAllLocations] = useState([]); // все локации, загружены один раз
-    const [normParams, setNormParams]   = useState(null);
-    const [loading, setLoading]         = useState(true);
+    const [trackPath, setTrackPath]       = useState('');
+    const [allLocations, setAllLocations] = useState([]);
+    const [normParams, setNormParams]     = useState(null);
+    const [loading, setLoading]           = useState(true);
     const isMounted = useRef(true);
     const firstDriverNum = drivers?.[0]?.driver_number ?? null;
 
@@ -86,14 +88,24 @@ function useMap(sessionKey, drivers, replayTime = null) {
                 }
 
                 if (!isMounted.current) return;
+
                 const cachedLocs = getLocationCache(sessionKey);
                 if (cachedLocs) {
                     if (isMounted.current) setAllLocations(cachedLocs);
                 } else {
-                    const locs = await fetchAllDriverLocations(sessionKey);
+                    const allLocs = [];
+                    for (const driver of drivers) {
+                        if (!isMounted.current) return;
+                        try {
+                            const driverLocs = await fetchDriverAllLocations(sessionKey, driver.driver_number);
+                            allLocs.push(...driverLocs);
+                        } catch (e) {
+                            console.error(`Locations failed for driver ${driver.driver_number}:`, e);
+                        }
+                    }
                     if (isMounted.current) {
-                        setAllLocations(locs);
-                        setLocationCache(sessionKey, locs);
+                        setAllLocations(allLocs);
+                        setLocationCache(sessionKey, allLocs);
                     }
                 }
             } catch (err) {
