@@ -15,7 +15,7 @@ function useReplay(allPositions, minTime, allIntervals = [], sessionKey = null) 
     const maxTime = useMemo(() => {
         if (!allPositions || allPositions.length === 0) return null;
         const times = allPositions.map(p => new Date(p.date).getTime()).filter(Boolean);
-        return new Date(times.reduce((max,cur) => cur > max ? cur : max), -Infinity);
+        return new Date(times.reduce((max,cur) => cur > max ? cur : max, -Infinity));
     }, [allPositions]);
 
     useEffect(() => {

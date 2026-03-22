@@ -53,22 +53,22 @@ function PitWall({ year }) {
         return ct
             ? pits.filter(p => p.pit_in_time && new Date(p.pit_in_time) <= ct)
             : pits;
-    }, [ct]);
+    }, [ct, pits]);
     const displayFiaMessages = useMemo(() => {
         return ct
             ? fiaMessages.filter(m => new Date(m.date) <= ct)
             : fiaMessages;
-    },[ct]);
+    },[ct, fiaMessages]);
     const displayRadio = useMemo(() => {
         return ct
             ? radio.filter(m => new Date(m.date) <= ct)
             : radio;
-    }, [ct]);
+    }, [ct, radio]);
     const currentWeather = useMemo(() => {
         if (!weather.length) return null;
         if (!ct) return weather.at(-1);
         return weather.filter(w => new Date(w.date) <= ct).at(-1);
-    }, [weather, ct]);
+    }, [ct, weather]);
 
     const activeSession = sessions.find(s => s.session_key === activeSessionKey);
 
