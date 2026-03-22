@@ -3,6 +3,16 @@
     font-family: 'JetBrains Mono', monospace;
 }
 
+.lapCounter {
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #e10600;
+    border-bottom: 1px solid #1a1a1a;
+    background: #0a0a0a;
+}
+
 .towerBody {
     overflow-y: auto;
     max-height: calc(100vh - 176px);
