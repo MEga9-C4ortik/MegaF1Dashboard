@@ -87,7 +87,7 @@ function getSessionBestLapTime(laps, currentTime) {
         validLaps = validLaps.filter(l => l.date_start && new Date(l.date_start) <= currentTime);
     }
     if (!validLaps.length) return null;
-    return validLaps.reduce((min, cur) => cur.lap_duration < min ? cur.lap_duration : min, +Infinity).map(l => l.lap_duration);
+    return validLaps.reduce((min, cur) => cur.lap_duration < min ? cur.lap_duration : min, +Infinity);
 }
 
 function getActivePit(pits, driverNumber, currentTime) {
@@ -208,6 +208,12 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
                 <span>GAP / LEAD</span>
             </div>
 
+            {leaderCurrentLap != null && totalRaceLaps != null && (
+                <div className={styles.lapCounter}>
+                    LAP {leaderCurrentLap} / {totalRaceLaps}
+                </div>
+            )}
+
             <div className={styles.towerBody}>
                 {latest.map((pos, index) => {
                     const driver    = driversMap[pos.driver_number];
@@ -261,7 +267,6 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
 
                             <span className={styles.lapsCol}>
                                 {isInPit && activePit ? (
-                                    // Во время пита — таймер вместо лап-тайма
                                     <>
                                         <PitTimer pit={activePit} currentTime={currentTime} />
                                         <span className={styles.bestLap}>
