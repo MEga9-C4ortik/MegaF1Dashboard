@@ -124,144 +124,142 @@ function useLiveData(sessionKey) {
             if (posData && posData.length > 0) {
                 if (initialDynamicDone.current) {
                     setPositions(prev => {
-                        setPositions(prev => {
-                            const merged = [...prev, ...posData.map(p => ({ ...p, _ts: Date.parse(p.date) }))];
-                            const seen = new Set();
-                            return merged.filter(p => {
-                                const key = `${p.driver_number}_${p.date}`;
-                                if (seen.has(key)) return false;
-                                seen.add(key);
-                                return true;
-                            });
+                        const merged = [...prev, ...posData.map(p => ({ ...p, _ts: Date.parse(p.date) }))];
+                        const seen = new Set();
+                        return merged.filter(p => {
+                            const key = `${p.driver_number}_${p.date}`;
+                            if (seen.has(key)) return false;
+                            seen.add(key);
+                            return true;
                         });
-                    } else {
-                        const withTs = posData.map(p => ({ ...p, _ts: Date.parse(p.date) }));
-                        setPositions(withTs);
-                        setCached(sessionKey, { positions: withTs });
-                    }
+                    });
+                } else {
+                    const withTs = posData.map(p => ({ ...p, _ts: Date.parse(p.date) }));
+                    setPositions(withTs);
+                    setCached(sessionKey, { positions: withTs });
                 }
+            }
 
-                if (intData && intData.length > 0) {
-                    if (initialDynamicDone.current) {
-                        setIntervals(prev => {
-                            setIntervals(prev => {
-                                const merged = [...prev, ...intData.map(i => ({ ...i, _ts: Date.parse(i.date) }))];
-                                const seen = new Set();
-                                return merged.filter(i => {
-                                    const key = `${i.driver_number}_${i.date}`;
-                                    if (seen.has(key)) return false;
-                                    seen.add(key);
-                                    return true;
-                                });
-                            });
-                        } else {
-                            const withTs = intData.map(i => ({ ...i, _ts: Date.parse(i.date) }));
-                            setIntervals(withTs);
-                            setCached(sessionKey, { intervals: withTs });
-                        }
-                    }
-
-                    if (weatherData && weatherData.length > 0) {
-                        if (initialDynamicDone.current) {
-                            setWeather(prev => {
-                                const merged = [...prev, ...weatherData];
-                                const seen = new Set();
-                                return merged.filter(i => {
-                                    const key = `${i.date}`;
-                                    if (seen.has(key)) return false;
-                                    seen.add(key);
-                                    return true;
-                                });
-                            });
-                        } else {
-                            setWeather(weatherData);
-                            setCached(sessionKey, { weather: weatherData });
-                        }
-                    }
-
-                    if (lapsData && lapsData.length > 0) {
-                        if (initialDynamicDone.current) {
-                            setLaps(prev => {
-                                const merged = [...prev, ...lapsData];
-                                const seen = new Set();
-                                return merged.filter(l => {
-                                    const key = `${l.driver_number}_${l.lap_number}`;
-                                    if (seen.has(key)) return false;
-                                    seen.add(key);
-                                    return true;
-                                });
-                            });
-                        } else {
-                            setLaps(lapsData);
-                            setCached(sessionKey, { laps: lapsData });
-                        }
-                    }
-
-
-                    if (!initialDynamicDone.current) {
-                        initialDynamicDone.current = true;
-                    }
-
-                } catch (err) {
-                    console.error('Dynamic fetch error:', err);
+            if (intData && intData.length > 0) {
+                if (initialDynamicDone.current) {
+                    setIntervals(prev => {
+                        const merged = [...prev, ...intData.map(i => ({ ...i, _ts: Date.parse(i.date) }))];
+                        const seen = new Set();
+                        return merged.filter(i => {
+                            const key = `${i.driver_number}_${i.date}`;
+                            if (seen.has(key)) return false;
+                            seen.add(key);
+                            return true;
+                        });
+                    });
+                } else {
+                    const withTs = intData.map(i => ({ ...i, _ts: Date.parse(i.date) }));
+                    setIntervals(withTs);
+                    setCached(sessionKey, { intervals: withTs });
                 }
-            }, [sessionKey]);
+            }
 
-            const loadStatic = useCallback(async () => {
-                if (!sessionKey) return;
-
-                if (hasStaticCache(sessionKey)) {
-                    setLoading(false);
-                    return;
+            if (weatherData && weatherData.length > 0) {
+                if (initialDynamicDone.current) {
+                    setWeather(prev => {
+                        const merged = [...prev, ...weatherData];
+                        const seen = new Set();
+                        return merged.filter(i => {
+                            const key = `${i.date}`;
+                            if (seen.has(key)) return false;
+                            seen.add(key);
+                            return true;
+                        });
+                    });
+                } else {
+                    setWeather(weatherData);
+                    setCached(sessionKey, { weather: weatherData });
                 }
+            }
 
-                try {
-                    const toCache = {};
-                    const tryFetch = async (fn, setter, key) => {
-                        if (!isMounted.current) return;
-                        try {
-                            const data = await fn(sessionKey);
-                            if (isMounted.current) setter(data);
-                            toCache[key] = data;
-                        } catch (e) {
-                            if (!e.message?.includes('429')) console.error(`${key} failed:`, e);
-                        }
-                    };
-
-                    await tryFetch(fetchDrivers,     setDrivers,     'drivers');
-                    await tryFetch(fetchStints,      setStints,      'stints');
-                    await tryFetch(fetchPits,        setPits,        'pits');
-                    await tryFetch(fetchFiaMessages, setFiaMessages, 'fiaMessages');
-                    await tryFetch(fetchTeamRadio,   setRadio,       'radio');
-
-                    if (Object.keys(toCache).length > 0) {
-                        setCached(sessionKey, toCache);
-                    }
-                } catch (err) {
-                    console.error('Static fetch error:', err);
-                } finally {
-                    if (isMounted.current) setLoading(false);
+            if (lapsData && lapsData.length > 0) {
+                if (initialDynamicDone.current) {
+                    setLaps(prev => {
+                        const merged = [...prev, ...lapsData];
+                        const seen = new Set();
+                        return merged.filter(l => {
+                            const key = `${l.driver_number}_${l.lap_number}`;
+                            if (seen.has(key)) return false;
+                            seen.add(key);
+                            return true;
+                        });
+                    });
+                } else {
+                    setLaps(lapsData);
+                    setCached(sessionKey, { laps: lapsData });
                 }
-            }, [sessionKey]);
+            }
 
-            useEffect(() => {
-                if (!sessionKey) return;
-                const init = async () => {
-                    await loadDynamic();
-                    await loadStatic();
-                };
-                init();
-                const dynamicTimer = setInterval(loadDynamic, DYNAMIC_INTERVAL);
-                const staticTimer  = setInterval(loadStatic,  STATIC_INTERVAL);
-                return () => {
-                    clearInterval(dynamicTimer);
-                    clearInterval(staticTimer);
-                };
-            }, [loadDynamic, loadStatic, sessionKey]);
 
-            const hasData = drivers.length > 0 || positions.length > 0;
+            if (!initialDynamicDone.current) {
+                initialDynamicDone.current = true;
+            }
 
-            return { positions, intervals, laps, drivers, stints, pits, fiaMessages, radio, weather, loading, hasData };
+        } catch (err) {
+            console.error('Dynamic fetch error:', err);
+        }
+    }, [sessionKey]);
+
+    const loadStatic = useCallback(async () => {
+        if (!sessionKey) return;
+
+        if (hasStaticCache(sessionKey)) {
+            setLoading(false);
+            return;
         }
 
-        export default useLiveData;
+        try {
+            const toCache = {};
+            const tryFetch = async (fn, setter, key) => {
+                if (!isMounted.current) return;
+                try {
+                    const data = await fn(sessionKey);
+                    if (isMounted.current) setter(data);
+                    toCache[key] = data;
+                } catch (e) {
+                    if (!e.message?.includes('429')) console.error(`${key} failed:`, e);
+                }
+            };
+
+            await tryFetch(fetchDrivers,     setDrivers,     'drivers');
+            await tryFetch(fetchStints,      setStints,      'stints');
+            await tryFetch(fetchPits,        setPits,        'pits');
+            await tryFetch(fetchFiaMessages, setFiaMessages, 'fiaMessages');
+            await tryFetch(fetchTeamRadio,   setRadio,       'radio');
+
+            if (Object.keys(toCache).length > 0) {
+                setCached(sessionKey, toCache);
+            }
+        } catch (err) {
+            console.error('Static fetch error:', err);
+        } finally {
+            if (isMounted.current) setLoading(false);
+        }
+    }, [sessionKey]);
+
+    useEffect(() => {
+        if (!sessionKey) return;
+        const init = async () => {
+            await loadDynamic();
+            await loadStatic();
+        };
+        init();
+        const dynamicTimer = setInterval(loadDynamic, DYNAMIC_INTERVAL);
+        const staticTimer  = setInterval(loadStatic,  STATIC_INTERVAL);
+        return () => {
+            clearInterval(dynamicTimer);
+            clearInterval(staticTimer);
+        };
+    }, [loadDynamic, loadStatic, sessionKey]);
+
+    const hasData = drivers.length > 0 || positions.length > 0;
+
+    return { positions, intervals, laps, drivers, stints, pits, fiaMessages, radio, weather, loading, hasData };
+}
+
+export default useLiveData;
