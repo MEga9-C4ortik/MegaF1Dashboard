@@ -19,8 +19,6 @@ const meetingMatchesRace = (meeting, raceDate) => {
     return diffDays >= 0 && diffDays <= 7;
 };
 
-const delay = ms => new Promise(r => setTimeout(r, ms));
-
 async function buildFPClassification(sessionKey) {
     const laps = await fetchLaps(sessionKey);
     const drivers = await fetchDrivers(sessionKey);

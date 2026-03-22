@@ -176,6 +176,10 @@
         font-size: 9px;
     }
 
+    .towerBody {
+        max-height: calc(100vh - 176px - 70px);
+    }
+
     .row {
         grid-template-columns: 28px minmax(0, 1fr) 50px 88px 88px;
         padding: 5px 8px;

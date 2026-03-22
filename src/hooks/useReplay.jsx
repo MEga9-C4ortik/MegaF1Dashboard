@@ -9,8 +9,6 @@ function useReplay(allPositions, minTime, allIntervals = [], sessionKey = null) 
 
     const speedRef    = useRef(1);
     const initialized = useRef(false);
-    const isFollowing = useRef(true);
-    const [followingState, setFollowingState] = useState(true);
 
     useEffect(() => { speedRef.current = speed; }, [speed]);
 
@@ -25,8 +23,6 @@ function useReplay(allPositions, minTime, allIntervals = [], sessionKey = null) 
         setIsPlaying(false);
         setSpeed(1);
         initialized.current = false;
-        isFollowing.current = true;
-        setFollowingState(true);
     }, [sessionKey]);
 
     useEffect(() => {
@@ -75,16 +71,12 @@ function useReplay(allPositions, minTime, allIntervals = [], sessionKey = null) 
     }, [allIntervals, currentTime]);
 
     const play = () => {
-        isFollowing.current = false;
-        setFollowingState(false);
         setIsPlaying(true);
     };
     const pause = () => setIsPlaying(false);
 
     const seek = (fraction) => {
         if (!minTime || !maxTime) return;
-        isFollowing.current = false;
-        setFollowingState(false);
         const range = maxTime.getTime() - minTime.getTime();
         setCurrentTime(new Date(minTime.getTime() + range * fraction));
         setIsPlaying(false);
@@ -101,7 +93,6 @@ function useReplay(allPositions, minTime, allIntervals = [], sessionKey = null) 
         replayPositions, replayIntervals,
         isPlaying, currentTime, minTime, maxTime, progress,
         speed, play, pause, seek, setSpeed,
-        isFollowing: followingState,
     };
 }
 
