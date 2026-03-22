@@ -14,8 +14,8 @@ function useReplay(allPositions, minTime, allIntervals = [], sessionKey = null) 
 
     const maxTime = useMemo(() => {
         if (!allPositions || allPositions.length === 0) return null;
-        const times = allPositions.map(p => new Date(p.date).getTime()).filter(Boolean);
-        return new Date(times.reduce((max,cur) => cur > max ? cur : max, -Infinity));
+        return new Date(allPositions.reduce((max, p) =>
+            p._ts > max ? p._ts : max, -Infinity));
     }, [allPositions]);
 
     useEffect(() => {
@@ -49,10 +49,10 @@ function useReplay(allPositions, minTime, allIntervals = [], sessionKey = null) 
     const replayPositions = useMemo(() => {
         if (!currentTime || !allPositions?.length) return [];
         const cutoff = currentTime.getTime();
-        const filtered = allPositions.filter(p => new Date(p.date).getTime() <= cutoff);
+        const filtered = allPositions.filter(p => p._ts <= cutoff);
         const latest = {};
         filtered.forEach(p => {
-            if (!latest[p.driver_number] || p.date > latest[p.driver_number].date)
+            if (!latest[p.driver_number] || p._ts > latest[p.driver_number]._ts)
                 latest[p.driver_number] = p;
         });
         return Object.values(latest);
@@ -61,10 +61,10 @@ function useReplay(allPositions, minTime, allIntervals = [], sessionKey = null) 
     const replayIntervals = useMemo(() => {
         if (!currentTime || !allIntervals?.length) return [];
         const cutoff = currentTime.getTime();
-        const filtered = allIntervals.filter(i => new Date(i.date).getTime() <= cutoff);
+        const filtered = allIntervals.filter(i => i._ts <= cutoff);
         const latest = {};
         filtered.forEach(i => {
-            if (!latest[i.driver_number] || i.date > latest[i.driver_number].date)
+            if (!latest[i.driver_number] || i._ts > latest[i.driver_number]._ts)
                 latest[i.driver_number] = i;
         });
         return Object.values(latest);

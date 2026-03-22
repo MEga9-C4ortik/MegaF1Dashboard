@@ -172,6 +172,10 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
     if (!positions || !drivers) return null;
 
     const latest = getLatestPositions(positions);
+    const totalRaceLaps = laps.length > 0
+        ? laps.reduce((max, l) => l.lap_number > max ? l.lap_number : max, 0)
+        : null;
+    const leaderCurrentLap = getLastLap(laps, latest[0]?.driver_number, currentTime)?.lap_number ?? null;
 
     const driversMap = {};
     drivers.forEach(d => { driversMap[d.driver_number] = d; });
