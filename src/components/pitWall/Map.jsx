@@ -27,30 +27,50 @@ function DriverDot({ dot }) {
 }
 
 function Map({ sessionKey, drivers, replayTime }) {
-    const { trackPath, driverDots, loading, W, H } = useTrackMap(sessionKey, drivers, replayTime)
+    const { trackPath, driverDots, trackLoading, locProgress, W, H } = useTrackMap(sessionKey, drivers, replayTime);
+
+    const locsDone = locProgress.total > 0 && locProgress.done >= locProgress.total;
+    const locsPercent = locProgress.total > 0
+        ? Math.round((locProgress.done / locProgress.total) * 100)
+        : 0;
 
     return (
         <div className={styles.container}>
             <div className={styles.mapWrapper}>
-                {loading ? (
+                {trackLoading ? (
                     <p className={styles.loading}>Loading track...</p>
                 ) : (
-                    <svg
-                        viewBox={`0 0 ${W} ${H}`}
-                        className={styles.svg}
-                        preserveAspectRatio="xMidYMid meet"
-                    >
-                        {trackPath && <>
-                            <path d={trackPath} fill="none" stroke="#0a0a0a"  strokeWidth={22} strokeLinecap="round" strokeLinejoin="round" />
-                            <path d={trackPath} fill="none" stroke="#1c1c1c"  strokeWidth={16} strokeLinecap="round" strokeLinejoin="round" />
-                            <path d={trackPath} fill="none" stroke="#242424"  strokeWidth={10} strokeLinecap="round" strokeLinejoin="round" />
-                            <path d={trackPath} fill="none" stroke="#2e2e2e"  strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" strokeDasharray="6 12" />
-                        </>}
+                    <div className={styles.svgContainer}>
+                        <svg
+                            viewBox={`0 0 ${W} ${H}`}
+                            className={styles.svg}
+                            preserveAspectRatio="xMidYMid meet"
+                        >
+                            {trackPath && <>
+                                <path d={trackPath} fill="none" stroke="#0a0a0a"  strokeWidth={22} strokeLinecap="round" strokeLinejoin="round" />
+                                <path d={trackPath} fill="none" stroke="#1c1c1c"  strokeWidth={16} strokeLinecap="round" strokeLinejoin="round" />
+                                <path d={trackPath} fill="none" stroke="#242424"  strokeWidth={10} strokeLinecap="round" strokeLinejoin="round" />
+                                <path d={trackPath} fill="none" stroke="#2e2e2e"  strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" strokeDasharray="6 12" />
+                            </>}
+                            {driverDots.map(dot => (
+                                <DriverDot key={dot.driver_number} dot={dot} />
+                            ))}
+                        </svg>
 
-                        {driverDots.map(dot => (
-                            <DriverDot key={dot.driver_number} dot={dot} />
-                        ))}
-                    </svg>
+                        {!locsDone && locProgress.total > 0 && (
+                            <div className={styles.locOverlay}>
+                                <div className={styles.locProgressBar}>
+                                    <div
+                                        className={styles.locProgressFill}
+                                        style={{ width: `${locsPercent}%` }}
+                                    />
+                                </div>
+                                <span className={styles.locProgressText}>
+                                    {locProgress.done}/{locProgress.total} drivers
+                                </span>
+                            </div>
+                        )}
+                    </div>
                 )}
             </div>
         </div>
