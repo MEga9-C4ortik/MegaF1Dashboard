@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
-import { fetchTrackLayout, fetchDriverLocationsDirectly } from '../services/openf1Api'
+import { fetchTrackLayout, fetchDriverAllLocations } from '../services/openf1Api'
 import {
     getTrackLayoutCache, setTrackLayoutCache,
     getLocationCache, setLocationCache
@@ -43,7 +43,6 @@ function useMap(sessionKey, drivers, replayTime = null) {
     const [trackPath, setTrackPath]       = useState('');
     const [allLocations, setAllLocations] = useState([]);
     const [normParams, setNormParams]     = useState(null);
-    // Две фазы загрузки — трек отдельно, локации отдельно
     const [trackLoading, setTrackLoading]   = useState(true);
     const [locProgress, setLocProgress]     = useState({ done: 0, total: 0 });
     const isMounted = useRef(true);
@@ -64,11 +63,10 @@ function useMap(sessionKey, drivers, replayTime = null) {
 
         const load = async () => {
             try {
-                // ── Фаза 1: трек ──────────────────────────────────────────────
                 const cachedTrack = getTrackLayoutCache(sessionKey);
                 let points = [];
-                let bestPoints = []; // лучшее что нашли, даже если мало точек
-                const MIN_POINTS = 500; // после i%5 = 2500 оригинальных точек
+                let bestPoints = [];
+                const MIN_POINTS = 500;
 
                 if (cachedTrack) {
                     points = cachedTrack;
@@ -84,7 +82,6 @@ function useMap(sessionKey, drivers, replayTime = null) {
                             break;
                         }
                     }
-                    // Если ни один пилот не набрал MIN_POINTS — берём лучшее что есть
                     if (points.length < MIN_POINTS && bestPoints.length > 50) {
                         points = bestPoints;
                     }
@@ -100,12 +97,10 @@ function useMap(sessionKey, drivers, replayTime = null) {
                     setTrackPath(pointsToPath(normed));
                 }
 
-                // Трек загружен — показываем его немедленно
                 if (isMounted.current) setTrackLoading(false);
 
                 if (!isMounted.current) return;
 
-                // ── Фаза 2: локации пилотов (фоново, с прогрессом) ────────────
                 const cachedLocs = getLocationCache(sessionKey);
                 if (cachedLocs) {
                     if (isMounted.current) {
@@ -119,15 +114,13 @@ function useMap(sessionKey, drivers, replayTime = null) {
                     for (let i = 0; i < drivers.length; i++) {
                         if (!isMounted.current) return;
                         try {
-                            const locs = await fetchDriverLocationsDirectly(sessionKey, drivers[i].driver_number);
-                            allLocs.push(...locs);
+                            const locs = await fetchDriverAllLocations(sessionKey, drivers[i].driver_number);                            allLocs.push(...locs);
                         } catch (e) {
                             console.error(`Locations failed for driver ${drivers[i].driver_number}:`, e);
                         }
                         if (isMounted.current) {
                             setLocProgress({ done: i + 1, total: drivers.length });
                         }
-                        // 150мс между запросами — 20 пилотов = ~3 сек вместо 10
                         if (i < drivers.length - 1) await delay(150);
                     }
 

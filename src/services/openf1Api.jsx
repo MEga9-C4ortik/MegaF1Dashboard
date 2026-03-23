@@ -102,9 +102,23 @@ export const fetchTrackLayout = async (sessionKey, driverNumber) => {
 }
 
 export const fetchDriverAllLocations = async (sessionKey, driverNumber) => {
-  const data = await safeFetch(`${BASE_URL}/location?session_key=${sessionKey}&driver_number=${driverNumber}`);
-  const arr = Array.isArray(data) ? data : [];
-  return arr
-      .filter((_, i) => i % 3 === 0)
-      .map(loc => ({ ...loc, _ts: Date.parse(loc.date) }));
-}
+  const url = `${BASE_URL}/location?session_key=${sessionKey}&driver_number=${driverNumber}`;
+  for (let attempt = 1; attempt <= 4; attempt++) {
+    try {
+      const res = await fetch(url); 
+      if (res.status === 404) return [];
+      if (res.ok) {
+        const arr = await res.json();
+        return arr
+            .filter((_, i) => i % 3 === 0)
+            .map(loc => ({ ...loc, _ts: Date.parse(loc.date) }));
+      }
+      if (res.status === 429 || res.status >= 500) await delay(1500 * attempt);
+      else return [];
+    } catch {
+      if (attempt === 4) return [];
+      await delay(1000);
+    }
+  }
+  return [];
+};
