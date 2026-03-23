@@ -21,16 +21,14 @@ function getCurrentStint(stints, laps, driverNumber, currentTime) {
 
     const driverLaps = laps
         .filter(l => l.driver_number === driverNumber && l.lap_duration != null)
-        .filter(l => !l.date_start || new Date(l.date_start) <= currentTime)
+        .filter(l => !currentTime || (l.date_start && new Date(l.date_start) <= currentTime))
         .sort((a, b) => b.lap_number - a.lap_number);
 
     const currentLapNumber = driverLaps[0]?.lap_number ?? 0;
 
     let activeStint = driverStints[0];
     for (const stint of driverStints) {
-        if (stint.lap_start <= currentLapNumber) {
-            activeStint = stint;
-        }
+        if (stint.lap_start <= currentLapNumber) activeStint = stint;
     }
     return activeStint;
 }
@@ -39,14 +37,11 @@ function getCurrentTyreAge(laps, driverNumber, stint, currentTime) {
     if (!stint) return null;
 
     let driverLaps = laps.filter(l =>
-        l.driver_number === driverNumber &&
-        l.lap_duration != null
+        l.driver_number === driverNumber && l.lap_duration != null
     );
-    if (currentTime) {
-        driverLaps = driverLaps.filter(l =>
-            !l.date_start || new Date(l.date_start) <= currentTime
-        );
-    }
+    driverLaps = driverLaps.filter(l =>
+        !currentTime || (l.date_start && new Date(l.date_start) <= currentTime)
+    );
 
     const stintLaps = driverLaps.filter(l => l.lap_number >= stint.lap_start);
     return (stint.tyre_age_at_start ?? 0) + stintLaps.length;
@@ -64,9 +59,9 @@ function getLastLap(laps, driverNumber, currentTime) {
     let driverLaps = laps.filter(
         l => l.driver_number === driverNumber && l.lap_duration != null
     );
-    if (currentTime) {
-        driverLaps = driverLaps.filter(l => !l.date_start || new Date(l.date_start) <= currentTime);
-    }
+    driverLaps = driverLaps.filter(l =>
+        !currentTime || (l.date_start && new Date(l.date_start) <= currentTime)
+    );
     if (!driverLaps.length) return null;
     return driverLaps.reduce((a, b) => b.lap_number > a.lap_number ? b : a);
 }
@@ -75,9 +70,9 @@ function getBestLap(laps, driverNumber, currentTime) {
     let driverLaps = laps.filter(
         l => l.driver_number === driverNumber && l.lap_duration != null
     );
-    if (currentTime) {
-        driverLaps = driverLaps.filter(l => !l.date_start || new Date(l.date_start) <= currentTime);
-    }
+    driverLaps = driverLaps.filter(l =>
+        !currentTime || (l.date_start && new Date(l.date_start) <= currentTime)
+    );
     if (!driverLaps.length) return null;
     return driverLaps.reduce((best, cur) =>
         cur.lap_duration < best.lap_duration ? cur : best
@@ -86,9 +81,9 @@ function getBestLap(laps, driverNumber, currentTime) {
 
 function getSessionBestLapTime(laps, currentTime) {
     let validLaps = laps.filter(l => l.lap_duration != null);
-    if (currentTime) {
-        validLaps = validLaps.filter(l => !l.date_start || new Date(l.date_start) <= currentTime);
-    }
+    validLaps = validLaps.filter(l =>
+        !currentTime || (l.date_start && new Date(l.date_start) <= currentTime)
+    );
     if (!validLaps.length) return null;
     return validLaps.reduce((min, cur) => cur.lap_duration < min ? cur.lap_duration : min, +Infinity);
 }
@@ -174,14 +169,11 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
 
     const inPitNow = new Set();
     pits.forEach(p => {
-        if (!p.date) return;
+        if (!p.date || p.pit_duration == null) return;
         const inT = new Date(p.date).getTime();
-        if (p.pit_duration == null) return;
         const outT = inT + p.pit_duration * 1000;
         const ct = currentTime?.getTime() ?? Date.now();
-        if (inT <= ct && outT > ct) {
-            inPitNow.add(p.driver_number);
-        }
+        if (inT <= ct && outT > ct) inPitNow.add(p.driver_number);
     });
 
     const sessionBestTime = getSessionBestLapTime(laps, currentTime);
@@ -221,10 +213,8 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
 
                     const isPurple = bestLap && sessionBestTime != null
                         && bestLap.lap_duration === sessionBestTime;
-
                     const isPersonalBest = lastLap && bestLap
                         && lastLap.lap_number === bestLap.lap_number;
-
                     const lastLapColor = isPurple ? '#c084fc' : isPersonalBest ? '#4ade80' : undefined;
 
                     return (
