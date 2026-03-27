@@ -15,7 +15,7 @@
 
 .towerBody {
     overflow-y: auto;
-    max-height: calc(100vh - 176px);
+    max-height: calc(100vh - 210px);
     border-bottom: #222 solid 2px;
 }
 

@@ -66,12 +66,32 @@ function useMap(sessionKey, drivers, replayTime = null) {
                 const cachedTrack = getTrackLayoutCache(sessionKey);
                 let points = [];
                 let bestPoints = [];
-                const MIN_POINTS = 500;
+                const MIN_POINTS = 2500;
 
                 if (cachedTrack) {
                     points = cachedTrack;
                 } else {
-                    for (const driver of drivers) {
+                    // Fetch lap counts in parallel to find the driver with the most laps
+                    const lapCounts = await Promise.all(
+                        drivers.map(async (driver) => {
+                            try {
+                                const res = await fetch(
+                                    `https://api.openf1.org/v1/laps?session_key=${sessionKey}&driver_number=${driver.driver_number}`
+                                );
+                                const data = await res.json();
+                                return { driver, count: Array.isArray(data) ? data.length : 0 };
+                            } catch {
+                                return { driver, count: 0 };
+                            }
+                        })
+                    );
+
+                    // Sort descending by lap count — driver with most laps goes first
+                    const sortedDrivers = [...lapCounts]
+                        .sort((a, b) => b.count - a.count)
+                        .map(d => d.driver);
+
+                    for (const driver of sortedDrivers) {
                         if (!isMounted.current) return;
                         const candidate = await fetchTrackLayout(sessionKey, driver.driver_number);
                         if (candidate.length > bestPoints.length) {
@@ -114,7 +134,8 @@ function useMap(sessionKey, drivers, replayTime = null) {
                     for (let i = 0; i < drivers.length; i++) {
                         if (!isMounted.current) return;
                         try {
-                            const locs = await fetchDriverAllLocations(sessionKey, drivers[i].driver_number);                            allLocs.push(...locs);
+                            const locs = await fetchDriverAllLocations(sessionKey, drivers[i].driver_number);
+                            allLocs.push(...locs);
                         } catch (e) {
                             console.error(`Locations failed for driver ${drivers[i].driver_number}:`, e);
                         }
