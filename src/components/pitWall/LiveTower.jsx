@@ -21,7 +21,7 @@ function getCurrentStint(stints, laps, driverNumber, currentTime) {
 
     const driverLaps = laps
         .filter(l => l.driver_number === driverNumber && l.lap_duration != null)
-        .filter(l => !currentTime || (l.date_start && new Date(l.date_start) <= currentTime))
+        .filter(l => l.date_start && new Date(l.date_start) <= currentTime)
         .sort((a, b) => b.lap_number - a.lap_number);
 
     const currentLapNumber = driverLaps[0]?.lap_number ?? 0;

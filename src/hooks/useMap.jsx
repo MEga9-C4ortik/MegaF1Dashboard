@@ -40,21 +40,19 @@ function pointsToPath(points) {
 }
 
 function useMap(sessionKey, drivers, replayTime = null) {
-    const [trackPath, setTrackPath]       = useState('');
+    const [trackPath, setTrackPath]     = useState('');
     const [allLocations, setAllLocations] = useState([]);
-    const [normParams, setNormParams]     = useState(null);
-    const [trackLoading, setTrackLoading]   = useState(true);
-    const [locProgress, setLocProgress]     = useState({ done: 0, total: 0 });
-    const isMounted = useRef(true);
+    const [normParams, setNormParams]   = useState(null);
+    const [trackLoading, setTrackLoading] = useState(true);
+    const [locProgress, setLocProgress] = useState({ done: 0, total: 0 });
+
     const firstDriverNum = drivers?.[0]?.driver_number ?? null;
 
     useEffect(() => {
-        isMounted.current = true;
-        return () => { isMounted.current = false; };
-    }, []);
-
-    useEffect(() => {
         if (!sessionKey || !firstDriverNum) return;
+
+        let cancelled = false;
+
         setTrackLoading(true);
         setTrackPath('');
         setAllLocations([]);
@@ -71,7 +69,6 @@ function useMap(sessionKey, drivers, replayTime = null) {
                 if (cachedTrack) {
                     points = cachedTrack;
                 } else {
-                    // Fetch lap counts in parallel to find the driver with the most laps
                     const lapCounts = await Promise.all(
                         drivers.map(async (driver) => {
                             try {
@@ -86,77 +83,73 @@ function useMap(sessionKey, drivers, replayTime = null) {
                         })
                     );
 
-                    // Sort descending by lap count — driver with most laps goes first
                     const sortedDrivers = [...lapCounts]
                         .sort((a, b) => b.count - a.count)
                         .map(d => d.driver);
 
                     for (const driver of sortedDrivers) {
-                        if (!isMounted.current) return;
+                        if (cancelled) return;
                         const candidate = await fetchTrackLayout(sessionKey, driver.driver_number);
-                        if (candidate.length > bestPoints.length) {
-                            bestPoints = candidate;
-                        }
+                        if (candidate.length > bestPoints.length) bestPoints = candidate;
                         if (candidate.length >= MIN_POINTS) {
                             points = candidate;
                             break;
                         }
                     }
-                    if (points.length < MIN_POINTS && bestPoints.length > 50) {
-                        points = bestPoints;
-                    }
-                    if (points.length > 50) {
-                        setTrackLayoutCache(sessionKey, points);
-                    }
+
+                    if (points.length < MIN_POINTS && bestPoints.length > 50) points = bestPoints;
+                    if (points.length > 50) setTrackLayoutCache(sessionKey, points);
                 }
 
-                if (points.length > 50 && isMounted.current) {
+                if (cancelled) return;
+
+                if (points.length > 50) {
                     const params = buildNormParams(points);
                     setNormParams(params);
                     const normed = points.map(p => normPoint(p.x, p.y, params));
                     setTrackPath(pointsToPath(normed));
                 }
 
-                if (isMounted.current) setTrackLoading(false);
-
-                if (!isMounted.current) return;
+                setTrackLoading(false);
 
                 const cachedLocs = getLocationCache(sessionKey);
                 if (cachedLocs) {
-                    if (isMounted.current) {
+                    if (!cancelled) {
                         setAllLocations(cachedLocs);
-                        setLocProgress({ done: cachedLocs.length > 0 ? drivers.length : 0, total: drivers.length });
+                        setLocProgress({
+                            done: cachedLocs.length > 0 ? drivers.length : 0,
+                            total: drivers.length,
+                        });
                     }
                 } else {
-                    if (isMounted.current) setLocProgress({ done: 0, total: drivers.length });
-                    const allLocs = [];
+                    if (!cancelled) setLocProgress({ done: 0, total: drivers.length });
 
+                    const allLocs = [];
                     for (let i = 0; i < drivers.length; i++) {
-                        if (!isMounted.current) return;
+                        if (cancelled) return;
                         try {
                             const locs = await fetchDriverAllLocations(sessionKey, drivers[i].driver_number);
                             allLocs.push(...locs);
                         } catch (e) {
                             console.error(`Locations failed for driver ${drivers[i].driver_number}:`, e);
                         }
-                        if (isMounted.current) {
-                            setLocProgress({ done: i + 1, total: drivers.length });
-                        }
+                        if (!cancelled) setLocProgress({ done: i + 1, total: drivers.length });
                         if (i < drivers.length - 1) await delay(150);
                     }
 
-                    if (isMounted.current) {
+                    if (!cancelled) {
                         setAllLocations(allLocs);
                         setLocationCache(sessionKey, allLocs);
                     }
                 }
             } catch (err) {
                 console.error('Map load failed:', err);
-                if (isMounted.current) setTrackLoading(false);
+                if (!cancelled) setTrackLoading(false);
             }
         };
 
         load();
+        return () => { cancelled = true; };
     }, [sessionKey, firstDriverNum]);
 
     const driverDots = useMemo(() => {
