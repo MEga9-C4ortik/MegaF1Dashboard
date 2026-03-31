@@ -122,7 +122,7 @@
 
 .mapColumn {
     flex: 0 0 auto;
-    width: min(45%, 500px);
+    width: min(55%, 600px);
     border-right: 1px solid #1a1a1a;
 }
 

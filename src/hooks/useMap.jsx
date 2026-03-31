@@ -34,9 +34,15 @@ function normPoint(x, y, params) {
 
 function pointsToPath(points) {
     if (!points.length) return '';
-    return points
-        .map((p, i) => `${i === 0 ? 'M' : 'L'}${p.px.toFixed(1)},${p.py.toFixed(1)}`)
-        .join(' ') + ' Z';
+    return points.map((p, i) => {
+        if (i === 0) return `M${p.px.toFixed(1)},${p.py.toFixed(1)}`;
+        const prev = points[i - 1];
+        const dx = p.px - prev.px;
+        const dy = p.py - prev.py;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const cmd = dist > 50 ? 'M' : 'L';
+        return `${cmd}${p.px.toFixed(1)},${p.py.toFixed(1)}`;
+    }).join(' ');
 }
 
 function useMap(sessionKey, drivers, replayTime = null) {
@@ -156,14 +162,12 @@ function useMap(sessionKey, drivers, replayTime = null) {
         if (!normParams || !allLocations.length || !replayTime) return [];
 
         const ct = replayTime instanceof Date ? replayTime.getTime() : new Date(replayTime).getTime();
-        const since = ct - 5000;
-
         const driversMap = {};
         drivers?.forEach(d => { driversMap[d.driver_number] = d; });
 
         const latest = {};
         for (const loc of allLocations) {
-            if (loc._ts >= since && loc._ts <= ct) {
+            if (loc._ts <= ct) {
                 if (!latest[loc.driver_number] || loc._ts > latest[loc.driver_number]._ts) {
                     latest[loc.driver_number] = loc;
                 }
