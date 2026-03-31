@@ -21,7 +21,7 @@
 
 .colHeader {
     display: grid;
-    grid-template-columns: 36px minmax(0, 1fr) 75px 90px 90px;
+    grid-template-columns: 30px 85px 50px 85px 85px;;
     padding: 5px 12px;
     gap: 8px;
     border-bottom: 2px solid #1a1a1a;
@@ -35,7 +35,7 @@
 
 .row {
     display: grid;
-    grid-template-columns: 36px minmax(0, 1fr) 55px 90px 90px;
+    grid-template-columns: 30px 85px 50px 85px 85px;
     padding: 6px 12px;
     border-bottom: 1px solid #111;
     border-left: 3px solid transparent;

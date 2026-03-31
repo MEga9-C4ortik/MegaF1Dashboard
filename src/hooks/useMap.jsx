@@ -40,6 +40,7 @@ function pointsToPath(points) {
         const dx = p.px - prev.px;
         const dy = p.py - prev.py;
         const dist = Math.sqrt(dx * dx + dy * dy);
+        if(dist < 4) return null;
         const cmd = dist > 50 ? 'M' : 'L';
         return `${cmd}${p.px.toFixed(1)},${p.py.toFixed(1)}`;
     }).join(' ');
@@ -109,8 +110,15 @@ function useMap(sessionKey, drivers, replayTime = null) {
 
                 if (cancelled) return;
 
-                if (points.length > 50) {
-                    const params = buildNormParams(points);
+                const filtered = points.filter((p, i) => {
+                    if (i === 0) return true;
+                    const prev = points[i - 1];
+                    const dist = Math.sqrt((p.x - prev.x) ** 2 + (p.y - prev.y) ** 2);
+                    return dist < 300;
+                });
+
+                if (filtered.length > 50) {
+                    const params = buildNormParams(filtered);
                     setNormParams(params);
                     const normed = points.map(p => normPoint(p.x, p.y, params));
                     setTrackPath(pointsToPath(normed));
@@ -140,7 +148,7 @@ function useMap(sessionKey, drivers, replayTime = null) {
                             console.error(`Locations failed for driver ${drivers[i].driver_number}:`, e);
                         }
                         if (!cancelled) setLocProgress({ done: i + 1, total: drivers.length });
-                        if (i < drivers.length - 1) await delay(150);
+                        if (i < drivers.length - 1) await delay(100);
                     }
 
                     if (!cancelled) {
