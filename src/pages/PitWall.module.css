@@ -118,6 +118,7 @@
     flex-direction: row;
     align-items: flex-start;
     width: 100%;
+    overflow: hidden;
 }
 
 .mapColumn {
@@ -129,6 +130,7 @@
     flex: 0 0 400px;
     width: 400px;
     min-width: 0;
+    overflow: hidden;
 }
 
 .rightTabs {
