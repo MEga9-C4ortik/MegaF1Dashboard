@@ -15,13 +15,14 @@
 
 .towerBody {
     overflow-y: auto;
-    max-height: calc(100vh - 130px);
+    max-height: 790px;
     border-bottom: #222 solid 2px;
+    overflow-x: hidden;
 }
 
 .colHeader {
     display: grid;
-    grid-template-columns: 30px 85px 50px 85px 85px;;
+    grid-template-columns: 30px 85px 60px 90px 90px;
     padding: 5px 12px;
     gap: 8px;
     border-bottom: 2px solid #1a1a1a;
@@ -35,7 +36,7 @@
 
 .row {
     display: grid;
-    grid-template-columns: 30px 85px 50px 85px 85px;
+    grid-template-columns: 30px 85px 60px 90px 90px;
     padding: 6px 12px;
     border-bottom: 1px solid #111;
     border-left: 3px solid transparent;
