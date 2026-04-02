@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import logo from '../../assets/myLogo.svg'
 import styles from './Navbar.module.css'
 
-function Navbar({ year, setYear }) {
+function Navbar({ year, setYear, hidden, setHidden }) {
     const location = useLocation();
     const [menuOpen, setMenuOpen] = useState(false);
 
@@ -13,6 +13,12 @@ function Navbar({ year, setYear }) {
     const YEARS = Array.from(
         { length: currentYear - 1949 },
         (_, i) => currentYear - i
+    );
+
+    if (hidden) return (
+        <div className={styles.navbarCollapsed}>
+            <button onClick={() => setHidden(false)} className={styles.expandBtn}>▼</button>
+        </div>
     );
 
     return (

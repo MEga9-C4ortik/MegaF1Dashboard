@@ -218,27 +218,6 @@
     border-top: 1px solid #1a1a1a;
 }
 
-.messagesToggle {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 24px;
-    background: #0d0d0d;
-    color: #555;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 20px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    border: none;
-    cursor: pointer;
-    transition: color 0.15s;
-}
-
-.messagesToggle:hover {
-    color: #fff;
-}
-
 .messagesContent {
     display: grid;
     grid-template-columns: 1fr 1fr;

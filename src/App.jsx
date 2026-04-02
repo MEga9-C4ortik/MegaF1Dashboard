@@ -11,10 +11,11 @@ import NotFound from './pages/NotFound'
 function App() {
     const currentYear = new Date().getFullYear();
     const [year, setYear] = useState(currentYear);
+    const [navBarHidden, setNavBarHidden] = useState(false);
 
     return (
         <BrowserRouter>
-            <Navbar year={year} setYear={setYear} />
+            <Navbar year={year} setYear={setYear} hidden={navBarHidden} setHidden={setNavBarHidden} />
             <Routes>
                 <Route path="/" element={<Calendar year={year} />} />
                 <Route path="/standings" element={<Standings year={year} />} />

@@ -14,7 +14,6 @@ import styles from './PitWall.module.css'
 function PitWall({ year }) {
     const [searchParams] = useSearchParams();
     const [mobileTab, setMobileTab] = useState('map'); // 'map' | 'tower'
-    const [messagesOpen, setMessagesOpen] = useState(false);
     const navigate = useNavigate();
     const urlSessionKey = searchParams.get('sessionKey')
         ? Number(searchParams.get('sessionKey'))
@@ -179,19 +178,11 @@ function PitWall({ year }) {
                     </div>
 
                     <div className={styles.messagesAccordion}>
-                        <button
-                            className={styles.messagesToggle}
-                            onClick={() => setMessagesOpen(v => !v)}
-                        >
-                            <span>RACE CONTROL & RADIO</span>
-                            <span>{messagesOpen ? '▲' : '▼'}</span>
-                        </button>
-                        {messagesOpen && (
-                            <div className={styles.messagesContent}>
-                                <FiaMessages messages={displayFiaMessages} />
-                                <RadioMessages messages={displayRadio} drivers={drivers} />
-                            </div>
-                        )}
+                        <span>RACE CONTROL & RADIO</span>
+                        <div className={styles.messagesContent}>
+                            <FiaMessages messages={displayFiaMessages} />
+                            <RadioMessages messages={displayRadio} drivers={drivers} />
+                        </div>
                     </div>
                 </div>
             )}
