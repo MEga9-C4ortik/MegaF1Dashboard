@@ -75,6 +75,12 @@ function Navbar({ year, setYear, hidden, setHidden }) {
                 )}
 
                 <button
+                    className={styles.collapseBtn}
+                    onClick={() => setHidden(true)}
+                    title="Hide navbar"
+                >▲</button>
+
+                <button
                     className={`${styles.burger} ${menuOpen ? styles.burgerOpen : ''}`}
                     onClick={() => setMenuOpen(!menuOpen)}
                 >
