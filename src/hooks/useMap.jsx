@@ -43,7 +43,7 @@ function pointsToPath(points) {
         if(dist < 4) return null;
         const cmd = dist > 50 ? 'M' : 'L';
         return `${cmd}${p.px.toFixed(1)},${p.py.toFixed(1)}`;
-    }).join(' ');
+    }).filter(Boolean).join(' ');
 }
 
 function useMap(sessionKey, drivers, replayTime = null) {
@@ -114,7 +114,7 @@ function useMap(sessionKey, drivers, replayTime = null) {
                     if (i === 0) return true;
                     const prev = points[i - 1];
                     const dist = Math.sqrt((p.x - prev.x) ** 2 + (p.y - prev.y) ** 2);
-                    return dist < 300;
+                    return dist < 800;
                 });
 
                 if (filtered.length > 50) {
