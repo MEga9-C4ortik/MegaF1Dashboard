@@ -181,7 +181,7 @@
 
 @media (max-width: 768px) {
     .colHeader {
-        grid-template-columns: 28px minmax(0, 1fr) 50px 88px 88px;
+        grid-template-columns: 28px 100px 50px 88px 88px;
         padding: 4px 8px;
         gap: 5px;
         font-size: 9px;
@@ -192,13 +192,13 @@
     }
 
     .row {
-        grid-template-columns: 28px minmax(0, 1fr) 50px 88px 88px;
+        grid-template-columns: 28px 100px 50px 88px 88px;
         padding: 5px 8px;
         gap: 5px;
     }
 
     .pos           { font-size: 13px; }
-    .acronym       { font-size: 12px; }
+    .acronym       { font-size: 11px; }
     .team          { font-size: 9px; }
     .lapTime       { font-size: 11px; }
     .bestLap       { font-size: 10px; }

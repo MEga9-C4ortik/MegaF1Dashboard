@@ -120,7 +120,7 @@ function useMap(sessionKey, drivers, replayTime = null) {
                 if (filtered.length > 50) {
                     const params = buildNormParams(filtered);
                     setNormParams(params);
-                    const normed = points.map(p => normPoint(p.x, p.y, params));
+                    const normed = filtered.map(p => normPoint(p.x, p.y, params));
                     setTrackPath(pointsToPath(normed));
                 }
 
