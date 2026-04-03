@@ -142,7 +142,7 @@
 .collapseBtn {
     background: transparent;
     color: #333;
-    font-size: 12px;
+    font-size: 20px;
     border: none;
     cursor: pointer;
     transition: color 0.15s;
@@ -168,7 +168,7 @@
 .expandBtn {
     background: transparent;
     color: #333;
-    font-size: 10px;
+    font-size: 20px;
     border: none;
     cursor: pointer;
     transition: color 0.15s;
