@@ -36,7 +36,7 @@ function PitWall({ year }) {
     const replayMinTime = useMemo(() => {
         if (!positions.length) return null;
         const minTs = positions.reduce((min, p) => p._ts < min ? p._ts : min, Infinity);
-        return minTs === Infinity ? null : new Date(minTs - 10_000);
+        return minTs === Infinity ? null : new Date(minTs);
     }, [positions]);
 
     const replay = useReplay(positions, replayMinTime, intervals, activeSessionKey);

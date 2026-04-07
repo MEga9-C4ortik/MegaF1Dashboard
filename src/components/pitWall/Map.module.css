@@ -71,3 +71,7 @@
     text-transform: uppercase;
     text-align: right;
 }
+
+circle {
+    transition: cx 0.5s linear, cy 0.5s linear;
+}
