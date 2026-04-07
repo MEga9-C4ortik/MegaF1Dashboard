@@ -163,8 +163,7 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
         ? laps.reduce((max, l) => l.lap_number > max ? l.lap_number : max, 0)
         : null;
     const currentLap = laps.length > 0
-        ? laps.reduce((max, l) => (l.lap_number > max && l.dateStart <= currentTime)
-            ? l.lap_number : max, 0)
+        ? laps.reduce((a, b) => b.lap_number > a.lap_number ? b : a)
         : null;
 
     const driversMap = {};
