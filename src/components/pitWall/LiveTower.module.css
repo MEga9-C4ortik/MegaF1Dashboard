@@ -26,7 +26,7 @@
     padding: 5px 12px;
     gap: 8px;
     border-bottom: 2px solid #1a1a1a;
-    border-left: 3px solid transparent;
+    border-left: 9px solid transparent;
     font-size: 14px;
     color: #777;
     letter-spacing: 1.5px;
@@ -38,8 +38,8 @@
     display: grid;
     grid-template-columns: 30px 85px 60px 110px 110px;
     padding: 6px 12px;
-    border-bottom: 1px solid #111;
-    border-left: 3px solid transparent;
+    border-bottom: 3px solid #111;
+    border-left: 4px solid transparent;
     transition: background 0.1s, border-left-color 0.3s;
     align-items: center;
     gap: 8px;
