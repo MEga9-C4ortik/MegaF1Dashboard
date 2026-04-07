@@ -1,7 +1,7 @@
 import useTrackMap from '../../hooks/useMap'
 import styles from './Map.module.css'
 
-function DriverDot({ dot }) {
+function DriverDot({ dot, animate }) {
     const hasColor = dot.color != null;
     const color    = hasColor ? dot.color : '#666';
     const label    = dot.acronym ?? String(dot.number);
@@ -30,7 +30,7 @@ function DriverDot({ dot }) {
     );
 }
 
-function Map({ sessionKey, drivers, replayTime }) {
+function Map({ sessionKey, drivers, replayTime, isPlaying }) {
     const { trackPath, driverDots, trackLoading, locProgress, W, H } = useTrackMap(sessionKey, drivers, replayTime);
 
     const locsDone = locProgress.total > 0 && locProgress.done >= locProgress.total;
@@ -57,7 +57,7 @@ function Map({ sessionKey, drivers, replayTime }) {
                                 <path d={trackPath} fill="none" stroke="#2e2e2e"  strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" strokeDasharray="6 12" />
                             </>}
                             {driverDots.map(dot => (
-                                <DriverDot key={dot.driver_number} dot={dot} />
+                                <DriverDot key={dot.driver_number} dot={dot} animate={isPlaying} />
                             ))}
                         </svg>
 

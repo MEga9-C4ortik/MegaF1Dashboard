@@ -155,7 +155,7 @@ function PitWall({ year }) {
 
                     <div className={styles.mapAndTower}>
                         <div className={`${styles.mapColumn} ${mobileTab !== 'map' ? styles.mobileHidden : ''}`}>
-                            <Map sessionKey={activeSessionKey} drivers={drivers} replayTime={ct} />
+                            <Map sessionKey={activeSessionKey} drivers={drivers} replayTime={ct} isPlaying={replay.isPlaying} />
                         </div>
 
                         <div className={`${styles.rightPanel} ${mobileTab !== 'tower' ? styles.mobileHidden : ''}`}>
