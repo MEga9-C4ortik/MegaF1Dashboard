@@ -17,7 +17,7 @@ function formatDuration(min, max) {
 }
 
 function ReplayControls({ isPlaying, currentTime, minTime, maxTime, progress, speed, play, pause, seek, setSpeed }) {
-    const handleSlider = (e) => seek(Number(e.target.value) / 100);
+    const handleSlider = (e) => seek(Number(e.target.value) / 1000);
     const isFinished = progress >= 1;
 
     return (
@@ -45,7 +45,7 @@ function ReplayControls({ isPlaying, currentTime, minTime, maxTime, progress, sp
             <input
                 type="range"
                 className={styles.slider}
-                min={0} max={100}
+                min={0} max={1000}
                 value={Math.round(progress * 100)}
                 onChange={handleSlider}
             />

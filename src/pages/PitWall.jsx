@@ -34,13 +34,10 @@ function PitWall({ year }) {
     } = useLiveData(activeSessionKey);
 
     const replayMinTime = useMemo(() => {
-        if (!laps.length) return null;
-        const firstLap = laps
-            .filter(l => l.lap_number === 1 && l.date_start)
-            .map(l => new Date(l.date_start).getTime());
-        if (!firstLap.length) return null;
-        return new Date(firstLap.reduce((min, cur) => cur < min ? cur : min, +Infinity) - 10_000); // -10 сек буфер
-    }, [laps]);
+        if (!positions.length) return null;
+        const minTs = positions.reduce((min, p) => p._ts < min ? p._ts : min, Infinity);
+        return minTs === Infinity ? null : new Date(minTs - 10_000);
+    }, [positions]);
 
     const replay = useReplay(positions, replayMinTime, intervals, activeSessionKey);
     const ct = replay.currentTime;
