@@ -46,7 +46,7 @@ function ReplayControls({ isPlaying, currentTime, minTime, maxTime, progress, sp
                 type="range"
                 className={styles.slider}
                 min={0} max={1000}
-                value={Math.round(progress * 100)}
+                value={Math.round(progress * 1000)}
                 onChange={handleSlider}
             />
 
