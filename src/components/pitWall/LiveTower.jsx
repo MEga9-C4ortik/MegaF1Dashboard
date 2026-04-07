@@ -162,7 +162,10 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
     const totalRaceLaps = laps.length > 0
         ? laps.reduce((max, l) => l.lap_number > max ? l.lap_number : max, 0)
         : null;
-    const leaderCurrentLap = getLastLap(laps, latest[0]?.driver_number, currentTime)?.lap_number ?? null;
+    const currentLap = laps.length > 0
+        ? laps.reduce((max, l) => (l.lap_number > max && currentTime)
+            ? l.lap_number : max, 0)
+        : null;
 
     const driversMap = {};
     drivers.forEach(d => { driversMap[d.driver_number] = d; });
@@ -193,7 +196,7 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
             </div>
 
             <div className={styles.lapCounter}>
-                LAP {leaderCurrentLap ?? 0} / {totalRaceLaps ?? '—'}
+                LAP {currentLap ?? 0} / {totalRaceLaps ?? '—'}
             </div>
 
             <div className={styles.towerBody}>
