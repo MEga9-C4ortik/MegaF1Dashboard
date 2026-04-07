@@ -9,7 +9,7 @@ function DriverDot({ dot, animate }) {
 
     return (
         <g key={dot.driver_number}>
-            <circle cx={dot.px} cy={dot.py} r={16} fill={color} opacity={hasColor ? 0.12 : 0.06}
+            <circle cx={dot.px} cy={dot.py} r={12} fill={color} opacity={hasColor ? 0.12 : 0.06}
                 style={{ transition: animate ? 'cx 0.5s linear, cy 0.5s linear' : 'none' }
             } />
             <circle cx={dot.px} cy={dot.py} r={8} fill={color} stroke="#050505" strokeWidth={2}
