@@ -162,11 +162,11 @@ function LiveTower({ positions, drivers, stints, intervals, laps, pits, currentT
     const totalRaceLaps = laps.length > 0
         ? laps.reduce((max, l) => l.lap_number > max ? l.lap_number : max, 0)
         : null;
-    const currentLap = laps.length > 0
-        ? laps
-            .filter(l => !currentTime || (l.date_start && new Date(l.date_start) <= currentTime))
-            .reduce((a, b) => b.lap_number > a.lap_number ? b : a)
-            ?.lap_number
+    const filteredLaps = laps.filter(l =>
+        !currentTime || (l.date_start && new Date(l.date_start) <= currentTime)
+    );
+    const currentLap = filteredLaps.length > 0
+        ? filteredLaps.reduce((a, b) => b.lap_number > a.lap_number ? b : a).lap_number
         : null;
 
     const driversMap = {};
