@@ -71,7 +71,17 @@ function getLastLap(laps, driverNumber, currentTime) {
 }
 
 function getBestLap(laps, driverNumber, currentTime) {
-    let driverLaps = getLastLap(laps, driverNumber, currentTime);
+    let driverLaps = laps.filter(
+        l => l.driver_number === driverNumber && l.lap_duration != null
+    );
+    if (currentTime) {
+        const ct = currentTime.getTime();
+        driverLaps = driverLaps.filter(l =>
+            l.date_start &&
+            new Date(l.date_start).getTime() + l.lap_duration * 1000 <= ct
+        );
+    }
+    if (!driverLaps.length) return null;
     return driverLaps.reduce((best, cur) =>
         cur.lap_duration < best.lap_duration ? cur : best
     );
