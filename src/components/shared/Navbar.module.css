@@ -27,7 +27,7 @@
 .title {
     font-size: 40px;
     color: #e10600;
-    font-weight: 700;
+    font-weight: 600;
     letter-spacing: 1px;
     text-transform: uppercase;
 }
@@ -194,6 +194,14 @@
         display: none;
     }
 
+    .left {
+        min-width: auto;
+    }
+
+    .right {
+        min-width: 0;
+    }
+
     .title {
         font-size: 22px;
     }
@@ -204,7 +212,6 @@
 
     .burger {
         display: flex;
-
     }
 
     .yearSelect{
@@ -252,5 +259,9 @@
     .mobileLink:hover {
         color: #fff;
         background: #151515;
+    }
+
+    .collapseBtn {
+        font-size: 14px;
     }
 }
