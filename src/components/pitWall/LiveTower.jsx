@@ -59,21 +59,19 @@ function getLastLap(laps, driverNumber, currentTime) {
     let driverLaps = laps.filter(
         l => l.driver_number === driverNumber && l.lap_duration != null
     );
-    driverLaps = driverLaps.filter(l =>
-        !currentTime || (l.date_start && new Date(l.date_start) <= currentTime)
-    );
+    if (currentTime) {
+        const ct = currentTime.getTime();
+        driverLaps = driverLaps.filter(l =>
+            l.date_start &&
+            new Date(l.date_start).getTime() + l.lap_duration * 1000 <= ct
+        );
+    }
     if (!driverLaps.length) return null;
     return driverLaps.reduce((a, b) => b.lap_number > a.lap_number ? b : a);
 }
 
 function getBestLap(laps, driverNumber, currentTime) {
-    let driverLaps = laps.filter(
-        l => l.driver_number === driverNumber && l.lap_duration != null
-    );
-    driverLaps = driverLaps.filter(l =>
-        !currentTime || (l.date_start && new Date(l.date_start) <= currentTime)
-    );
-    if (!driverLaps.length) return null;
+    let driverLaps = getLastLap(laps, driverNumber, currentTime);
     return driverLaps.reduce((best, cur) =>
         cur.lap_duration < best.lap_duration ? cur : best
     );
@@ -81,11 +79,17 @@ function getBestLap(laps, driverNumber, currentTime) {
 
 function getSessionBestLapTime(laps, currentTime) {
     let validLaps = laps.filter(l => l.lap_duration != null);
-    validLaps = validLaps.filter(l =>
-        !currentTime || (l.date_start && new Date(l.date_start) <= currentTime)
-    );
+    if (currentTime) {
+        const ct = currentTime.getTime();
+        validLaps = validLaps.filter(l =>
+            l.date_start &&
+            new Date(l.date_start).getTime() + l.lap_duration * 1000 <= ct
+        );
+    }
     if (!validLaps.length) return null;
-    return validLaps.reduce((min, cur) => cur.lap_duration < min ? cur.lap_duration : min, +Infinity);
+    return validLaps.reduce((min, cur) =>
+        cur.lap_duration < min ? cur.lap_duration : min, +Infinity
+    );
 }
 
 function getActivePit(pits, driverNumber, currentTime) {
