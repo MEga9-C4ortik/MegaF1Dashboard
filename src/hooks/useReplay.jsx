@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 
 const TICK_MS = 500;
 
-function useReplay(allPositions, minTime, allIntervals = [], sessionKey = null) {
+function useReplay(allPositions, allIntervals = [], laps = [], sessionKey = null) {
     const [isPlaying, setIsPlaying]     = useState(false);
     const [speed, setSpeed]             = useState(1);
     const [currentTime, setCurrentTime] = useState(null);
@@ -12,11 +12,28 @@ function useReplay(allPositions, minTime, allIntervals = [], sessionKey = null) 
 
     useEffect(() => { speedRef.current = speed; }, [speed]);
 
-    const maxTime = useMemo(() => {
-        if (!allPositions || allPositions.length === 0) return null;
-        return new Date(allPositions.reduce((max, p) =>
-            p._ts > max ? p._ts : max, -Infinity));
+    const minTime = useMemo(() => {
+        const lap1Starts = laps
+            .filter(l => l.lap_number === 1 && l.date_start != null)
+            .map(l => new Date(l.date_start).getTime());
+
+        if (lap1Starts.length > 0)
+            return new Date(Math.min(...lap1Starts));
+
+        if (!allPositions?.length) return null;
+        const minTs = allPositions.reduce((min, p) =>
+            p._ts < min ? p._ts : min, Infinity);
+        return minTs === Infinity ? null : new Date(minTs);
     }, [allPositions]);
+
+    const maxTime = useMemo(() => {
+        if (!allPositions?.length) return null;
+        const maxPos = allPositions.reduce((max, p) =>
+            p._ts > max ? p._ts : max, -Infinity);
+        const maxInt = allIntervals.reduce((max, i) =>
+            i._ts > max ? i._ts : max, -Infinity);
+        return new Date(Math.max(maxPos, maxInt));
+    }, [allPositions, allIntervals]);
 
     useEffect(() => {
         setCurrentTime(null);

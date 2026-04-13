@@ -195,11 +195,13 @@
     }
 
     .left {
-        min-width: auto;
+        flex: 1;
+        min-width: 0;
     }
 
     .right {
         min-width: 0;
+        flex-shrink: 0;
     }
 
     .title {

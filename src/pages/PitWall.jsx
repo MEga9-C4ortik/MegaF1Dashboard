@@ -33,13 +33,7 @@ function PitWall({ year }) {
         weather, loading: dataLoading,
     } = useLiveData(activeSessionKey);
 
-    const replayMinTime = useMemo(() => {
-        if (!positions.length) return null;
-        const minTs = positions.reduce((min, p) => p._ts < min ? p._ts : min, Infinity);
-        return minTs === Infinity ? null : new Date(minTs);
-    }, [positions]);
-
-    const replay = useReplay(positions, replayMinTime, intervals, activeSessionKey);
+    const replay = useReplay(positions, intervals, laps, activeSessionKey);
     const ct = replay.currentTime;
 
     const displayPositions = (positions.length > 0) ? replay.replayPositions : [];
