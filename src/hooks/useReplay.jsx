@@ -24,7 +24,7 @@ function useReplay(allPositions, allIntervals = [], laps = [], sessionKey = null
         const minTs = allPositions.reduce((min, p) =>
             p._ts < min ? p._ts : min, Infinity);
         return minTs === Infinity ? null : new Date(minTs);
-    }, [allPositions]);
+    }, [allPositions, laps]);
 
     const maxTime = useMemo(() => {
         if (!allPositions?.length) return null;
