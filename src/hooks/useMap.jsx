@@ -164,7 +164,7 @@ function useMap(sessionKey, drivers, replayTime = null) {
 
         load();
         return () => { cancelled = true; };
-    }, [sessionKey, firstDriverNum]);
+    }, [sessionKey, firstDriverNum, drivers]);
 
     const driverDots = useMemo(() => {
         if (!normParams || !allLocations.length || !replayTime) return [];
