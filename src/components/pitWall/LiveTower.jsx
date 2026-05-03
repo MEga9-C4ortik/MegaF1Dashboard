@@ -143,7 +143,9 @@ function PitTimer({ pit, currentTime }) {
     const [elapsed, setElapsed] = useState(0);
 
     const inT    = pit?.date ? new Date(pit.date).getTime() : null;
-    const isDone = pit?.pit_duration != null;
+    const isDone = pit?.pit_duration != null
+        ? currentTime instanceof Date ? currentTime.getTime() : currentTime > inT + pit.pit_duration * 1000
+        : false;
 
     useEffect(() => {
         if (!inT) return;
